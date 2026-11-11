@@ -1439,7 +1439,7 @@
                                         local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://shimo.im/docs/rGrd8pY8xWkt6ryW#anchor-RnU9" />
                         <local:MyButton Text="PCL 分发有限许可" Width="170" Padding="13,0" Margin="0,0,20,0" 
                                         local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://shimo.im/docs/rGrd8pY8xWkt6ryW#anchor-X0bo" />
-                        <local:MyButton Text="开源代码" Width="140" Padding="13,0" local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/Hex-Dragon/PCL2" />
+                        <local:MyButton Text="开源代码" Width="140" Padding="13,0" local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/FoxesLauncher/FoxesLauncher" />
                     </StackPanel>
                 </StackPanel>
             </local:MyCard>

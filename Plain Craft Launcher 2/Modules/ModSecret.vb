@@ -52,13 +52,8 @@ Friend Module ModSecret
     Public ColorBg0 As New MyColor(150, 192, 249)
     Public ColorBg1 As New MyColor(190, Color7)
     Public ColorGray1 As New MyColor(64, 64, 64)
-    Public ColorGray2 As New MyColor(115, 115, 115)
-    Public ColorGray3 As New MyColor(140, 140, 140)
     Public ColorGray4 As New MyColor(166, 166, 166)
     Public ColorGray5 As New MyColor(204, 204, 204)
-    Public ColorGray6 As New MyColor(235, 235, 235)
-    Public ColorGray7 As New MyColor(240, 240, 240)
-    Public ColorGray8 As New MyColor(245, 245, 245)
     Public ColorSemiTransparent As New MyColor(1, Color8)
 
     Public ThemeNow As Integer = -1

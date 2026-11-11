@@ -1477,19 +1477,6 @@ OnLoaded:
         Dim c = Integer.Parse(Uuid(23), Globalization.NumberStyles.AllowHexSpecifier)
         Dim d = Integer.Parse(Uuid(31), Globalization.NumberStyles.AllowHexSpecifier)
         Return If((a Xor b Xor c Xor d) Mod 2, "Alex", "Steve")
-        'Math.floorMod(uuid.hashCode(), 18)
-
-        'Public Function hashCode(ByVal str As String) As Integer
-        'Dim hash As Integer = 0
-        'Dim n As Integer = str.Length
-        'If n = 0 Then
-        '    Return hash
-        'End If
-        'For i As Integer = 0 To n - 1
-        '    hash = hash + Asc(str(i)) * (1 << (n - i - 1))
-        'Next
-        'Return hash
-        'End Function
     End Function
 
 #End Region

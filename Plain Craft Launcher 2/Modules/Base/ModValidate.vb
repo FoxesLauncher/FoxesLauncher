@@ -41,19 +41,6 @@ Public Class ValidateNullable
 End Class
 
 ''' <summary>
-''' 不能为 Nothing 或空字符串（不包括全空格检查）。
-''' </summary>
-Public Class ValidateNullOrEmpty
-    Inherits Validate
-    Public Sub New()
-    End Sub
-    Public Overrides Function Validate(Str As String) As String
-        If IsNothing(Str) OrElse String.IsNullOrEmpty(Str) Then Return "输入内容不能为空！"
-        Return ""
-    End Function
-End Class
-
-''' <summary>
 ''' 不能为 Nothing 或空字符串（包括全空格检查）。
 ''' </summary>
 Public Class ValidateNullOrWhiteSpace
@@ -77,25 +64,6 @@ Public Class ValidateFunc
     End Sub
     Public Overrides Function Validate(Str As String) As String
         Return _func(Str)
-    End Function
-End Class
-
-''' <summary>
-''' 必须满足正则表达式。
-''' </summary>
-Public Class ValidateRegex
-    Inherits Validate
-    Public Property Regex As String
-    Public Property ErrorDescription As String = "正则检查失败！"
-    Public Sub New()
-    End Sub '用于 XAML 初始化
-    Public Sub New(Regex As String, Optional ErrorDescription As String = "正则检查失败！")
-        Me.Regex = Regex
-        Me.ErrorDescription = ErrorDescription
-    End Sub
-    Public Overrides Function Validate(Str As String) As String
-        If Not Str.RegexCheck(Regex) Then Return ErrorDescription
-        Return ""
     End Function
 End Class
 
@@ -306,63 +274,6 @@ Public Class ValidateFolderName
             Return ""
         Catch ex As Exception
             Logger.Warn(ex, "检查文件夹名出错")
-            Return "错误：" & ex.Message
-        End Try
-    End Function
-End Class
-
-''' <summary>
-''' 对文件名的粗略的特化检测。
-''' </summary>
-Public Class ValidateFileName
-    Inherits Validate
-    Public Property Name As String
-    Public Property UseMinecraftCharCheck As Boolean = True
-    Public Property IgnoreCase As Boolean = True
-    Public Property ParentFolder As String = Nothing
-    Public Property RequireParentFolderExists = True
-    Public Sub New()
-    End Sub
-    Public Sub New(Name As String, Optional UseMinecraftCharCheck As Boolean = True, Optional IgnoreCase As Boolean = True)
-        Me.Name = Name
-        Me.IgnoreCase = IgnoreCase
-        Me.UseMinecraftCharCheck = UseMinecraftCharCheck
-    End Sub
-    Public Overrides Function Validate(Str As String) As String
-        Try
-            '检查是否为空
-            Dim LengthCheck As String = New ValidateNullOrWhiteSpace().Validate(Str)
-            If Not LengthCheck = "" Then Return LengthCheck
-            '检查空格
-            If Str.StartsWithF(" ") Then Return "文件名不能以空格开头！"
-            If Str.EndsWithF(" ") Then Return "文件名不能以空格结尾！"
-            '检查长度
-            LengthCheck = New ValidateLength(1, 253).Validate(Str & If(ParentFolder, ""))
-            If LengthCheck <> "" Then Return LengthCheck
-            '检查尾部小数点
-            If Str.EndsWithF(".") Then Return "文件名不能以小数点结尾！"
-            '检查特殊字符
-            Dim CharactCheck As String = New ValidateExcept(Path.GetInvalidFileNameChars() & If(UseMinecraftCharCheck, "!;", ""), "文件名不可包含 % 字符！").Validate(Str)
-            If CharactCheck <> "" Then Return CharactCheck
-            '检查特殊字符串
-            Dim InvalidStrCheck As String = New ValidateExceptSame({"CON", "PRN", "AUX", "CLOCK$", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"}, "文件名不可为 %！", True).Validate(Str)
-            If InvalidStrCheck <> "" Then Return InvalidStrCheck
-            '检查 NTFS 8.3 文件名（#4505）
-            If Str.RegexCheck(".{2,}~\d") Then Return "文件名不能包含这一特殊格式！"
-            '检查文件重名
-            If ParentFolder IsNot Nothing Then
-                Dim DirInfo = DirectoryUtils.GetInfo(ParentFolder)
-                If DirInfo.Exists Then
-                    Dim SameNameCheck = New ValidateExceptSame(DirInfo.EnumerateFiles("*").Select(Function(f) f.Name),
-                                                               "不可与现有文件重名！", IgnoreCase).Validate(Str)
-                    If Not SameNameCheck = "" Then Return SameNameCheck
-                Else
-                    If RequireParentFolderExists Then Return $"父文件夹不存在：{ParentFolder}"
-                End If
-            End If
-            Return ""
-        Catch ex As Exception
-            Logger.Warn(ex, "检查文件名出错")
             Return "错误：" & ex.Message
         End Try
     End Function

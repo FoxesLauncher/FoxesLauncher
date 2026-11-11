@@ -962,10 +962,6 @@ Public Module ModDownload
         ''' 获取到的数据。
         ''' </summary>
         Public Value As List(Of DlLiteLoaderListEntry)
-        ''' <summary>
-        ''' 官方源的失败原因。若没有则为 Nothing。
-        ''' </summary>
-        Public OfficialError As Exception
     End Structure
 
     Public Class DlLiteLoaderListEntry

@@ -152,13 +152,6 @@ Public Class MyTextBox
         End If
     End Sub
 
-    ''' <summary>
-    ''' 强制显示结果为正常，类似尚未输入过文本的状态。不影响实际的检查结果。
-    ''' </summary>
-    Public Sub ForceShowAsSuccess()
-        IsTextChanged = False
-        ChangeValidateResult(IsValidated, True)
-    End Sub
     Private ShownValidateResult As ValidateState = ValidateState.NotInited
     Private Sub ChangeValidateResult(IsSuccessful As Boolean, IsLoaded As Boolean)
         If IsLoaded AndAlso AniControlEnabled = 0 AndAlso labWrong IsNot Nothing Then

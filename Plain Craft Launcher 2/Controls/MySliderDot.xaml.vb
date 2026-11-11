@@ -88,7 +88,6 @@ Public Class MySliderDot
         If Not NewValue = Value Then Value = NewValue
     End Sub
     Public Sub DragStop()
-        RefreshColor()
         AniStart({
                  AaScaleTransform(ShapeDot, 2.3 - CType(ShapeDot.RenderTransform, ScaleTransform).ScaleX, 200,, New AniEaseOutFluent)
             }, "MySlider Scale " & Uuid)
@@ -99,71 +98,5 @@ Public Class MySliderDot
         End If
     End Sub
 
-    '指向动画
-
-    Private Sub RefreshColor() Handles Me.IsEnabledChanged, Me.MouseEnter, Me.MouseLeave
-        'Try
-
-        '    '判断当前颜色
-        '    Dim ColorName As String
-        '    Dim AnimationTime As Integer
-        '    If IsEnabled Then
-        '        If IsMouseOver OrElse (Not IsNothing(DragControl) AndAlso DragControl.Equals(Me)) Then
-        '            ColorName = "ColorBrush3"
-        '            AnimationTime = 100
-        '        Else
-        '            ColorName = "ColorBrush1"
-        '            AnimationTime = 200
-        '        End If
-        '    Else
-        '        ColorName = "ColorBrushGray4"
-        '        AnimationTime = 200
-        '    End If
-        '    '触发颜色动画
-        '    If IsLoaded AndAlso AniControlEnabled = 0 Then '防止默认属性变更触发动画
-        '        '有动画
-        '        AniStart({AaColor(Me, BorderBrushProperty, ColorName, AnimationTime)}, "MySlider Color " & Uuid)
-        '    Else
-        '        '无动画
-        '        AniStop("MySlider Color " & Uuid)
-        '        SetResourceReference(BorderBrushProperty, ColorName)
-        '    End If
-
-        'Catch ex As Exception
-        '    Log(ex, "滑动条颜色改变出错")
-        'End Try
-    End Sub
-
-    '按键改变
-
-    'Public Property ValueByKey As UInteger = 1
-    'Private Sub MySlider_MouseEnter() Handles Me.MouseEnter
-    '    Focus() '确保按键能改变值
-    'End Sub
-    'Private Sub MySlider_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-    '    '拒绝一边拖动一边用按键改变
-    '    If ReferenceEquals(Me, DragControl) Then Exit Sub
-    '    '改变值
-    '    If e.Key = Key.Left Then
-    '        ChangeByKey = True
-    '        Value -= ValueByKey
-    '        ChangeByKey = False
-    '        e.Handled = True
-    '    ElseIf e.Key = Key.Right Then
-    '        ChangeByKey = True
-    '        Value += ValueByKey
-    '        ChangeByKey = False
-    '        e.Handled = True
-    '    Else
-    '        Exit Sub
-    '    End If
-    '    '更新 Popup
-    '    If GetHintText IsNot Nothing Then
-    '        TextHint.Text = GetHintText.DynamicInvoke(Value)
-    '        Popup.IsOpen = True
-    '        AniStop("MySlider KeyPopup " & Uuid)
-    '        AniStart(AaCode(Sub() Popup.IsOpen = False, 700 * AniSpeed), "MySlider KeyPopup " & Uuid)
-    '    End If
-    'End Sub
 
 End Class

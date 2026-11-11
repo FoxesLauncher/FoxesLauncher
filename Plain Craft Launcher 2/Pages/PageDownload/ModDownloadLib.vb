@@ -1577,40 +1577,6 @@ Retry:
 
 #Region "Fabric 下载"
 
-    Public Sub McDownloadFabricLoaderSave(DownloadInfo As JObject)
-        Try
-            Dim Url As String = DownloadInfo("url").ToString
-            Dim FileName As String = PathUtils.GetLastPart(Url)
-            Dim Version As String = PathUtils.GetLastPart(DownloadInfo("version").ToString)
-            Dim Target As String = Dialogs.SaveFile("选择保存位置", FileName, filter:={("jar", "Fabric 安装器")})
-            If Target Is Nothing Then Return
-
-            '重复任务检查
-            For Each OngoingLoader In LoaderTaskbar.ToList()
-                If OngoingLoader.Name <> $"Fabric {Version} 安装器下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Red)
-                Return
-            Next
-
-            '构造步骤加载器
-            Dim Loaders As New List(Of LoaderBase)
-            '下载
-            'BMCLAPI 不支持 Fabric Installer 下载
-            Dim Address As New List(Of String)
-            Address.Add(Url)
-            Loaders.Add(New LoaderDownload("下载主文件", New List(Of NetFile) From {New NetFile(Address.ToArray, Target, New FileChecker With {.MinSize = 1024 * 64})}) With {.ProgressWeight = 15})
-            '启动
-            Dim Loader As New LoaderCombo(Of JObject)("Fabric " & Version & " 安装器下载", Loaders) With {.OnStateChanged = AddressOf LoaderStateChangedHintOnly}
-            Loader.Start(DownloadInfo)
-            LoaderTaskbarAdd(Loader)
-            FrmMain.BtnExtraDownload.ShowRefresh()
-            FrmMain.BtnExtraDownload.Ribble()
-
-        Catch ex As Exception
-            Logger.Error(ex, "开始 Fabric 安装器下载失败")
-        End Try
-    End Sub
-
     ''' <summary>
     ''' 获取下载某个 Fabric 版本的加载器列表。
     ''' 这不会补全所需的支持库文件，需要后续手动补全支持库。

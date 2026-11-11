@@ -342,3 +342,48 @@ ASALocalRun/
 healthchecksdb
 
 MaskFiles/
+
+# --------------------------------------------------------------------------------------------
+
+## FoxesLauncher 项目专用
+
+# 编辑器、IDE 与用户配置
+.vsconfig
+.vscode/
+*.vbproj.user
+*.csproj.user
+*.vbproj.bak
+*.csproj.bak
+*.sln.docstates
+*.userprefs
+
+# 构建、发布与测试产物
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Tt]est[Rr]esult*/
+*.binlog
+*.log
+*.pdb
+*.tmp
+*.cache
+*.nupkg
+
+# 本地运行目录
+/.minecraft/
+/PCL/
+
+# 发布包与官方更新补丁
+/最新正式版.zip
+/patches/
+
+# 临时文件与系统文件
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -403,28 +403,6 @@ NextInner:
     End Structure
 
     ''' <summary>
-    ''' 根据登录信息获取玩家的 MC 用户名。如果无法获取则返回 Nothing。
-    ''' </summary>
-    Public Function McLoginName() As String
-        '根据当前登录方式优先返回
-        Select Case Settings.Get(Of McLoginType)("LoginType")
-            Case McLoginType.Ms
-                If Settings.Get(Of String)("CacheMsV2Name") <> "" Then Return Settings.Get(Of String)("CacheMsV2Name")
-            Case McLoginType.Legacy
-                If Settings.Get(Of String)("LoginLegacyName") <> "" Then Return Settings.Get(Of String)("LoginLegacyName").ToString.BeforeFirst("¨")
-            Case McLoginType.Nide
-                If Settings.Get(Of String)("CacheNideName") <> "" Then Return Settings.Get(Of String)("CacheNideName")
-            Case McLoginType.Auth
-                If Settings.Get(Of String)("CacheAuthName") <> "" Then Return Settings.Get(Of String)("CacheAuthName")
-        End Select
-        '查找所有可能的项
-        If Settings.Get(Of String)("CacheMsV2Name") <> "" Then Return Settings.Get(Of String)("CacheMsV2Name")
-        If Settings.Get(Of String)("CacheNideName") <> "" Then Return Settings.Get(Of String)("CacheNideName")
-        If Settings.Get(Of String)("CacheAuthName") <> "" Then Return Settings.Get(Of String)("CacheAuthName")
-        If Settings.Get(Of String)("LoginLegacyName") <> "" Then Return Settings.Get(Of String)("LoginLegacyName").ToString.BeforeFirst("¨")
-        Return Nothing
-    End Function
-    ''' <summary>
     ''' 当前是否可以进行登录。若不可以则会返回错误原因。
     ''' </summary>
     Public Function McLoginAble() As String

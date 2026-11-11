@@ -139,11 +139,6 @@ Public Module ModAnimation
         ''' <remarks></remarks>
         Scale
         ''' <summary>
-        ''' 文字一个个出现。
-        ''' </summary>
-        ''' <remarks></remarks>
-        TextAppear
-        ''' <summary>
         ''' 执行代码。
         ''' </summary>
         ''' <remarks></remarks>
@@ -166,10 +161,6 @@ Public Module ModAnimation
         Width
         Height
         Opacity
-        Value
-        Radius
-        BorderThickness
-        StrokeThickness
         TranslateX
         TranslateY
         [Double]
@@ -256,64 +247,6 @@ Public Module ModAnimation
     ''' <remarks></remarks>
     Public Function AaOpacity(Obj As Object, Value As Double, Optional Time As Integer = 400, Optional Delay As Integer = 0, Optional Ease As AniEase = Nothing, Optional After As Boolean = False) As AniData
         Return New AniData With {.TypeMain = AniType.Number, .TypeSub = AniTypeSub.Opacity,
-                                   .TimeTotal = Time, .Ease = If(Ease, New AniEaseLinear), .Obj = Obj, .Value = Value, .IsAfter = After, .TimeFinished = -Delay}
-    End Function
-    ''' <summary>
-    ''' 改变对象的Value属性的动画。
-    ''' </summary>
-    ''' <param name="Obj">动画的对象。</param>
-    ''' <param name="Value">Value属性改变的值。</param>
-    ''' <param name="Time">动画长度（毫秒）。</param>
-    ''' <param name="Delay">动画延迟执行的时间（毫秒）。</param>
-    ''' <param name="Ease">插值器类型。</param>
-    ''' <param name="After">是否等到以前的动画完成后才继续本动画。</param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Function AaValue(Obj As Object, Value As Double, Optional Time As Integer = 400, Optional Delay As Integer = 0, Optional Ease As AniEase = Nothing, Optional After As Boolean = False) As AniData
-        Return New AniData With {.TypeMain = AniType.Number, .TypeSub = AniTypeSub.Value,
-                                   .TimeTotal = Time, .Ease = If(Ease, New AniEaseLinear), .Obj = Obj, .Value = Value, .IsAfter = After, .TimeFinished = -Delay}
-    End Function
-    ''' <summary>
-    ''' 改变对象的Radius属性的动画。
-    ''' </summary>
-    ''' <param name="Obj">动画的对象。</param>
-    ''' <param name="Value">Radius属性改变的值。</param>
-    ''' <param name="Time">动画长度（毫秒）。</param>
-    ''' <param name="Delay">动画延迟执行的时间（毫秒）。</param>
-    ''' <param name="Ease">插值器类型。</param>
-    ''' <param name="After">是否等到以前的动画完成后才继续本动画。</param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Function AaRadius(Obj As Object, Value As Double, Optional Time As Integer = 400, Optional Delay As Integer = 0, Optional Ease As AniEase = Nothing, Optional After As Boolean = False) As AniData
-        Return New AniData With {.TypeMain = AniType.Number, .TypeSub = AniTypeSub.Radius,
-                                   .TimeTotal = Time, .Ease = If(Ease, New AniEaseLinear), .Obj = Obj, .Value = Value, .IsAfter = After, .TimeFinished = -Delay}
-    End Function
-    ''' <summary>
-    ''' 改变对象的BorderThickness属性的动画。
-    ''' </summary>
-    ''' <param name="Obj">动画的对象。</param>
-    ''' <param name="Value">BorderThickness属性改变的值。</param>
-    ''' <param name="Time">动画长度（毫秒）。</param>
-    ''' <param name="Delay">动画延迟执行的时间（毫秒）。</param>
-    ''' <param name="Ease">插值器类型。</param>
-    ''' <param name="After">是否等到以前的动画完成后才继续本动画。</param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Function AaBorderThickness(Obj As Object, Value As Double, Optional Time As Integer = 400, Optional Delay As Integer = 0, Optional Ease As AniEase = Nothing, Optional After As Boolean = False) As AniData
-        Return New AniData With {.TypeMain = AniType.Number, .TypeSub = AniTypeSub.BorderThickness,
-                                   .TimeTotal = Time, .Ease = If(Ease, New AniEaseLinear), .Obj = Obj, .Value = Value, .IsAfter = After, .TimeFinished = -Delay}
-    End Function
-    ''' <summary>
-    ''' 改变对象的StrokeThickness属性的动画。
-    ''' </summary>
-    ''' <param name="Obj">动画的对象。</param>
-    ''' <param name="Value">StrokeThickness属性改变的值。</param>
-    ''' <param name="Time">动画长度（毫秒）。</param>
-    ''' <param name="Delay">动画延迟执行的时间（毫秒）。</param>
-    ''' <param name="Ease">插值器类型。</param>
-    ''' <param name="After">是否等到以前的动画完成后才继续本动画。</param>
-    Public Function AaStrokeThickness(Obj As Object, Value As Double, Optional Time As Integer = 400, Optional Delay As Integer = 0, Optional Ease As AniEase = Nothing, Optional After As Boolean = False) As AniData
-        Return New AniData With {.TypeMain = AniType.Number, .TypeSub = AniTypeSub.StrokeThickness,
                                    .TimeTotal = Time, .Ease = If(Ease, New AniEaseLinear), .Obj = Obj, .Value = Value, .IsAfter = After, .TimeFinished = -Delay}
     End Function
     ''' <summary>
@@ -418,24 +351,6 @@ Public Module ModAnimation
         Return New AniData With {.TypeMain = AniType.Scale, .TimeTotal = Time, .Ease = If(Ease, New AniEaseLinear), .Obj = Obj, .Value = ChangeRect, .IsAfter = After, .TimeFinished = -Delay}
     End Function
 
-    'TextAppear
-
-    ''' <summary>
-    ''' 让一段文字一个个字出现或消失的动画。
-    ''' </summary>
-    ''' <param name="Obj">动画的对象。必须是Label或TextBlock。</param>
-    ''' <param name="Hide">是否为一个个字隐藏。默认为False（一个个字出现）。这些字必须已经存在了。</param>
-    ''' <param name="TimePerText">是否采用根据文本长度决定时间的方式。</param>
-    ''' <param name="Time">动画长度（毫秒）。若TimePerText为True，这代表每个字所占据的时间。</param>
-    ''' <param name="Delay">动画延迟执行的时间（毫秒）。</param>
-    ''' <param name="After">是否等到以前的动画完成后才继续本动画。</param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Function AaTextAppear(Obj As Object, Optional Hide As Boolean = False, Optional TimePerText As Boolean = True, Optional Time As Integer = 70, Optional Delay As Integer = 0, Optional Ease As AniEase = Nothing, Optional After As Boolean = False) As AniData
-        'Are we cool yet？
-        Return New AniData With {.TypeMain = AniType.TextAppear, .Ease = If(Ease, New AniEaseLinear), .TimeTotal = If(TimePerText, Time * If(TypeOf Obj Is TextBlock, Obj.Text, Obj.Context.ToString).ToString.Length, Time), .Obj = Obj, .Value = {If(TypeOf Obj Is TextBlock, Obj.Text, Obj.Context.ToString), Hide}, .IsAfter = After, .TimeFinished = -Delay}
-    End Function
-
     'Code
 
     ''' <summary>
@@ -512,23 +427,6 @@ Public Module ModAnimation
     Public Function AaTranslateY(Obj As Object, Value As Double, Optional Time As Integer = 400, Optional Delay As Integer = 0, Optional Ease As AniEase = Nothing, Optional After As Boolean = False) As AniData
         Return New AniData With {.TypeMain = AniType.Number, .TypeSub = AniTypeSub.TranslateY,
                                    .TimeTotal = Time, .Ease = If(Ease, New AniEaseLinear), .Obj = Obj, .Value = Value, .IsAfter = After, .TimeFinished = -Delay}
-    End Function
-
-    '特殊
-
-    ''' <summary>
-    ''' 将一个StackPanel中的各个项目依次显示。
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Function AaStack(Stack As StackPanel, Optional Time As Integer = 100, Optional Delay As Integer = 25) As List(Of AniData)
-        Dim Result = New List(Of AniData)
-        Dim AniDelay As Integer = 0
-        For Each Item In Stack.Children
-            Item.Opacity = 0
-            Result.Add(AaOpacity(Item, 1, Time, AniDelay))
-            AniDelay += Delay
-        Next
-        Return Result
     End Function
 
 #End Region
@@ -683,49 +581,8 @@ Public Module ModAnimation
         End Function
     End Class
 
-    'Car / 平滑-回弹
-    ''' <summary>
-    ''' 回弹开始，短平滑结束。
-    ''' </summary>
-    Public Class AniEaseInCar
-        Inherits AniEase
-        Private Ease As AniEaseInout
-        Public Sub New(Optional Middle As Double = 0.7, Optional Power As AniEasePower = AniEasePower.Middle)
-            Ease = New AniEaseInout(New AniEaseInBack(Power), New AniEaseOutFluent(Power), Middle)
-        End Sub
-        Public Overrides Function GetValue(t As Double) As Double
-            Return Ease.GetValue(t)
-        End Function
-    End Class
-    ''' <summary>
-    ''' 短平滑开始，回弹结束。
-    ''' </summary>
-    Public Class AniEaseOutCar
-        Inherits AniEase
-        Private Ease As AniEaseInout
-        Public Sub New(Optional Middle As Double = 0.3, Optional Power As AniEasePower = AniEasePower.Middle)
-            Ease = New AniEaseInout(New AniEaseInFluent(Power), New AniEaseOutBack(Power), Middle)
-        End Sub
-        Public Overrides Function GetValue(t As Double) As Double
-            Return Ease.GetValue(t)
-        End Function
-    End Class
 
     'Elastic / 弹簧
-    ''' <summary>
-    ''' 弹簧开始。约在 60% 到达最小值。
-    ''' </summary>
-    Public Class AniEaseInElastic
-        Inherits AniEase
-        Private ReadOnly p As Integer '6~9
-        Public Sub New(Optional Power As AniEasePower = AniEasePower.Middle)
-            p = Power + 4
-        End Sub
-        Public Overrides Function GetValue(t As Double) As Double
-            t = t.Clamp(0, 1)
-            Return t ^ ((p - 1) * 0.25) * Math.Cos((p - 3.5) * Math.PI * (1 - t) ^ 1.5)
-        End Function
-    End Class
     ''' <summary>
     ''' 弹簧结束。约在 40% 到达最大值。
     ''' </summary>
@@ -972,14 +829,6 @@ NextAni:
                             Case AniTypeSub.Height
                                 Dim Obj As FrameworkElement = Ani.Obj
                                 Obj.Height = Math.Max(If(Double.IsNaN(Obj.Height), Obj.ActualHeight, Obj.Height) + Delta, 0)
-                            Case AniTypeSub.Value
-                                Ani.Obj.Value += Delta
-                            Case AniTypeSub.Radius
-                                Ani.Obj.Radius += Delta
-                            Case AniTypeSub.StrokeThickness
-                                Ani.Obj.StrokeThickness = Math.Max(Ani.Obj.StrokeThickness + Delta, 0)
-                            Case AniTypeSub.BorderThickness
-                                Ani.Obj.BorderThickness = New Thickness(CType(Ani.Obj.BorderThickness, Thickness).Bottom + Delta)
                             Case AniTypeSub.TranslateX
                                 If IsNothing(Ani.Obj.RenderTransform) OrElse TypeOf Ani.Obj.RenderTransform IsNot TranslateTransform Then Ani.Obj.RenderTransform = New TranslateTransform(0, 0)
                                 CType(Ani.Obj.RenderTransform, TranslateTransform).X += Delta
@@ -1010,27 +859,6 @@ NextAni:
                     Obj.Margin = New Thickness(Obj.Margin.Left + MathUtils.Lerp(0, Ani.Value.Left, Delta), Obj.Margin.Top + MathUtils.Lerp(0, Ani.Value.Top, Delta), Obj.Margin.Right + MathUtils.Lerp(0, Ani.Value.Left, Delta), Obj.Margin.Bottom + MathUtils.Lerp(0, Ani.Value.Top, Delta))
                     Obj.Width = Math.Max(Obj.Width + MathUtils.Lerp(0, Ani.Value.Width, Delta), 0)
                     Obj.Height = Math.Max(Obj.Height + MathUtils.Lerp(0, Ani.Value.Height, Delta), 0)
-
-                Case AniType.TextAppear
-                    Dim Text As String = Ani.Value(0)
-                    Dim TextCount As Integer = If(Ani.Value(1), Text.Length, 0) +
-                                               Math.Round(Text.Length * If(Ani.Value(1), -1, 1) * Ani.Ease.GetDelta(Ani.TimeFinished / Ani.TimeTotal, 0))
-                    Dim NewText As String = Text.Substring(0, TextCount)
-                    '添加乱码
-                    If TextCount < Text.Length Then
-                        Dim NextText As String = Text.Substring(TextCount, 1)
-                        If Convert.ToInt32(Convert.ToChar(NextText)) >= Convert.ToInt32(Convert.ToChar(128)) Then
-                            NewText &= Encoding.GetEncoding("GB18030").GetString({RandomInteger(16 + 160, 87 + 160), RandomInteger(1 + 160, 89 + 160)})
-                        Else
-                            NewText &= RandomInteger(0, 85).ConvertRadix(86)
-                        End If
-                    End If
-                    '设置文本
-                    If TypeOf Ani.Obj Is TextBlock Then
-                        Ani.Obj.Text = NewText
-                    Else
-                        Ani.Obj.Context = NewText
-                    End If
 
                 Case AniType.Code
                     Ani.TimeFinished = Ani.TimeTotal

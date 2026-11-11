@@ -405,24 +405,6 @@ Retry:
         Canceled = 6
     End Enum
     ''' <summary>
-    ''' 预下载检查行为。
-    ''' </summary>
-    Public Enum NetPreDownloadBehaviour
-        ''' <summary>
-        ''' 当文件已存在时，显示提示以提醒用户是否继续下载。
-        ''' </summary>
-        HintWhileExists
-        ''' <summary>
-        ''' 当文件已存在或正在下载时，直接退出下载函数执行，不对用户进行提示。
-        ''' </summary>
-        ExitWhileExistsOrDownloading
-        ''' <summary>
-        ''' 不进行已存在检查。
-        ''' </summary>
-        IgnoreCheck
-    End Enum
-
-    ''' <summary>
     ''' 下载线程。
     ''' </summary>
     Public Class NetThread
@@ -1852,17 +1834,6 @@ FinishExCatch:
 #End Region
 
 #Region "端口"
-
-    ''' <summary>
-    ''' 随机获取单个可用的端口。
-    ''' </summary>
-    Public Function FindFreePort() As Integer
-        Dim Listener As New TcpListener(IPAddress.Loopback, 0)
-        Listener.Start()
-        Dim port As Integer = CType(Listener.LocalEndpoint, IPEndPoint).Port
-        Listener.Stop()
-        Return port
-    End Function
 
     ''' <summary>
     ''' 获取当前已被占用的端口列表。
