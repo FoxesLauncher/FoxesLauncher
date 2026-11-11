@@ -280,6 +280,65 @@ Public Class ValidateFolderName
 End Class
 
 ''' <summary>
+''' 对文件名的粗略的特化检测。
+''' </summary>
+Public Class ValidateFileName
+    Inherits Validate
+    Public Property Name As String
+    Public Property UseMinecraftCharCheck As Boolean = True
+    Public Property IgnoreCase As Boolean = True
+    Public Property ParentFolder As String = Nothing
+    Public Property RequireParentFolderExists = True
+    Public Sub New()
+    End Sub
+    Public Sub New(Name As String, Optional UseMinecraftCharCheck As Boolean = True, Optional IgnoreCase As Boolean = True)
+        Me.Name = Name
+        Me.IgnoreCase = IgnoreCase
+        Me.UseMinecraftCharCheck = UseMinecraftCharCheck
+    End Sub
+    Public Overrides Function Validate(Str As String) As String
+        Try
+            '检查是否为空
+            Dim LengthCheck As String = New ValidateNullOrWhiteSpace().Validate(Str)
+            If Not LengthCheck = "" Then Return LengthCheck
+            '检查空格
+            If Str.StartsWithF(" ") Then Return "文件名不能以空格开头！"
+            If Str.EndsWithF(" ") Then Return "文件名不能以空格结尾！"
+            '检查长度
+            LengthCheck = New ValidateLength(1, 253).Validate(Str & If(ParentFolder, ""))
+            If LengthCheck <> "" Then Return LengthCheck
+            '检查尾部小数点
+            If Str.EndsWithF(".") Then Return "文件名不能以小数点结尾！"
+            '检查特殊字符
+            Dim InvalidChars As Char() = Path.GetInvalidFileNameChars()
+            If UseMinecraftCharCheck Then InvalidChars = InvalidChars.Concat("!;".ToCharArray()).ToArray()
+            Dim CharactCheck As String = New ValidateExcept(InvalidChars, "文件名不可包含 % 字符！").Validate(Str)
+            If CharactCheck <> "" Then Return CharactCheck
+            '检查特殊字符串
+            Dim InvalidStrCheck As String = New ValidateExceptSame({"CON", "PRN", "AUX", "CLOCK$", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"}, "文件名不可为 %！", True).Validate(Str)
+            If InvalidStrCheck <> "" Then Return InvalidStrCheck
+            '检查 NTFS 8.3 文件名（#4505）
+            If Str.RegexCheck(".{2,}~\d") Then Return "文件名不能包含这一特殊格式！"
+            '检查文件重名
+            If ParentFolder IsNot Nothing Then
+                Dim DirInfo = DirectoryUtils.GetInfo(ParentFolder)
+                If DirInfo.Exists Then
+                    Dim SameNameCheck = New ValidateExceptSame(DirInfo.EnumerateFiles("*").Select(Function(f) f.Name),
+                                                               "不可与现有文件重名！", IgnoreCase).Validate(Str)
+                    If Not SameNameCheck = "" Then Return SameNameCheck
+                Else
+                    If RequireParentFolderExists Then Return $"父文件夹不存在：{ParentFolder}"
+                End If
+            End If
+            Return ""
+        Catch ex As Exception
+            Logger.Warn(ex, "检查文件名出错")
+            Return "错误：" & ex.Message
+        End Try
+    End Function
+End Class
+
+''' <summary>
 ''' 要求输入一个可用的文件夹路径。
 ''' </summary>
 Public Class ValidateFolderPath
