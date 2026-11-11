@@ -106,6 +106,8 @@ RetryCacheCheck:
             If Environment.OSVersion.Version < New Version(6, 2) Then 'Windows 7 回退（#8519）
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 Or SecurityProtocolType.Tls Or SecurityProtocolType.Tls11 Or SecurityProtocolType.Tls12
             End If
+            '安装全局证书校验，始终拒绝私钥已泄露的 eMudhra 中间证书
+            ModNet.ShouldValidateSslCertificateOnLogin(Settings.Get(Of Boolean)("ToolDownloadCert"))
             '设置初始窗口
             If Settings.Get(Of Boolean)("UiLauncherLogo") Then
                 FrmStart = New SplashScreen("Images\icon.ico")
