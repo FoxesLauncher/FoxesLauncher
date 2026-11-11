@@ -1,4 +1,6 @@
 Imports System.Net.Sockets
+Imports System.Security.Cryptography
+Imports System.Security.Cryptography.X509Certificates
 
 Public Module ModNet
 
@@ -1882,12 +1884,42 @@ FinishExCatch:
     End Function
 
     ''' <summary>
-    ''' 设置是否应当在正版登录时校验 SSL 证书。
+    ''' 已知私钥已泄露、必须拒绝的中间证书（SHA-256 指纹）。
+    ''' 来源：eMudhra 2026 年 10 月中间证书事故，共 8 个中间 CA，含 Sectigo 交叉签名后为 16 张证书。
+    ''' https://emudhra.we-have-a-problem.com/impacted-intermediates.json
+    ''' </summary>
+    Private ReadOnly CompromisedCertificateSha256 As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase) From {
+        "42C4ACCD12C4F59597925E1A08A7A90102608543809308D50EC427E118BA1493",
+        "45A883F349AEDFD5F3A649B5498FFB121712BA8B448F3F2A91DBC5A766FCDDBE",
+        "98B896625C0C230ADEEC3EB2CF6AAD5001ECF9156A68644E82374CE5833BC25B",
+        "5F1DED4DD590AF74631290CF073B122A2AAC6A1FA479778A0BD43579BD832699",
+        "E7568FE6E12331F4FD7DE61DA4C7559D0F8EB192A218D4741A3BA75184333838",
+        "579480AEA166290BD3C643589E795FC0D0E54E86505D180F1DFF99EFD3199512",
+        "0164D7CEAE5BB909C272AF151FF44B1177AE9B47D9424B94F1D9558C30934D19",
+        "62B7F9868263F72F6911FC78CEAF72C1979158B7368BF648683BB2AA39B02E72",
+        "CB6E15165AC802E9B3F993F16C25D41F4E81C21EBDE71AE1B012AC00BF9C7C3F",
+        "7485B51C0ED192878FA1D2F948FB529AE1842CC5086C4B67F7BE5B2039DE9489",
+        "432EC25F0D28DE9006D97BF752F17BBB2CD41F669933FCB072D9A1148D0261F3",
+        "FD9D5C2DBBD4995AB69B8D50C439D9527B00529199C2FD01B2174EB58F07021F",
+        "9E39DE2881273ACC225A149C72BA3E0F51424963669AB633EE1DC7DF5DB067B4",
+        "A496E23AC0CAB8155FC9B117B97EAE368EFCBB9041AEC8804D5A308D2D01C2D8",
+        "4B2460A466F95FD40113BCDCCA2CEB29B3B093921DE45474DA7DF48874C630B1",
+        "84112972B8E59D14560AE7E7119654474AAD119990CF3722BFC1E3B91615E1FD"
+    }
+
+    ''' <summary>
+    ''' 设置 SSL 证书校验，并始终拒绝使用已知泄露中间证书的证书链。
+    ''' 该回调对 HttpWebRequest 与 HttpClientHandler 均生效。
     ''' </summary>
     Public Sub ShouldValidateSslCertificateOnLogin(Enabled As Boolean)
         ServicePointManager.ServerCertificateValidationCallback =
         Function(Sender, Certificate, Chain, Failure)
             Dim Request As HttpWebRequest = TryCast(Sender, HttpWebRequest)
+            '无论其他校验结果如何，只要链中出现已知泄露的中间证书就直接拒绝
+            If IsCompromisedCertificatePresent(Certificate, Chain) Then
+                Logger.Warn($"已拒绝使用私钥泄露证书的 TLS 连接，提供的证书为 {Certificate?.Subject}，URL：{Request?.Address}")
+                Return False
+            End If
             If Failure = Net.Security.SslPolicyErrors.None Then Return True '已通过验证
             '基于 #3018 和 #5879，只在访问正版登录 API 时跳过证书验证
             Logger.Warn($"未通过 SSL 证书验证（{Failure}），提供的证书为 {Certificate?.Subject}，URL：{Request?.Address}")
@@ -1900,5 +1932,33 @@ FinishExCatch:
             End If
         End Function
     End Sub
+
+    ''' <summary>
+    ''' 检查证书本身或其证书链中是否包含已知私钥泄露的中间证书。
+    ''' </summary>
+    Private Function IsCompromisedCertificatePresent(Certificate As X509Certificate, Chain As X509Chain) As Boolean
+        If IsCompromisedCertificate(Certificate) Then Return True
+        If Chain IsNot Nothing Then
+            For Each Element In Chain.ChainElements
+                If Element IsNot Nothing AndAlso IsCompromisedCertificate(Element.Certificate) Then Return True
+            Next
+        End If
+        Return False
+    End Function
+
+    Private Function IsCompromisedCertificate(Certificate As X509Certificate) As Boolean
+        If Certificate Is Nothing Then Return False
+        Try
+            Dim Certificate2 As X509Certificate2 = TryCast(Certificate, X509Certificate2)
+            If Certificate2 Is Nothing Then Certificate2 = New X509Certificate2(Certificate)
+            Using Sha256 As System.Security.Cryptography.SHA256 = System.Security.Cryptography.SHA256.Create()
+                Dim Hash As String = BitConverter.ToString(Sha256.ComputeHash(Certificate2.RawData)).Replace("-", "")
+                Return CompromisedCertificateSha256.Contains(Hash)
+            End Using
+        Catch ex As Exception
+            Logger.Warn(ex, "检查 TLS 证书是否属于已知泄露证书失败")
+            Return False
+        End Try
+    End Function
 
 End Module

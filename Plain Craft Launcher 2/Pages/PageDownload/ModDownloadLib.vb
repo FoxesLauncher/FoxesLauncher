@@ -1578,6 +1578,47 @@ Retry:
 #Region "Fabric 下载"
 
     ''' <summary>
+    ''' 将 Fabric 安装器保存到本地，以便手动安装。
+    ''' </summary>
+    Public Sub McDownloadFabricLoaderSave(DownloadInfo As JObject)
+        Try
+            If DownloadInfo Is Nothing OrElse DownloadInfo("url") Is Nothing Then
+                Hint("未能获取 Fabric 安装器下载地址！", HintType.Red)
+                Return
+            End If
+            Dim Url As String = DownloadInfo("url").ToString
+            Dim FileName As String = PathUtils.GetLastPart(Url)
+            Dim Version As String = DownloadInfo("version").ToString
+            Dim Target As String = Dialogs.SaveFile("选择保存位置", FileName, filter:={("jar", "Fabric 安装器")})
+            If Target Is Nothing Then Return
+
+            '重复任务检查
+            For Each OngoingLoader In LoaderTaskbar.ToList()
+                If OngoingLoader.Name <> $"Fabric {Version} 安装器下载" Then Continue For
+                Hint("该版本正在下载中！", HintType.Red)
+                Return
+            Next
+
+            '构造步骤加载器
+            Dim Loaders As New List(Of LoaderBase)
+            '下载
+            'BMCLAPI 不支持 Fabric Installer 下载
+            Dim Address As New List(Of String)
+            Address.Add(Url)
+            Loaders.Add(New LoaderDownload("下载主文件", New List(Of NetFile) From {New NetFile(Address.ToArray, Target, New FileChecker With {.MinSize = 1024 * 64})}) With {.ProgressWeight = 15})
+            '启动
+            Dim Loader As New LoaderCombo(Of JObject)("Fabric " & Version & " 安装器下载", Loaders) With {.OnStateChanged = AddressOf LoaderStateChangedHintOnly}
+            Loader.Start(DownloadInfo)
+            LoaderTaskbarAdd(Loader)
+            FrmMain.BtnExtraDownload.ShowRefresh()
+            FrmMain.BtnExtraDownload.Ribble()
+
+        Catch ex As Exception
+            Logger.Error(ex, "开始 Fabric 安装器下载失败")
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' 获取下载某个 Fabric 版本的加载器列表。
     ''' 这不会补全所需的支持库文件，需要后续手动补全支持库。
     ''' </summary>
@@ -1615,6 +1656,21 @@ Retry:
                 .Logo = PathImage & "Blocks/Fabric.png"
             }
             AddHandler NewItem.Click, OnClick
+            '保存安装器
+            Dim Installer As JObject = Nothing
+            Try
+                If DlFabricListLoader.State = LoadState.Finished AndAlso DlFabricListLoader.Output.Value IsNot Nothing Then
+                    Dim Installers = DlFabricListLoader.Output.Value("installer")
+                    If Installers IsNot Nothing AndAlso Installers.HasValues Then Installer = TryCast(Installers.First, JObject)
+                End If
+            Catch ex As Exception
+                Logger.Warn(ex, "获取 Fabric 安装器版本失败")
+            End Try
+            If Installer IsNot Nothing Then
+                Dim BtnSave As New MyIconButton With {.Logo = Logo.IconButtonSave, .ToolTip = "保存最新版安装器"}
+                AddHandler BtnSave.Click, Sub(sender As Object, e As RoutedEventArgs) McDownloadFabricLoaderSave(Installer)
+                NewItem.Buttons = {BtnSave}
+            End If
             Return NewItem
         End Function) With {.Height = 42}
     End Function
