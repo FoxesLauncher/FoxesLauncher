@@ -2,16 +2,9 @@
 
 Friend Module ModSecret
 
-    '标注 PCL 的不同分支，仅用于替换标记
-    Public Const VersionBranchMain As String = "OpenSource"
-    '在开源版的注册表与常规版的注册表隔离，以防数据冲突
-    Public Const RegFolder As String = "PCLDebug"
-    '用于微软登录的 ClientId
-    Public OAuthClientId As String = If(Environment.GetEnvironmentVariable("PCL_MS_CLIENT_ID"), "")
-    'CurseForge API Key
-    Public CurseForgeAPIKey As String = If(Environment.GetEnvironmentVariable("PCL_CURSEFORGE_API_KEY"), "")
-    '用于匿名数据收集的腾讯云日志服务上报 URL，形如 https://{region}.cls.tencentcs.com/track?topic_id={topic_id}
-    Public Const ClsBaseUrl As String = ""
+    '构建时配置（VersionBranchMain、RegFolder、OAuthClientId、CurseForgeAPIKey、ClsBaseUrl、CommitHash）
+    '由 build\GenerateSecrets.ps1 根据仓库根目录的 .env 生成到 Modules\GeneratedSecrets.vb，
+    '请不要在此处硬编码；配置格式参考 .env.example。
 
 #Region "网络鉴权"
 

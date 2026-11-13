@@ -54,6 +54,9 @@ cd FoxesLauncher
 # 如果克隆时没有拉取子模块
 git submodule update --init --recursive
 
+# 复制本地构建配置，并按需填写私有值（.env 不会被提交）
+cp .env.example .env
+
 # 还原 NuGet 包
 dotnet restore PCLCS/PCLCS.csproj
 
@@ -69,12 +72,20 @@ msbuild "Plain Craft Launcher 2.sln" /p:Configuration=Release
 Plain Craft Launcher 2\bin\Plain Craft Launcher 2.exe
 ```
 
-可选环境变量：
+构建时会由 `build/GenerateSecrets.ps1` 读取仓库根目录的 `.env`（以及可选的 `.env.local`），生成 `Plain Craft Launcher 2/Modules/GeneratedSecrets.vb`。该生成文件与 `.env` 均已被 Git 忽略，请勿提交真实密钥。
 
+主要配置项：
+
+- `PCL_VERSION_BRANCH`：分支标识。开源版填 `OpenSource`，正式版填 `Official`，会影响更新、联网配置等功能的可用性判断。
+- `PCL_REG_FOLDER`：注册表隔离目录。留空时，`Official` 使用 `PCL`，其他分支使用 `PCLDebug`。
 - `PCL_MS_CLIENT_ID`：微软登录使用的 OAuth Client ID。
 - `PCL_CURSEFORGE_API_KEY`：CurseForge API Key。
+- `PCL_CLS_BASE_URL`：匿名遥测上报地址，留空则关闭。
+- `PCL_COMMIT_HASH`：构建对应的 Commit Hash，留空时自动从 Git 读取。
 
-未设置时，对应功能会使用空值或不可用，不影响其他模块构建。
+也可以在构建前通过同名环境变量注入配置，环境变量优先于 `.env`（CI 即通过这种方式读取 repository secrets）。
+
+未配置时，对应功能会使用空值或不可用，不影响其他模块构建。
 
 ### 项目结构
 
@@ -144,6 +155,9 @@ cd FoxesLauncher
 # If submodules were not fetched during cloning
 git submodule update --init --recursive
 
+# Copy local build configuration and fill in private values (.env is not committed)
+cp .env.example .env
+
 # Restore NuGet packages
 dotnet restore PCLCS/PCLCS.csproj
 
@@ -159,10 +173,18 @@ The output is located at:
 Plain Craft Launcher 2\bin\Plain Craft Launcher 2.exe
 ```
 
-Optional environment variables:
+During the build, `build/GenerateSecrets.ps1` reads `.env` (and optionally `.env.local`) from the repository root and generates `Plain Craft Launcher 2/Modules/GeneratedSecrets.vb`. Both the generated file and `.env` are ignored by Git; never commit real secrets.
 
+Main configuration keys:
+
+- `PCL_VERSION_BRANCH`: branch marker. Use `OpenSource` for the open-source edition and `Official` for the official/release branch; this also controls update and online configuration features.
+- `PCL_REG_FOLDER`: registry isolation folder. When empty, `Official` uses `PCL` and other branches use `PCLDebug`.
 - `PCL_MS_CLIENT_ID`: OAuth client ID used for Microsoft login.
 - `PCL_CURSEFORGE_API_KEY`: CurseForge API key.
+- `PCL_CLS_BASE_URL`: anonymous telemetry endpoint; leave empty to disable.
+- `PCL_COMMIT_HASH`: commit hash for the build; read from Git when empty.
+
+You can also inject the same-named environment variables before building; they take precedence over `.env` (CI uses this to read repository secrets).
 
 When unset, the corresponding features will use empty values or remain unavailable; other modules can still be built.
 

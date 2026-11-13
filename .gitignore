@@ -387,3 +387,10 @@ MaskFiles/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# 本地构建配置（可能包含密钥，请勿提交）
+.env
+.env.*
+!.env.example
+.env.local
+Plain Craft Launcher 2/Modules/GeneratedSecrets.vb

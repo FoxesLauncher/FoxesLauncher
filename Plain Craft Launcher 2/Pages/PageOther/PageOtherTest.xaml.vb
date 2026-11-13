@@ -148,6 +148,10 @@ Public Class PageOtherTest
 
 #Region "清理游戏垃圾"
 
+    Private Sub BtnClear_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnClear.Click
+        RubbishClear()
+    End Sub
+
     Public Shared Sub RubbishClear()
         RunInUi(
         Sub()
@@ -234,6 +238,10 @@ Public Class PageOtherTest
 #Region "内存优化"
 
     Private Shared IsMemoryOptimizeRunning As Boolean = False
+
+    Private Sub BtnMemory_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnMemory.Click
+        RunInThread(Sub() MemoryOptimize(True))
+    End Sub
 
     Public Shared Sub MemoryOptimize(ShowHint As Boolean)
         If IsMemoryOptimizeRunning Then

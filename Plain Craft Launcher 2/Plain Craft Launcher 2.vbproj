@@ -186,6 +186,10 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
   </ItemGroup>
+  <PropertyGroup>
+    <GeneratedSecretsFile>$(MSBuildProjectDirectory)\Modules\GeneratedSecrets.vb</GeneratedSecretsFile>
+    <GeneratedSecretsIncluded Condition="Exists('$(GeneratedSecretsFile)')">true</GeneratedSecretsIncluded>
+  </PropertyGroup>
   <ItemGroup>
     <ApplicationDefinition Include="Application.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -257,6 +261,7 @@
     <Compile Include="Modules\ModDevelop.vb" />
     <Compile Include="Modules\Minecraft\ModWatcher.vb" />
     <Compile Include="Modules\ModSecret.vb" />
+    <Compile Include="Modules\GeneratedSecrets.vb" Condition="'$(GeneratedSecretsIncluded)' == 'true'" />
     <Compile Include="Pages\PageDownload\Resource\PageResource.xaml.vb">
       <DependentUpon>PageResource.xaml</DependentUpon>
     </Compile>
@@ -949,5 +954,12 @@
     <Resource Include="Images\Heads\HerobrineXia.png" />
 
   </ItemGroup>
+  <!-- 在编译前根据仓库根目录的 .env 生成构建期私有配置 -->
+  <Target Name="GenerateBuildSecrets" BeforeTargets="BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\build\GenerateSecrets.ps1&quot; -RepoRoot &quot;$(MSBuildThisFileDirectory)..&quot; -OutputFile &quot;$(GeneratedSecretsFile)&quot;" />
+    <ItemGroup Condition="'$(GeneratedSecretsIncluded)' != 'true'">
+      <Compile Include="$(GeneratedSecretsFile)" />
+    </ItemGroup>
+  </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
