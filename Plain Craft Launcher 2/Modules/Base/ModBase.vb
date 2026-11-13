@@ -7,7 +7,7 @@ Public Module ModBase
 
     '下列版本信息由更新器自动修改
     Public Const VersionBaseName As String = "2.99.0.1" '显示用版本名
-    Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
+    'CommitHash 由 build\GenerateSecrets.ps1 在构建时写入 GeneratedSecrets.vb
 #If RELEASE Then
     Public Const VersionCode As Integer = 415 '正式版
 #Else
