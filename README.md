@@ -8,7 +8,8 @@
 [![Stars](https://img.shields.io/github/stars/FoxesLauncher/FoxesLauncher?style=flat&labelColor=444444&color=eac54f)](https://github.com/FoxesLauncher/FoxesLauncher)
 [![Issues](https://img.shields.io/github/issues/FoxesLauncher/FoxesLauncher?style=flat&labelColor=444444&color=1F883D)](https://github.com/FoxesLauncher/FoxesLauncher/issues)
 [![Build](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml/badge.svg)](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml)
-[![License](https://img.shields.io/badge/license-PCL%20Distribution%20License-blue.svg)](LICENCE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Upstream License](https://img.shields.io/badge/upstream-PCL%20Distribution%20License-blue.svg)](LICENCE)
 [![Version](https://img.shields.io/badge/version-2.99.0.1-informational.svg)](https://github.com/FoxesLauncher/FoxesLauncher/releases)
 
 ---
@@ -102,11 +103,11 @@ Plain Craft Launcher 2\bin\Plain Craft Launcher 2.exe
 
 ### 变更日志
 
-- `2.99.0.1`：同步 PCL 2.99.0.1；整理项目地址、Issue 模板、README 与仓库排除项；清理无引用代码、预编译发布包与未使用的重复清单文件。
+- `2.99.0.1`：同步 PCL 2.99.0.1；整理项目地址、Issue 模板、README 与仓库排除项；清理无引用代码、预编译发布包与未使用的重复清单文件；补充 MIT 许可证与上游版权说明。
 
 ### 许可证与致谢
 
-本项目继续使用 PCL 的 [分发有限许可与存储库合理使用指南](LICENCE)。任何基于本项目的修改、分发或二次创作都必须遵守该文件的要求，并保留对原作者龙腾猫跃的署名与赞助链接。
+本项目由 EndlessMC Organization 新增的代码与文档以 [MIT 许可证](LICENSE) 发布。由于本项目基于 PCL2，上游代码与资源仍受 PCL 的 [分发有限许可与存储库合理使用指南](LICENCE) 约束；MIT 许可证不构成对上游内容的重新许可。任何基于本项目的修改、分发或二次创作都必须同时遵守该文件的要求，并保留对原作者龙腾猫跃的署名与赞助链接。
 
 - 原始项目：[Meloong-Git/PCL](https://github.com/Meloong-Git/PCL)
 - 帮助文档：[LTCatt/PCL2Help](https://github.com/LTCatt/PCL2Help)
@@ -203,11 +204,11 @@ The current version is `2.99.0.1`. The version name is defined in `Plain Craft L
 
 ### Changelog
 
-- `2.99.0.1`: synced with PCL 2.99.0.1; updated project URLs, issue templates, README, and repository ignore rules; removed unreferenced code, the prebuilt release archive, and the unused duplicate manifest.
+- `2.99.0.1`: synced with PCL 2.99.0.1; updated project URLs, issue templates, README, and repository ignore rules; removed unreferenced code, the prebuilt release archive, and the unused duplicate manifest; added the MIT license and upstream copyright notice.
 
 ### License and Credits
 
-This project continues to use PCL's [Distribution License and Repository Fair-Use Guidelines](LICENCE). Any modification, distribution, or derivative work based on this project must comply with that document and retain the attribution and sponsorship links for the original author, 龙腾猫跃.
+New code and documentation authored by the EndlessMC Organization are released under the [MIT License](LICENSE). Because this project is based on PCL2, upstream code and assets remain governed by PCL's [Distribution License and Repository Fair-Use Guidelines](LICENCE); the MIT License does not relicense upstream content. Any modification, distribution, or derivative work based on this project must also comply with that document and retain the attribution and sponsorship links for the original author, 龙腾猫跃.
 
 - Upstream project: [Meloong-Git/PCL](https://github.com/Meloong-Git/PCL)
 - Help documentation: [LTCatt/PCL2Help](https://github.com/LTCatt/PCL2Help)

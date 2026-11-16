@@ -10,9 +10,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("Plain Craft Launcher 启动器")>
 <Assembly: AssemblyDescription("Minecraft 启动器")>
-<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyCompany("EndlessMC Organization")>
 <Assembly: AssemblyProduct("Plain Craft Launcher")>
-<Assembly: AssemblyCopyright("Copyright © 成都瓜皮龙科技有限公司")>
+<Assembly: AssemblyCopyright("Copyright © 2024-2026 EndlessMC Organization; portions Copyright © 成都瓜皮龙科技有限公司")>
 <Assembly: AssemblyConfiguration("PCL2 Config Mark")>
 <Assembly: ComVisible(False)>
 

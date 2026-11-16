@@ -388,6 +388,25 @@ MaskFiles/
 Thumbs.db
 desktop.ini
 
+# 测试覆盖率、诊断与安装包产物
+*.trx
+*.coverage
+*.coveragexml
+*.snupkg
+*.wixpdb
+*.appxupload
+*.appxbundle
+*.msix
+*.msixbundle
+*.msi
+*.msm
+*.msp
+
+# 其他 IDE 与工具缓存
+.fleet/
+.history/
+*.iml
+
 # 本地构建配置（可能包含密钥，请勿提交）
 .env
 .env.*
