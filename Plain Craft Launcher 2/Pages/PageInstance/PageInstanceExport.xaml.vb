@@ -574,7 +574,6 @@ Public Class PageInstanceExport
                 If DirectoryUtils.Exists(Paths.Base & "PCL\Help\") Then DirectoryUtils.Copy(Paths.Base & "PCL\Help\", CacheFolder & "PCL\Help\")
                 If FileUtils.Exists(Paths.Base & "PCL\Custom.xaml") Then FileUtils.Copy(Paths.Base & "PCL\Custom.xaml", CacheFolder & "PCL\Custom.xaml")
                 If FileUtils.Exists(Paths.Base & "PCL\Setup.ini") Then FileUtils.Copy(Paths.Base & "PCL\Setup.ini", CacheFolder & "PCL\Setup.ini")
-                If FileUtils.Exists(Paths.Base & "PCL\hints.txt") Then FileUtils.Copy(Paths.Base & "PCL\hints.txt", CacheFolder & "PCL\hints.txt")
                 If FileUtils.Exists(Paths.Base & "PCL\Logo.png") Then FileUtils.Copy(Paths.Base & "PCL\Logo.png", CacheFolder & "PCL\Logo.png")
             End If
         End Sub) With {.ProgressWeight = 5})

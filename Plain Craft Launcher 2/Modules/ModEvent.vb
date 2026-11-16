@@ -156,7 +156,6 @@ Public Class CustomEvent
         刷新主页
         刷新页面
         刷新帮助
-        今日人品
         内存优化
         清理垃圾
         弹出窗口
@@ -257,9 +256,6 @@ Public Class CustomEvent
                 Case EventType.刷新帮助
                     RunInUiWait(Sub() PageOtherLeft.RefreshHelp())
                     If String.IsNullOrEmpty(Arg) Then Hint("已刷新！", HintType.Green)
-
-                Case EventType.今日人品
-                    PageOtherTest.Jrrp()
 
                 Case EventType.内存优化
                     RunInThread(Sub() PageOtherTest.MemoryOptimize(True))

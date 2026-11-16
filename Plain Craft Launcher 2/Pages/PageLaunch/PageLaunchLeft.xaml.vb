@@ -8,9 +8,6 @@ Public Class PageLaunchLeft
     Public Sub PageLaunchLeft_Loaded() Handles Me.Loaded
         If IsLoad Then RefreshPage(True, False)
 
-        AprilPosTrans.X = 0
-        AprilPosTrans.Y = 0
-
         If IsLoad Then Return
         IsLoad = True
         AniControlEnabled += 1
@@ -148,13 +145,9 @@ Public Class PageLaunchLeft
         LabLaunchingDownloadLeft.Visibility = Visibility.Collapsed
         ProgressLaunchingFinished.Width = New GridLength(0, GridUnitType.Star)
         ProgressLaunchingUnfinished.Width = New GridLength(1, GridUnitType.Star)
-        PanLaunchingHint.Opacity = 0
-        PanLaunchingHint.Visibility = Visibility.Collapsed
         PanLaunchingInfo.Width = Double.NaN '重置宽度改变动画
         McLaunchProcess = Nothing
         McLaunchWatcher = Nothing
-        '获取 “你知道吗” 提示
-        LabLaunchingHint.Text = PageOtherTest.GetRandomHint()
         '初始化其他页面
         PanInput.IsHitTestVisible = False
         PanLaunching.IsHitTestVisible = False
@@ -611,17 +604,6 @@ Finish:
     Public Sub LaunchButtonClick() Handles BtnLaunch.Click
         If McLaunchLoader.State = LoadState.Loading OrElse Not BtnLaunch.IsEnabled OrElse
             (FrmMain.PageRight IsNot Nothing AndAlso FrmMain.PageRight.PageState <> MyPageRight.PageStates.ContentStay AndAlso FrmMain.PageRight.PageState <> MyPageRight.PageStates.ContentEnter) Then Return
-        '愚人节处理
-        If IsAprilEnabled AndAlso Not IsAprilGiveup Then
-            ThemeUnlock(12, False, "隐藏主题 滑稽彩 已解锁！")
-            IsAprilGiveup = True
-            Settings.Set("AprilYear", Date.Now.Year)
-            FrmLaunchLeft.AprilScaleTrans.ScaleX = 1
-            FrmLaunchLeft.AprilScaleTrans.ScaleY = 1
-            FrmLaunchLeft.AprilPosTrans.X = 0
-            FrmLaunchLeft.AprilPosTrans.Y = 0
-            FrmMain.BtnExtraApril.ShowRefresh()
-        End If
         '实际的启动
         If BtnLaunch.Text = "启动游戏" Then
             McLaunchStart()
@@ -787,11 +769,9 @@ ExitRefresh:
             If (Not IsLaunched) = (LabLaunchingProgress.Visibility = Visibility.Collapsed) Then 'IsProgressStateChanged
                 LabLaunchingProgress.Visibility = Visibility.Visible
                 LabLaunchingProgressLeft.Visibility = Visibility.Visible
-                If IsLaunched Then PanLaunchingHint.Visibility = Visibility.Visible
                 AnimList.AddRange({
                     AaOpacity(LabLaunchingProgress, If(Not IsLaunched, 1, 0) - LabLaunchingProgress.Opacity, 90),
-                    AaOpacity(LabLaunchingProgressLeft, If(Not IsLaunched, 0.5, 0) - LabLaunchingProgressLeft.Opacity, 90),
-                    AaOpacity(PanLaunchingHint, If(IsLaunched, 1, 0) - PanLaunchingHint.Opacity, 90)
+                    AaOpacity(LabLaunchingProgressLeft, If(Not IsLaunched, 0.5, 0) - LabLaunchingProgressLeft.Opacity, 90)
                 })
             End If
             AniStart(AnimList, "Launching Progress")

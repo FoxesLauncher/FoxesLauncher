@@ -61,7 +61,6 @@ Public Module ModLaunch
             Hint($"版本 {McInstanceSelected.Name} 正在被修改，请稍后再启动！", HintType.Red)
             Return False
         End If
-        FrmMain.AprilGiveup()
         '禁止进入版本选择页面（否则就可以在启动中切换 McInstanceSelected 了）
         FrmMain.PageStack = FrmMain.PageStack.Where(Function(p) p.Page <> FormMain.PageType.InstanceSelect).ToList
         '实际启动加载器
@@ -275,15 +274,6 @@ NextInner:
                             End If
                     End Select
                 End Sub, "Buy Minecraft")
-            ElseIf Settings.Get(Of McLoginType)("LoginType") = McLoginType.Legacy Then
-                Select Case MyMsgBox("你必须先登录正版账号，才能进行离线登录！", "正版验证", "购买正版", "试玩", "返回",
-                    Button1Action:=Sub() OpenWebsite("https://www.xbox.com/zh-cn/games/store/minecraft-java-bedrock-edition-for-pc/9nxp44l49shj"))
-                    Case 2
-                        Hint("游戏将以试玩模式启动！", HintType.Red)
-                        CurrentLaunchOptions.ExtraGameArgs.Add("--demo")
-                    Case 3
-                        Throw New OperationCanceledException
-                End Select
             End If
         End If
     End Sub
@@ -584,7 +574,7 @@ Relogin:
 SkipLogin:
         McLaunchLog($"微软登录结束，AccessToken 将在 {DateTimeOffset.FromUnixTimeSeconds(ExpiresAt).LocalDateTime} 过期")
         Settings.Set("HintBuy", True) '关闭正版购买提示
-        If ThemeUnlock(10, False) Then MyMsgBox("感谢你对正版游戏的支持！" & vbCrLf & "隐藏主题 跳票红 已解锁！", "提示")
+
     End Sub
     Private Sub McLoginServerStart(Data As LoaderTask(Of McLoginServer, McLoginResult))
         Dim Input As McLoginServer = Data.Input

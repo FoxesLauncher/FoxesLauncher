@@ -642,138 +642,16 @@ NextFile:
     ''' 尝试解压内置帮助文件。
     ''' </summary>
     Public Sub HelpTryExtract()
-        If Settings.Get(Of Integer)("SystemHelpVersion") <> VersionCode OrElse Not FileUtils.Exists(PathTemp & "Help\启动器\备份设置.xaml") Then
+        If Settings.Get(Of Integer)("SystemHelpVersion") <> VersionCode OrElse
+           Not FileUtils.Exists(PathTemp & "Help\启动器\备份设置.xaml") OrElse
+           FileUtils.Exists(PathTemp & "Help\启动器\解锁主题 - Public.json") OrElse
+           FileUtils.Exists(PathTemp & "Help\帮助\提交帮助.json") Then
             DirectoryUtils.Delete(PathTemp & "Help")
             ExtractResources(PathTemp & "Cache\Help.zip", "Help")
             FileUtils.ExtractToDirectory(PathTemp & "Cache\Help.zip", PathTemp & "Help")
             Settings.Set("SystemHelpVersion", VersionCode)
             Logger.Info($"已解压内置帮助文件，目前状态：{FileUtils.Exists(PathTemp + "Help\启动器\备份设置.xaml")}")
         End If
-    End Sub
-
-#End Region
-
-#Region "愚人节"
-
-    Private _IsAprilEnabled As Boolean? = Nothing
-    Public ReadOnly Property IsAprilEnabled As Boolean
-        Get
-            If _IsAprilEnabled Is Nothing Then
-                _IsAprilEnabled =
-                    Date.Now.Month = 4 AndAlso Date.Now.Day = 1 AndAlso
-                    Settings.Get(Of Integer)("AprilYear") <> Date.Now.Year '成功后同年内则不再触发
-            End If
-            Return _IsAprilEnabled.Value
-        End Get
-    End Property
-    Public IsAprilGiveup As Boolean = False
-    Private AprilDifficultiedDistance As Integer = 0
-    Private Sub TimerFool()
-        Try
-            If FrmLaunchLeft Is Nothing OrElse FrmLaunchLeft.AprilPosTrans Is Nothing OrElse FrmMain.lastMouseArg Is Nothing Then Return
-            If IsAprilGiveup OrElse FrmMain.PageCurrent <> FormMain.PageType.Launch OrElse AniControlEnabled <> 0 OrElse Not FrmLaunchLeft.BtnLaunch.IsLoaded Then Return
-
-            '计算是否空闲
-            Dim MousePos = FrmMain.lastMouseArg.GetPosition(FrmMain)
-            Static IdieCount As Integer = 0
-            Static MousePosLast As New Point(0, 0)
-            If MousePos = MousePosLast Then
-                IdieCount += 1
-            Else
-                MousePosLast = MousePos
-                IdieCount = 0
-            End If
-            '计算躲避移动
-            Dim Direction As Vector
-            Dim Distance As Double
-            Dim ButtonWidth = FrmLaunchLeft.BtnLaunch.ActualWidth / 2, ButtonHeight = FrmLaunchLeft.BtnLaunch.ActualHeight / 2
-            Dim Vec As Vector = FrmMain.lastMouseArg.GetPosition(FrmLaunchLeft.BtnLaunch) - New Vector(ButtonWidth, ButtonHeight)
-            Dim Dir As New Vector(Vec.X, Vec.Y)
-            Dir.Normalize()
-            Direction = -Dir
-            Distance = New Vector(Math.Max(0, Math.Abs(Vec.X) - ButtonWidth), Math.Max(0, Math.Abs(Vec.Y) - ButtonHeight)).Length
-            Dim BreathScale = Math.Sin(Timer150Count / 37.5 * Math.PI)
-            Dim Difficulty As Double = 1 / (1 + (AprilDifficultiedDistance / 6000) ^ 2) + 0.25 '难度，初始为 1.25x，6000 距离为 0.75x，12000 为 0.5x，24000 为 0.256x，最低 0.25x
-            Dim Acc = Math.Max(0, -0.65 - Math.Log((Distance / Difficulty + 0.4) / 200)) * Direction * Difficulty '加速度
-            'FrmMain.Title = CInt(AprilTotalDistance) & " - " & Difficulty
-            '5s 不动时回到起始点
-            If IdieCount >= 64 * 5 Then
-                Dim SafeDist As Vector = FrmMain.lastMouseArg.GetPosition(FrmMain.PanMain) - New Vector(ButtonWidth, FrmMain.PanMain.ActualHeight - ButtonHeight * 3)
-                Dim Back As New Vector(FrmLaunchLeft.AprilPosTrans.X, FrmLaunchLeft.AprilPosTrans.Y)
-                If SafeDist.Length > 250 AndAlso Back.Length > 0.4 Then
-                    Acc -= Back * 0.0005
-                    Back.Normalize()
-                    Acc -= Back * 0.15
-                End If
-            End If
-            '回到边界
-            Static Speed As New Vector(0, 0)
-            Dim Relative As Point = FrmLaunchLeft.BtnLaunch.TranslatePoint(New Point(0, 0), FrmMain.PanForm)
-            If Relative.X < -ButtonWidth * 2 Then
-                FrmLaunchLeft.AprilPosTrans.X += FrmMain.PanForm.ActualWidth + ButtonWidth * 2 '离开左边界
-                Speed.X -= 80
-                If Relative.Y < 0 Then
-                    FrmLaunchLeft.AprilPosTrans.Y += ButtonHeight * 2.5
-                ElseIf Relative.Y > FrmMain.PanForm.ActualHeight - ButtonHeight * 2 Then
-                    FrmLaunchLeft.AprilPosTrans.Y -= ButtonHeight * 2.5
-                End If
-            ElseIf Relative.X > FrmMain.PanForm.ActualWidth Then
-                FrmLaunchLeft.AprilPosTrans.X -= FrmMain.PanForm.ActualWidth + ButtonWidth * 2 '离开右边界
-                Speed.X += 80
-                If Relative.Y < 0 Then
-                    FrmLaunchLeft.AprilPosTrans.Y += ButtonHeight * 2.5
-                ElseIf Relative.Y > FrmMain.PanForm.ActualHeight - ButtonHeight * 2 Then
-                    FrmLaunchLeft.AprilPosTrans.Y -= ButtonHeight * 2.5
-                End If
-            ElseIf Relative.Y < -ButtonHeight * 2 Then
-                FrmLaunchLeft.AprilPosTrans.Y += FrmMain.PanForm.ActualHeight + ButtonHeight * 2 '离开上边界
-                Speed.Y -= 25
-                If Relative.X < 0 Then
-                    FrmLaunchLeft.AprilPosTrans.X += ButtonWidth * 2
-                ElseIf Relative.X > FrmMain.PanForm.ActualWidth - ButtonWidth * 2 Then
-                    FrmLaunchLeft.AprilPosTrans.X -= ButtonWidth * 2
-                End If
-            ElseIf Relative.Y > FrmMain.PanForm.ActualHeight Then
-                FrmLaunchLeft.AprilPosTrans.Y -= FrmMain.PanForm.ActualHeight + ButtonHeight * 2 '离开下边界
-                Speed.Y += 25
-                If Relative.X < 0 Then
-                    FrmLaunchLeft.AprilPosTrans.X += ButtonWidth * 2
-                ElseIf Relative.X > FrmMain.PanForm.ActualWidth - ButtonWidth * 2 Then
-                    FrmLaunchLeft.AprilPosTrans.X -= ButtonWidth * 2
-                End If
-            End If
-            '移动
-            Speed = Speed * 0.8 + Acc
-            Dim SpeedValue = Math.Min(60, Speed.Length)
-            If SpeedValue < 0.01 Then Return
-            Speed.Normalize()
-            Speed *= SpeedValue
-            AprilDifficultiedDistance += SpeedValue
-            FrmLaunchLeft.AprilPosTrans.X += Speed.X
-            FrmLaunchLeft.AprilPosTrans.Y += Speed.Y
-            '大小改变
-            FrmLaunchLeft.AprilScaleTrans.ScaleX = (1 - (Math.Abs(Direction.X) - Math.Abs(Direction.Y)) * (SpeedValue / 160)).Clamp(0.2, 1.8)
-            FrmLaunchLeft.AprilScaleTrans.ScaleY = (1 - (Math.Abs(Direction.Y) - Math.Abs(Direction.X)) * (SpeedValue / 100)).Clamp(0.2, 1.8)
-            '放弃提示
-            Static GiveUpDistance As Double = -1500
-            GiveUpDistance += SpeedValue
-            If GiveUpDistance > 2500 Then
-                GiveUpDistance = 0
-                Select Case RandomInteger(0, 3)
-                    Case 0
-                        Hint("放弃吧！只需要点一下右下角的小白旗……", HintType.Red)
-                    Case 1
-                        Hint("看到右下角的那面小白旗了吗？", HintType.Red)
-                    Case 2
-                        Hint("这里建议点一下右下角的小白旗投降呢.jpg", HintType.Red)
-                    Case 3
-                        Hint("右下角的小白旗永远等着你……", HintType.Red)
-                End Select
-            End If
-
-        Catch ex As Exception
-            Logger.Error(ex, "愚人节移动出错")
-        End Try
     End Sub
 
 #End Region
@@ -892,8 +770,6 @@ NextFile:
             Text = Text.Replace("{login}", Replacer(Nothing))
         End If
         '高级
-        Text = Text.RegexReplace("\{hint\}", Function() Replacer(PageOtherTest.GetRandomHint()))
-        Text = Text.RegexReplace("\{cave\}", Function() Replacer(PageOtherTest.GetRandomCave()))
         Text = Text.RegexReplace("\{setup:([a-zA-Z0-9]+)\}", Function(m) Replacer(Settings.GetSafe(m.Groups(1).Value, McInstanceSelected)))
         Text = Text.RegexReplace("\{varible:([^:\}]+)(?::([^\}]+))?\}", Function(m) Replacer(RegistryUtils.TryRead($"HKEY_CURRENT_USER\Software\{RegFolder}", $"CustomEvent{m.Groups(1).Value}", m.Groups(2).Value)))
         Text = Text.RegexReplace("\{variable:([^:\}]+)(?::([^\}]+))?\}", Function(m) Replacer(RegistryUtils.TryRead($"HKEY_CURRENT_USER\Software\{RegFolder}", $"CustomEvent{m.Groups(1).Value}", m.Groups(2).Value)))
@@ -1005,7 +881,6 @@ NextFile:
 #End Region
 
     Public DragControl = Nothing
-    Private Timer4Count As Integer = 0
     Private Timer150Count As Integer = 0
     Private Sub TimerMain()
         Try
@@ -1014,28 +889,15 @@ NextFile:
             MyMsgBoxTick()
             FrmMain.DragTick()
             LoaderTaskbarProgressRefresh()
-            If ThemeDontClick = 2 Then ThemeRefresh()
 #End Region
         Catch ex As Exception
             Logger.Error(ex, "短程主时钟执行异常", LogBehavior.AlertThenCrash)
         End Try
-        Timer4Count += 1
-        If Timer4Count = 4 Then
-            Timer4Count = 0
-            Try
-#Region "每 250ms 执行一次的代码"
-                If ThemeNow = 12 Then ThemeRefresh()
-#End Region
-            Catch ex As Exception
-                Logger.Warn(ex, "中程主时钟执行异常")
-            End Try
-        End If
         Timer150Count += 1
         If Timer150Count = 150 Then
             Timer150Count = 0
             Try
 #Region "每 7.5s 执行一次的代码"
-                If FrmMain.BtnExtraApril_ShowCheck AndAlso AprilDifficultiedDistance <> 0 Then FrmMain.BtnExtraApril.Ribble()
                 '以未知原因窗口被丢到一边去的修复（Top、Left = -25600），还有 #745
                 RunInUi(
                 Sub()
@@ -1062,22 +924,6 @@ NextFile:
                 Logger.Error(ex, "程序主时钟出错")
             End Try
         End Sub, "Timer Main")
-        If Not IsAprilEnabled Then Return
-        RunInNewThread(
-        Sub()
-            Try
-                Dim LastTime = My.Computer.Clock.TickCount
-                Do While True
-                    If LastTime <> My.Computer.Clock.TickCount Then
-                        LastTime = My.Computer.Clock.TickCount
-                        RunInUiWait(AddressOf TimerFool)
-                    End If
-                    Thread.Sleep(1)
-                Loop
-            Catch ex As Exception
-                Logger.Error(ex, "愚人节主时钟出错")
-            End Try
-        End Sub, "Timer Main Fool")
     End Sub
 
 End Module

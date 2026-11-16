@@ -158,7 +158,7 @@ Public Class FormMain
                 BugCount += 19
             End If
             If LastVersion < 397 Then 'Snapshot 2.12.7.3
-                If LastVersion >= 393 AndAlso LastVersion < 397 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法使用自定义隐藏主题"))
+                '该版本中的主题相关修复已随主题功能一并移除
             End If
             If LastVersion < 395 Then 'Snapshot 2.12.7.2
                 If LastVersion = 393 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：部分个性化功能失效"))
@@ -310,8 +310,7 @@ Public Class FormMain
             End If
         End If
         '刷新主题
-        ThemeCheckAll(False)
-        ThemeRefresh(Settings.Get(Of Integer)("UiLauncherTheme"))
+        ThemeRefresh()
         '注册拖拽事件（不能直接加 Handles，否则没用；#6340）
         [AddHandler](DragDrop.DragEnterEvent, New DragEventHandler(AddressOf HandleDrag), handledEventsToo:=True)
         [AddHandler](DragDrop.DragOverEvent, New DragEventHandler(AddressOf HandleDrag), handledEventsToo:=True)
@@ -357,9 +356,12 @@ Public Class FormMain
         '扩展按钮
         BtnExtraDownload.ShowCheck = AddressOf BtnExtraDownload_ShowCheck
         BtnExtraBack.ShowCheck = AddressOf BtnExtraBack_ShowCheck
-        BtnExtraApril.ShowCheck = AddressOf BtnExtraApril_ShowCheck
         BtnExtraShutdown.ShowCheck = AddressOf BtnExtraShutdown_ShowCheck
-        BtnExtraApril.ShowRefresh()
+        '跟随系统深色模式时，实时响应系统主题切换
+        AddHandler Microsoft.Win32.SystemEvents.UserPreferenceChanged,
+            Sub(s, args)
+                If Settings.Get(Of Integer)("UiDarkMode") = 2 Then RunInUi(Sub() ThemeRefresh())
+            End Sub
         '初始化尺寸改变
         Dim Resizer As New MyResizer(Me)
         Resizer.addResizerDown(ResizerB)
@@ -449,7 +451,7 @@ Public Class FormMain
             Telemetry("启动")
             '开源版本提示
             If VersionBranchMain = "OpenSource" Then
-                MyMsgBox($"该版本中无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，然后在仓库根目录的 .env 中设置 PCL_CURSEFORGE_API_KEY{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，然后在仓库根目录的 .env 中设置 PCL_MS_CLIENT_ID{vbCrLf}- 更新与联网通知：避免滥用隐患{vbCrLf}- 主题切换：这是需要赞助解锁的纪念性质的功能，别让赞助者太伤心啦……", "开源版本说明")
+                MyMsgBox($"该版本中无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，然后在仓库根目录的 .env 中设置 PCL_CURSEFORGE_API_KEY{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，然后在仓库根目录的 .env 中设置 PCL_MS_CLIENT_ID{vbCrLf}- 更新与联网通知：避免滥用隐患", "开源版本说明")
             End If
         End Sub, "初始化", ThreadPriority.Lowest)
 
@@ -458,20 +460,6 @@ Public Class FormMain
     '根据打开次数触发的事件
     Private Sub RunCountSub()
         Settings.Set("SystemCount", Settings.Get(Of Integer)("SystemCount") + 1)
-        If BuildType = BuildTypes.Snapshot Then
-            Select Case Settings.Get(Of Integer)("SystemCount")
-                Case 1
-                    MyMsgBox("欢迎使用 PCL 快照版！" & vbCrLf &
-                             "快照版包含尚未在正式版发布的测试性功能，仅用于赞助者本人尝鲜。所以请不要发给其他人或者用于制作整合包哦！" & vbCrLf &
-                             "如果你并非通过赞助或赞助者本人邀请进群获得的本程序，那么可能是有人在违规传播，记得提醒他一下啦。", "快照版使用说明")
-            End Select
-            If Settings.Get(Of Integer)("SystemCount") >= 99 Then
-                If ThemeUnlock(6, False) Then
-                    MyMsgBox("你已经使用了 99 次 PCL 啦，感谢你长期以来的支持！" & vbCrLf &
-                             "隐藏主题 铁杆粉 已解锁！", "提示")
-                End If
-            End If
-        End If
     End Sub
     '升级与降级事件
     Private Sub UpgradeSub(LastVersionCode As Integer)
@@ -487,29 +475,8 @@ Public Class FormMain
         End If
         '被移除的窗口设置选项
         If Settings.Get(Of Integer)("LaunchArgumentWindowType") = 5 Then Settings.Set("LaunchArgumentWindowType", 1)
-        '修改主题设置项名称
-        If HighestVersionCode <= 207 Then
-            Dim UnlockedTheme As New List(Of String) From {"2"}
-            UnlockedTheme.AddRange(New List(Of String)(Settings.Get(Of String)("UiLauncherThemeHide").ToString.Split("|")))
-            UnlockedTheme.AddRange(New List(Of String)(Settings.Get(Of String)("UiLauncherThemeHide2").ToString.Split("|")))
-            Settings.Set("UiLauncherThemeHide2", UnlockedTheme.Distinct.ToList.Join("|"c))
-        End If
-        '重置欧皇彩
-        If LastVersionCode <= 115 AndAlso Settings.Get(Of String)("UiLauncherThemeHide2").ToString.Split("|").Contains("13") Then
-            Dim UnlockedTheme As New List(Of String)(Settings.Get(Of String)("UiLauncherThemeHide2").ToString.Split("|"))
-            UnlockedTheme.Remove("13")
-            Settings.Set("UiLauncherThemeHide2", UnlockedTheme.Join("|"c))
-            MyMsgBox("由于新版 PCL 修改了欧皇彩的解锁方式，你需要重新解锁欧皇彩。" & vbCrLf &
-                     "多谢各位的理解啦！", "重新解锁提醒")
-        End If
-        '重置滑稽彩
-        If LastVersionCode <= 152 AndAlso Settings.Get(Of String)("UiLauncherThemeHide2").ToString.Split("|").Contains("12") Then
-            Dim UnlockedTheme As New List(Of String)(Settings.Get(Of String)("UiLauncherThemeHide2").ToString.Split("|"))
-            UnlockedTheme.Remove("12")
-            Settings.Set("UiLauncherThemeHide2", UnlockedTheme.Join("|"c))
-            MyMsgBox("由于新版 PCL 修改了滑稽彩的解锁方式，你需要重新解锁滑稽彩。" & vbCrLf &
-                     "多谢各位的理解啦！", "重新解锁提醒")
-        End If
+        '旧版主页预设已移除，迁移到 Minecraft 新闻
+        If Settings.Get(Of Integer)("UiCustomPreset") <= 1 Then Settings.Set("UiCustomPreset", 2)
         '移动自定义皮肤
         If LastVersionCode <= 161 AndAlso FileUtils.Exists(Paths.Base & "PCL\CustomSkin.png") AndAlso Not FileUtils.Exists(Paths.AppDataThenName & "CustomSkin.png") Then
             FileUtils.Copy(Paths.Base & "PCL\CustomSkin.png", Paths.AppDataThenName & "CustomSkin.png")
@@ -856,11 +823,7 @@ Public Class FormMain
         End If
         '调用启动游戏
         If e.Key = Key.Enter AndAlso PageCurrent = FormMain.PageType.Launch Then
-            If IsAprilEnabled AndAlso Not IsAprilGiveup Then
-                Hint("木大！")
-            Else
-                FrmLaunchLeft.LaunchButtonClick()
-            End If
+            FrmLaunchLeft.LaunchButtonClick()
         End If
     End Sub
     Private Sub FormMain_MouseDown(sender As Object, e As MouseButtonEventArgs) Handles Me.MouseDown
@@ -1479,7 +1442,6 @@ Public Class FormMain
 
 #Region "设置为最新状态"
             BtnExtraDownload.ShowRefresh()
-            BtnExtraApril.ShowRefresh()
 #End Region
 
             Logger.Info($"切换主要页面：{Stack.Page}, {SubType}")
@@ -1644,20 +1606,6 @@ Public Class FormMain
         Return HasDownloadingTask() AndAlso Not PageCurrent = PageType.TaskManager
     End Function
 
-    '投降
-    Public Sub AprilGiveup() Handles BtnExtraApril.Click
-        If IsAprilEnabled AndAlso Not IsAprilGiveup Then
-            Hint("=D", HintType.Green)
-            IsAprilGiveup = True
-            FrmLaunchLeft.AprilScaleTrans.ScaleX = 1
-            FrmLaunchLeft.AprilScaleTrans.ScaleY = 1
-            BtnExtraApril.ShowRefresh()
-        End If
-    End Sub
-    Public Function BtnExtraApril_ShowCheck() As Boolean
-        Return IsAprilEnabled AndAlso Not IsAprilGiveup AndAlso PageCurrent = PageType.Launch
-    End Function
-
     '关闭 Minecraft
     Public Sub BtnExtraShutdown_Click() Handles BtnExtraShutdown.Click
         Try
@@ -1696,11 +1644,5 @@ Public Class FormMain
     End Function
 
 #End Region
-
-    '愚人节鼠标位置
-    Public lastMouseArg As MouseEventArgs = Nothing
-    Private Sub FormMain_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
-        lastMouseArg = e
-    End Sub
 
 End Class
