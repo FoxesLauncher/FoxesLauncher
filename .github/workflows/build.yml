@@ -2,13 +2,13 @@ name: Build
 on:
   push:
     paths:
-      - 'Plain Craft Launcher 2/**'
+      - 'Foxes Launcher/**'
       - '.github/workflows/**'
       - 'build/**'
       - '.env.example'
   pull_request:
     paths:
-      - 'Plain Craft Launcher 2/**'
+      - 'Foxes Launcher/**'
       - '.github/workflows/**'
       - 'build/**'
       - '.env.example'
@@ -48,24 +48,24 @@ jobs:
         Set-Location PCL2Help
         Remove-Item -Path *.* -Recurse -Force
         Compress-Archive -Path .\* -DestinationPath .\Help.zip
-        Copy-Item -Path .\Help.zip -Destination "${{ GITHUB.WORKSPACE }}\Plain Craft Launcher 2\Resources\Help.zip" -Force
+        Copy-Item -Path .\Help.zip -Destination "${{ GITHUB.WORKSPACE }}\Foxes Launcher\Resources\Help.zip" -Force
         Set-Location ..
         Remove-Item PCL2Help -Recurse -Force
         Set-Location ${{ GITHUB.WORKSPACE }}
 
 
     - name: Restore NuGet Packages
-      run: dotnet restore PCLCS\PCLCS.csproj
+      run: dotnet restore FXLCS\FXLCS.csproj
 
     - name: Build
       env:
-        PCL_MS_CLIENT_ID: ${{ secrets.CLIENT_ID }}
-        PCL_CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-        PCL_COMMIT_HASH: ${{ github.sha }}
-      run: msbuild "Plain Craft Launcher 2\Plain Craft Launcher 2.vbproj" -p:Configuration=${{ matrix.configuration }}
+        FXL_MS_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        FXL_CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+        FXL_COMMIT_HASH: ${{ github.sha }}
+      run: msbuild "Foxes Launcher\Foxes Launcher.vbproj" -p:Configuration=${{ matrix.configuration }}
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.configuration }} ${{ env.describe }}
-        path: Plain Craft Launcher 2\obj\${{ matrix.configuration }}\Plain Craft Launcher 2.exe
+        path: Foxes Launcher\obj\${{ matrix.configuration }}\Foxes Launcher.exe

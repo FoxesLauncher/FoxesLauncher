@@ -7,7 +7,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
-$solution = Join-Path $root 'Plain Craft Launcher 2.sln'
+$solution = Join-Path $root 'Foxes Launcher.sln'
 
 function Find-MSBuild {
     $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
@@ -27,8 +27,8 @@ Write-Host "==> Root:          $root"
 Write-Host "==> Configuration: $Configuration"
 Write-Host "==> Platform:      $Platform"
 
-# Initialize the MeloongCore submodule when the checkout is empty.
-$coreProject = Join-Path $root 'MeloongCore\Shared\MeloongCore.csproj'
+# Initialize the FoxesCore submodule when the checkout is empty.
+$coreProject = Join-Path $root 'FoxesCore\Shared\FoxesCore.csproj'
 if (-not (Test-Path $coreProject)) {
     Write-Host '==> Initializing submodules...'
     & git -C $root submodule update --init --recursive
@@ -52,6 +52,6 @@ Write-Host '==> Building...'
 & $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed with exit code $LASTEXITCODE" }
 
-$output = Join-Path $root 'Plain Craft Launcher 2\bin\Plain Craft Launcher 2.exe'
+$output = Join-Path $root 'Foxes Launcher\bin\Foxes Launcher.exe'
 Write-Host ''
 Write-Host "Build succeeded: $output"
