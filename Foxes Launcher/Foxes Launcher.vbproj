@@ -713,6 +713,7 @@
   <ItemGroup>
     <Compile Include="Modules\Base\ModAnimation.vb" />
     <Compile Include="Modules\Base\MyBitmap.vb" />
+    <Compile Include="Modules\Base\SplashWindow.vb" />
     <Compile Include="Modules\ModMain.vb" />
     <Compile Include="Modules\Base\ModBase.vb" />
     <Compile Include="My Project\AssemblyInfo.vb">

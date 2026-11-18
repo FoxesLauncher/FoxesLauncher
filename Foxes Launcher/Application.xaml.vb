@@ -110,8 +110,8 @@ RetryCacheCheck:
             ModNet.ShouldValidateSslCertificateOnLogin(Settings.Get(Of Boolean)("ToolDownloadCert"))
             '设置初始窗口
             If Settings.Get(Of Boolean)("UiLauncherLogo") Then
-                FrmStart = New SplashScreen("Images\icon.ico")
-                FrmStart.Show(False, True)
+                FrmStart = New SplashWindow()
+                FrmStart.ShowSplash(True)
             End If
             '基础信息
             Logger.Info($"程序版本：{VersionDisplay} ({VersionCode}{If(CommitHash = "", "", $"，#{CommitHash}")})")
