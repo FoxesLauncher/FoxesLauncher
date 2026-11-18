@@ -85,7 +85,7 @@ Friend Module ModSecret
                 Color5 = New MyColor(74, 104, 150)
                 Color6 = New MyColor(55, 63, 78)
                 Color7 = New MyColor(38, 42, 51)
-                Color8 = New MyColor(30, 33, 40)
+                Color8 = New MyColor(28, 255, 255, 255)
                 ColorBg0 = New MyColor(98, 140, 200)
                 ColorBg1 = New MyColor(230, 44, 48, 58)
                 ColorGray1 = New MyColor(232, 234, 238)
