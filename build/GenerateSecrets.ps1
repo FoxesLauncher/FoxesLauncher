@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Generates Plain Craft Launcher 2\Modules\GeneratedSecrets.vb from local
+    Generates Foxes Launcher\Modules\GeneratedSecrets.vb from local
     build configuration (.env) and build environment variables.
 
 .DESCRIPTION
@@ -29,7 +29,7 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($OutputFile)) {
-    $OutputFile = Join-Path $RepoRoot 'Plain Craft Launcher 2\Modules\GeneratedSecrets.vb'
+    $OutputFile = Join-Path $RepoRoot 'Foxes Launcher\Modules\GeneratedSecrets.vb'
 }
 
 function Read-DotEnv {
@@ -123,14 +123,14 @@ function Resolve-ConfigValue {
     return $Default
 }
 
-$versionBranch = Resolve-ConfigValue -Key 'PCL_VERSION_BRANCH' -Default 'OpenSource'
-$defaultRegFolder = if ($versionBranch -eq 'Official') { 'PCL' } else { 'PCLDebug' }
-$regFolder = Resolve-ConfigValue -Key 'PCL_REG_FOLDER' -Default $defaultRegFolder
-$msClientId = Resolve-ConfigValue -Key 'PCL_MS_CLIENT_ID'
-$curseForgeApiKey = Resolve-ConfigValue -Key 'PCL_CURSEFORGE_API_KEY'
-$clsBaseUrl = Resolve-ConfigValue -Key 'PCL_CLS_BASE_URL'
+$versionBranch = Resolve-ConfigValue -Key 'FXL_VERSION_BRANCH' -Default 'OpenSource'
+$defaultRegFolder = if ($versionBranch -eq 'Official') { 'FXL' } else { 'FXLDebug' }
+$regFolder = Resolve-ConfigValue -Key 'FXL_REG_FOLDER' -Default $defaultRegFolder
+$msClientId = Resolve-ConfigValue -Key 'FXL_MS_CLIENT_ID'
+$curseForgeApiKey = Resolve-ConfigValue -Key 'FXL_CURSEFORGE_API_KEY'
+$clsBaseUrl = Resolve-ConfigValue -Key 'FXL_CLS_BASE_URL'
 
-$commitHash = Resolve-ConfigValue -Key 'PCL_COMMIT_HASH'
+$commitHash = Resolve-ConfigValue -Key 'FXL_COMMIT_HASH'
 if ([string]::IsNullOrWhiteSpace($commitHash)) {
     $commitHash = Resolve-ConfigValue -Key 'GITHUB_SHA'
 }
@@ -146,17 +146,17 @@ $generated = @"
 
 Friend Module ModBuildSecrets
 
-    ' PCL_VERSION_BRANCH: branch marker
+    ' FXL_VERSION_BRANCH: branch marker
     Public Const VersionBranchMain As String = $(ConvertTo-VbStringLiteral $versionBranch)
-    ' PCL_REG_FOLDER: per-branch registry folder, isolated to avoid data conflicts
+    ' FXL_REG_FOLDER: per-branch registry folder, isolated to avoid data conflicts
     Public Const RegFolder As String = $(ConvertTo-VbStringLiteral $regFolder)
-    ' PCL_MS_CLIENT_ID: OAuth client ID used for Microsoft login
+    ' FXL_MS_CLIENT_ID: OAuth client ID used for Microsoft login
     Public Const OAuthClientId As String = $(ConvertTo-VbStringLiteral $msClientId)
-    ' PCL_CURSEFORGE_API_KEY: CurseForge API key
+    ' FXL_CURSEFORGE_API_KEY: CurseForge API key
     Public Const CurseForgeAPIKey As String = $(ConvertTo-VbStringLiteral $curseForgeApiKey)
-    ' PCL_CLS_BASE_URL: anonymous telemetry endpoint; empty disables telemetry
+    ' FXL_CLS_BASE_URL: anonymous telemetry endpoint; empty disables telemetry
     Public Const ClsBaseUrl As String = $(ConvertTo-VbStringLiteral $clsBaseUrl)
-    ' PCL_COMMIT_HASH: commit hash of this build
+    ' FXL_COMMIT_HASH: commit hash of this build
     Public Const CommitHash As String = $(ConvertTo-VbStringLiteral $commitHash)
 
 End Module

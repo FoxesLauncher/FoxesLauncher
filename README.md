@@ -8,8 +8,9 @@
 [![Stars](https://img.shields.io/github/stars/FoxesLauncher/FoxesLauncher?style=flat&labelColor=444444&color=eac54f)](https://github.com/FoxesLauncher/FoxesLauncher)
 [![Issues](https://img.shields.io/github/issues/FoxesLauncher/FoxesLauncher?style=flat&labelColor=444444&color=1F883D)](https://github.com/FoxesLauncher/FoxesLauncher/issues)
 [![Build](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml/badge.svg)](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml)
-[![License](https://img.shields.io/badge/license-PCL%20Distribution%20License-blue.svg)](LICENCE)
-[![Version](https://img.shields.io/badge/version-2.99.0.1-informational.svg)](https://github.com/FoxesLauncher/FoxesLauncher/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Upstream License](https://img.shields.io/badge/upstream-PCL%20Distribution%20License-blue.svg)](LICENCE)
+[![Version](https://img.shields.io/badge/version-0.0.1.0-informational.svg)](https://github.com/FoxesLauncher/FoxesLauncher/releases)
 
 ---
 
@@ -42,8 +43,8 @@ FoxesLauncher（狐狐启动器）是由终章 EndlessMC 组织维护的 Minecra
 
 - Visual Studio 2022（安装“.NET 桌面开发”工作负载）或对应的 MSBuild。
 - .NET Framework 4.8 Developer Pack。
-- .NET SDK 8.0 或更高版本（用于构建 `PCLCS`）。
-- Git（需要拉取 `MeloongCore` 子模块）。
+- .NET SDK 8.0 或更高版本（用于构建 `FXLCS`）。
+- Git（需要拉取 `FoxesCore` 子模块）。
 
 ### 构建
 
@@ -58,30 +59,30 @@ git submodule update --init --recursive
 cp .env.example .env
 
 # 还原 NuGet 包
-dotnet restore PCLCS/PCLCS.csproj
+dotnet restore FXLCS/FXLCS.csproj
 
 # 构建整个解决方案
-msbuild "Plain Craft Launcher 2.sln" /p:Configuration=Release
+msbuild "Foxes Launcher.sln" /p:Configuration=Release
 ```
 
-也可以直接用 Visual Studio 2022 打开 `Plain Craft Launcher 2.sln`，选择 `Release` 配置后生成解决方案。
+也可以直接用 Visual Studio 2022 打开 `Foxes Launcher.sln`，选择 `Release` 配置后生成解决方案。
 
 构建产物位于：
 
 ```text
-Plain Craft Launcher 2\bin\Plain Craft Launcher 2.exe
+Foxes Launcher\bin\Foxes Launcher.exe
 ```
 
-构建时会由 `build/GenerateSecrets.ps1` 读取仓库根目录的 `.env`（以及可选的 `.env.local`），生成 `Plain Craft Launcher 2/Modules/GeneratedSecrets.vb`。该生成文件与 `.env` 均已被 Git 忽略，请勿提交真实密钥。
+构建时会由 `build/GenerateSecrets.ps1` 读取仓库根目录的 `.env`（以及可选的 `.env.local`），生成 `Foxes Launcher/Modules/GeneratedSecrets.vb`。该生成文件与 `.env` 均已被 Git 忽略，请勿提交真实密钥。
 
 主要配置项：
 
-- `PCL_VERSION_BRANCH`：分支标识。开源版填 `OpenSource`，正式版填 `Official`，会影响更新、联网配置等功能的可用性判断。
-- `PCL_REG_FOLDER`：注册表隔离目录。留空时，`Official` 使用 `PCL`，其他分支使用 `PCLDebug`。
-- `PCL_MS_CLIENT_ID`：微软登录使用的 OAuth Client ID。
-- `PCL_CURSEFORGE_API_KEY`：CurseForge API Key。
-- `PCL_CLS_BASE_URL`：匿名遥测上报地址，留空则关闭。
-- `PCL_COMMIT_HASH`：构建对应的 Commit Hash，留空时自动从 Git 读取。
+- `FXL_VERSION_BRANCH`：分支标识。开源版填 `OpenSource`，正式版填 `Official`，会影响更新、联网配置等功能的可用性判断。
+- `FXL_REG_FOLDER`：注册表隔离目录。留空时，`Official` 使用 `FXL`，其他分支使用 `FXLDebug`。
+- `FXL_MS_CLIENT_ID`：微软登录使用的 OAuth Client ID。
+- `FXL_CURSEFORGE_API_KEY`：CurseForge API Key。
+- `FXL_CLS_BASE_URL`：匿名遥测上报地址，留空则关闭。
+- `FXL_COMMIT_HASH`：构建对应的 Commit Hash，留空时自动从 Git 读取。
 
 也可以在构建前通过同名环境变量注入配置，环境变量优先于 `.env`（CI 即通过这种方式读取 repository secrets）。
 
@@ -91,26 +92,26 @@ Plain Craft Launcher 2\bin\Plain Craft Launcher 2.exe
 
 | 目录 | 说明 |
 | --- | --- |
-| `Plain Craft Launcher 2/` | VB.NET WPF 主程序，包含 UI、页面、动画、实例与启动逻辑。 |
-| `PCLCS/` | C# 核心库，包含 Java、Minecraft 版本、安装清单与启动相关工具。 |
-| `MeloongCore/` | Git 子模块（FoxesCore），提供通用 .NET 与 WPF 基础库。 |
-| `Plain Craft Launcher 2.sln` | Visual Studio 解决方案。 |
+| `Foxes Launcher/` | VB.NET WPF 主程序，包含 UI、页面、动画、实例与启动逻辑。 |
+| `FXLCS/` | C# 核心库，包含 Java、Minecraft 版本、安装清单与启动相关工具。 |
+| `FoxesCore/` | Git 子模块（FoxesCore），提供通用 .NET 与 WPF 基础库。 |
+| `Foxes Launcher.sln` | Visual Studio 解决方案。 |
 
 ### 版本与更新
 
-当前版本为 `2.99.0.1`，版本号定义在 `Plain Craft Launcher 2/Modules/Base/ModBase.vb`，程序集版本定义在 `Plain Craft Launcher 2/My Project/AssemblyInfo.vb`。发布构建由 [Build 工作流](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml) 生成。
+当前版本为 `0.0.1.0`，版本号定义在 `Foxes Launcher/Modules/Base/ModBase.vb`，程序集版本定义在 `Foxes Launcher/My Project/AssemblyInfo.vb`。发布构建由 [Build 工作流](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml) 生成。
 
 ### 变更日志
 
-- `2.99.0.1`：同步 PCL 2.99.0.1；整理项目地址、Issue 模板、README 与仓库排除项；清理无引用代码、预编译发布包与未使用的重复清单文件。
+- `2.99.0.1`：同步 PCL 2.99.0.1；整理项目地址、Issue 模板、README 与仓库排除项；清理无引用代码、预编译发布包与未使用的重复清单文件；补充 MIT 许可证与上游版权说明。
 
 ### 许可证与致谢
 
-本项目继续使用 PCL 的 [分发有限许可与存储库合理使用指南](LICENCE)。任何基于本项目的修改、分发或二次创作都必须遵守该文件的要求，并保留对原作者龙腾猫跃的署名与赞助链接。
+本项目由 EndlessMC Organization 新增的代码与文档以 [MIT 许可证](LICENSE) 发布。由于本项目基于 PCL2，上游代码与资源仍受 PCL 的 [分发有限许可与存储库合理使用指南](LICENCE) 约束；MIT 许可证不构成对上游内容的重新许可。任何基于本项目的修改、分发或二次创作都必须同时遵守该文件的要求，并保留对原作者龙腾猫跃的署名与赞助链接。
 
 - 原始项目：[Meloong-Git/PCL](https://github.com/Meloong-Git/PCL)
 - 帮助文档：[LTCatt/PCL2Help](https://github.com/LTCatt/PCL2Help)
-- 感谢 PCL 社区、MeloongCore 贡献者以及所有提交反馈与代码的开发者。
+- 感谢 PCL 社区、FoxesCore 贡献者以及所有提交反馈与代码的开发者。
 
 ---
 
@@ -143,8 +144,8 @@ This repository is primarily intended for development and building. If you only 
 
 - Visual Studio 2022 with the ".NET desktop development" workload, or equivalent MSBuild.
 - .NET Framework 4.8 Developer Pack.
-- .NET SDK 8.0 or newer (for `PCLCS`).
-- Git (required for the `MeloongCore` submodule).
+- .NET SDK 8.0 or newer (for `FXLCS`).
+- Git (required for the `FoxesCore` submodule).
 
 ### Building
 
@@ -159,30 +160,30 @@ git submodule update --init --recursive
 cp .env.example .env
 
 # Restore NuGet packages
-dotnet restore PCLCS/PCLCS.csproj
+dotnet restore FXLCS/FXLCS.csproj
 
 # Build the whole solution
-msbuild "Plain Craft Launcher 2.sln" /p:Configuration=Release
+msbuild "Foxes Launcher.sln" /p:Configuration=Release
 ```
 
-You can also open `Plain Craft Launcher 2.sln` in Visual Studio 2022, select the `Release` configuration, and build the solution.
+You can also open `Foxes Launcher.sln` in Visual Studio 2022, select the `Release` configuration, and build the solution.
 
 The output is located at:
 
 ```text
-Plain Craft Launcher 2\bin\Plain Craft Launcher 2.exe
+Foxes Launcher\bin\Foxes Launcher.exe
 ```
 
-During the build, `build/GenerateSecrets.ps1` reads `.env` (and optionally `.env.local`) from the repository root and generates `Plain Craft Launcher 2/Modules/GeneratedSecrets.vb`. Both the generated file and `.env` are ignored by Git; never commit real secrets.
+During the build, `build/GenerateSecrets.ps1` reads `.env` (and optionally `.env.local`) from the repository root and generates `Foxes Launcher/Modules/GeneratedSecrets.vb`. Both the generated file and `.env` are ignored by Git; never commit real secrets.
 
 Main configuration keys:
 
-- `PCL_VERSION_BRANCH`: branch marker. Use `OpenSource` for the open-source edition and `Official` for the official/release branch; this also controls update and online configuration features.
-- `PCL_REG_FOLDER`: registry isolation folder. When empty, `Official` uses `PCL` and other branches use `PCLDebug`.
-- `PCL_MS_CLIENT_ID`: OAuth client ID used for Microsoft login.
-- `PCL_CURSEFORGE_API_KEY`: CurseForge API key.
-- `PCL_CLS_BASE_URL`: anonymous telemetry endpoint; leave empty to disable.
-- `PCL_COMMIT_HASH`: commit hash for the build; read from Git when empty.
+- `FXL_VERSION_BRANCH`: branch marker. Use `OpenSource` for the open-source edition and `Official` for the official/release branch; this also controls update and online configuration features.
+- `FXL_REG_FOLDER`: registry isolation folder. When empty, `Official` uses `FXL` and other branches use `FXLDebug`.
+- `FXL_MS_CLIENT_ID`: OAuth client ID used for Microsoft login.
+- `FXL_CURSEFORGE_API_KEY`: CurseForge API key.
+- `FXL_CLS_BASE_URL`: anonymous telemetry endpoint; leave empty to disable.
+- `FXL_COMMIT_HASH`: commit hash for the build; read from Git when empty.
 
 You can also inject the same-named environment variables before building; they take precedence over `.env` (CI uses this to read repository secrets).
 
@@ -192,26 +193,26 @@ When unset, the corresponding features will use empty values or remain unavailab
 
 | Directory | Description |
 | --- | --- |
-| `Plain Craft Launcher 2/` | VB.NET WPF application: UI, pages, animations, instances, and launch logic. |
-| `PCLCS/` | C# core library: Java, Minecraft versions, install manifests, and launch utilities. |
-| `MeloongCore/` | Git submodule (FoxesCore) providing shared .NET and WPF foundation libraries. |
-| `Plain Craft Launcher 2.sln` | Visual Studio solution. |
+| `Foxes Launcher/` | VB.NET WPF application: UI, pages, animations, instances, and launch logic. |
+| `FXLCS/` | C# core library: Java, Minecraft versions, install manifests, and launch utilities. |
+| `FoxesCore/` | Git submodule (FoxesCore) providing shared .NET and WPF foundation libraries. |
+| `Foxes Launcher.sln` | Visual Studio solution. |
 
 ### Version and Updates
 
-The current version is `2.99.0.1`. The version name is defined in `Plain Craft Launcher 2/Modules/Base/ModBase.vb`, and the assembly version is defined in `Plain Craft Launcher 2/My Project/AssemblyInfo.vb`. Release builds are produced by the [Build workflow](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml).
+The current version is `0.0.1.0`. The version name is defined in `Foxes Launcher/Modules/Base/ModBase.vb`, and the assembly version is defined in `Foxes Launcher/My Project/AssemblyInfo.vb`. Release builds are produced by the [Build workflow](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml).
 
 ### Changelog
 
-- `2.99.0.1`: synced with PCL 2.99.0.1; updated project URLs, issue templates, README, and repository ignore rules; removed unreferenced code, the prebuilt release archive, and the unused duplicate manifest.
+- `2.99.0.1`: synced with PCL 2.99.0.1; updated project URLs, issue templates, README, and repository ignore rules; removed unreferenced code, the prebuilt release archive, and the unused duplicate manifest; added the MIT license and upstream copyright notice.
 
 ### License and Credits
 
-This project continues to use PCL's [Distribution License and Repository Fair-Use Guidelines](LICENCE). Any modification, distribution, or derivative work based on this project must comply with that document and retain the attribution and sponsorship links for the original author, 龙腾猫跃.
+New code and documentation authored by the EndlessMC Organization are released under the [MIT License](LICENSE). Because this project is based on PCL2, upstream code and assets remain governed by PCL's [Distribution License and Repository Fair-Use Guidelines](LICENCE); the MIT License does not relicense upstream content. Any modification, distribution, or derivative work based on this project must also comply with that document and retain the attribution and sponsorship links for the original author, 龙腾猫跃.
 
 - Upstream project: [Meloong-Git/PCL](https://github.com/Meloong-Git/PCL)
 - Help documentation: [LTCatt/PCL2Help](https://github.com/LTCatt/PCL2Help)
-- Thanks to the PCL community, MeloongCore contributors, and everyone who has submitted feedback or code.
+- Thanks to the PCL community, FoxesCore contributors, and everyone who has submitted feedback or code.
 
 ---
 

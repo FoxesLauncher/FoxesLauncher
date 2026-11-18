@@ -1,4 +1,4 @@
-[submodule "MeloongCore"]
-	path = MeloongCore
+[submodule "FoxesCore"]
+	path = FoxesCore
 	url = https://github.com/FoxesLauncher/FoxesCore.git
 	branch = pcl-dev

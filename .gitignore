@@ -371,7 +371,7 @@ MaskFiles/
 
 # 本地运行目录
 /.minecraft/
-/PCL/
+/FXL/
 
 # 发布包与官方更新补丁
 /最新正式版.zip
@@ -388,9 +388,28 @@ MaskFiles/
 Thumbs.db
 desktop.ini
 
+# 测试覆盖率、诊断与安装包产物
+*.trx
+*.coverage
+*.coveragexml
+*.snupkg
+*.wixpdb
+*.appxupload
+*.appxbundle
+*.msix
+*.msixbundle
+*.msi
+*.msm
+*.msp
+
+# 其他 IDE 与工具缓存
+.fleet/
+.history/
+*.iml
+
 # 本地构建配置（可能包含密钥，请勿提交）
 .env
 .env.*
 !.env.example
 .env.local
-Plain Craft Launcher 2/Modules/GeneratedSecrets.vb
+Foxes Launcher/Modules/GeneratedSecrets.vb
