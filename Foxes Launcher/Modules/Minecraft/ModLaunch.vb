@@ -246,7 +246,20 @@ NextInner:
         '正版购买提示
         If CurrentLaunchOptions?.SaveBatch Is Nothing AndAlso '保存脚本时不提示
            Not Settings.Get(Of Boolean)("HintBuy") AndAlso Settings.Get(Of McLoginType)("LoginType") <> McLoginType.Ms Then
-            If Globalization.CultureInfo.CurrentCulture.Name.StartsWithF("zh") OrElse Globalization.CultureInfo.CurrentUICulture.Name.StartsWithF("zh") Then '中文？
+            If IsOfflineAccountRestricted AndAlso Settings.Get(Of McLoginType)("LoginType") = McLoginType.Legacy Then
+                '区域限制：需要先登录微软账户才能使用离线账户
+                Select Case MyMsgBox(OfflineAccountRestrictedMessage & vbCrLf & "登录一次微软账号后，即可继续使用离线账户。",
+                    "正版验证", "去登录", "试玩", "返回")
+                    Case 1
+                        Hint("请先在主页登录微软账号，然后再启动离线账户。", HintType.Red)
+                        Throw New OperationCanceledException
+                    Case 2
+                        Hint("游戏将以试玩模式启动！", HintType.Red)
+                        CurrentLaunchOptions.ExtraGameArgs.Add("--demo")
+                    Case 3
+                        Throw New OperationCanceledException
+                End Select
+            ElseIf Globalization.CultureInfo.CurrentCulture.Name.StartsWithF("zh") OrElse Globalization.CultureInfo.CurrentUICulture.Name.StartsWithF("zh") Then '中文？
                 RunInNewThread(
                 Sub()
                     Select Case Settings.Get(Of Integer)("SystemLaunchCount")

@@ -11,11 +11,31 @@ Public Class PageSetupSystem
         If IsLoaded Then Return
         IsLoaded = True
 
+        InitRegionLanguageCombos()
         AniControlEnabled += 1
         Reload()
         SliderLoad()
         AniControlEnabled -= 1
 
+    End Sub
+    ''' <summary>
+    ''' 初始化区域与语言下拉框的选项。
+    ''' </summary>
+    Private Sub InitRegionLanguageCombos()
+        If ComboRegion.Items.Count = 0 Then
+            For Each Entry In RegionEntries
+                Dim Item As New MyComboBoxItem With {.Content = Entry.Name, .Tag = Entry.Code}
+                SettingService.SetValue(Item, Entry.Code)
+                ComboRegion.Items.Add(Item)
+            Next
+        End If
+        If ComboLanguage.Items.Count = 0 Then
+            For Each Entry In LanguageEntries
+                Dim Item As New MyComboBoxItem With {.Content = Entry.Name, .Tag = Entry.Code}
+                SettingService.SetValue(Item, Entry.Code)
+                ComboLanguage.Items.Add(Item)
+            Next
+        End If
     End Sub
     Public Sub Reload()
         SettingService.RefreshSettings(Me)

@@ -1968,6 +1968,10 @@ Retry:
     ''' 进行合并安装。返回是否已经开始安装。
     ''' </summary>
     Public Function McInstallStart(Request As McInstallRequest) As Boolean
+        If IsGameDownloadRestricted Then
+            Hint(GameDownloadRestrictedMessage, HintType.Red)
+            Return False
+        End If
         Try
             Dim Loader As New LoaderCombo(Of String)(Request.NewInstanceName & " 安装", McInstallLoadersGet(Request)) With {.OnStateChanged = AddressOf McInstallState}
             '启动
@@ -1985,6 +1989,10 @@ Retry:
     ''' 进行修改安装。返回是否已经开始安装。
     ''' </summary>
     Public Function McModificationStart(Request As McInstallRequest, Instance As McInstance) As Boolean
+        If IsGameDownloadRestricted Then
+            Hint(GameDownloadRestrictedMessage, HintType.Red)
+            Return False
+        End If
         Try
             '检查版本目录下的 Natives，防止修改正在运行的游戏
             Dim TargetFolder = Instance.PathIndie

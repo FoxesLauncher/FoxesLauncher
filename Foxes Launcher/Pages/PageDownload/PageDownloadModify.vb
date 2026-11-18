@@ -632,6 +632,11 @@ Public Class PageDownloadModify
     End Sub
 
     Private Sub CardMinecraft_MouseLeftButtonUp(sender As Object, e As MouseButtonEventArgs) Handles CardMinecraft.MouseLeftButtonUp
+        If IsGameDownloadRestricted Then
+            Hint(GameDownloadRestrictedMessage, HintType.Red)
+            e.Handled = True
+            Return
+        End If
         ShowMinecraftVersionList()
         e.Handled = True
     End Sub

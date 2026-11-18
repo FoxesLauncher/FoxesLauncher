@@ -8,6 +8,10 @@ Public Module ModModpack
     ''' 弹窗要求选择一个整合包文件并进行安装。
     ''' </summary>
     Public Sub ModpackInstall()
+        If IsGameDownloadRestricted Then
+            Hint(GameDownloadRestrictedMessage, HintType.Red)
+            Return
+        End If
         Dim File As String = Dialogs.SelectFile("选择整合包压缩文件", False, filter:={({"rar", "zip", "mrpack"}, "整合包文件")}).FirstOrDefault() '选择整合包文件
         If String.IsNullOrEmpty(File) Then Return
         RunInThread(
@@ -25,6 +29,7 @@ Public Module ModModpack
     ''' 必须在工作线程执行。
     ''' </summary>
     Public Function ModpackInstall(File As String, Optional InstanceName As String = Nothing, Optional Logo As String = Nothing) As LoaderCombo(Of String)
+        If IsGameDownloadRestricted Then Throw New Exception(GameDownloadRestrictedMessage)
         Logger.Info($"整合包安装请求：{If(File, "null")}")
         Dim Archive As ZipArchive = Nothing
         Dim ArchiveBaseFolder As String = ""

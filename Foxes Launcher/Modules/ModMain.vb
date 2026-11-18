@@ -213,6 +213,7 @@ EndHint:
         [Select]
         Input
         Login
+        RegionLanguage
     End Enum
 
     ''' <summary>
@@ -322,6 +323,29 @@ EndHint:
         Logger.Info($"选择弹框返回：{If(Converter.Result, "null")}")
         Return Converter.Result
     End Function
+    ''' <summary>
+    ''' 显示区域与语言选择框。点击确定后返回选择结果。
+    ''' </summary>
+    ''' <param name="Title">弹窗的标题。</param>
+    ''' <param name="Button1">显示的第一个按钮，默认为 “确定”。</param>
+    Public Function MyMsgBoxRegionLanguage(Optional Title As String = "区域与语言", Optional Button1 As String = "确定") As RegionLanguageSelection
+        '主窗体尚未加载时直接返回，由调用方使用默认值
+        If FrmMain Is Nothing OrElse FrmMain.PanMsg Is Nothing Then Return Nothing
+        '将弹窗列入队列
+        Dim Converter As New MyMsgBoxConverter With {.Type = MyMsgBoxType.RegionLanguage, .Title = Title, .Button1 = Button1}
+        WaitingMyMsgBox.Enqueue(Converter)
+        '虽然我也不知道这是啥但是能用就成了 :)
+        Try
+            If FrmMain IsNot Nothing Then FrmMain.DragStop()
+            If RunInUi() Then MyMsgBoxTick()
+            ComponentDispatcher.PushModal()
+            Dispatcher.PushFrame(Converter.WaitFrame)
+        Finally
+            ComponentDispatcher.PopModal()
+        End Try
+        Logger.Info($"区域与语言弹框返回：{If(Converter.Result, "null")}")
+        Return Converter.Result
+    End Function
 
     ''' <summary>
     ''' 等待显示的弹窗。
@@ -346,6 +370,8 @@ EndHint:
                         FrmMain.PanMsg.Children.Add(New MyMsgText(TargetMsgBox))
                     Case MyMsgBoxType.Login
                         FrmMain.PanMsg.Children.Add(New MyMsgLogin(TargetMsgBox))
+                    Case MyMsgBoxType.RegionLanguage
+                        FrmMain.PanMsg.Children.Add(New MyMsgRegionLanguage(TargetMsgBox))
                 End Select
             Else
                 '没有弹窗，没有等待的弹窗

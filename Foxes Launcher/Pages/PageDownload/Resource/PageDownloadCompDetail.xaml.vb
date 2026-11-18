@@ -328,6 +328,10 @@ GroupDone:
 
     '整合包安装
     Public Sub Install_Click(sender As MyListItem, e As EventArgs)
+        If IsGameDownloadRestricted Then
+            Hint(GameDownloadRestrictedMessage, HintType.Red)
+            Return
+        End If
         Try
 
             '获取基本信息

@@ -139,22 +139,30 @@
                 </Grid>
             </local:MyCard>
 
-            <!-- <local:MyCard x:Name="CardMain" Margin="0,15" Title="全局设置">
-                <StackPanel Margin="25,40,25,15">
-                    <Grid x:Name="PanMainLang" Height="28" Margin="0,0,0,10" Visibility="Collapsed">
+            <local:MyCard x:Name="CardRegionLanguage" Margin="0,0,0,15" Title="区域与语言">
+                <StackPanel Margin="25,37,25,15">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Name" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="语言" Margin="0,0,25,0" />
-                        <local:MyComboBox x:Name="ComboBackgroundSuit" Tag="UiBackgroundSuit" HorizontalAlignment="Left" Width="170" Grid.Column="1">
-                            <local:MyComboBoxItem Content="简体中文" Tag="zh_CN" IsSelected="True" />
-                            <local:MyComboBoxItem Content="繁體中文" Tag="zh_HK" />
-                            <local:MyComboBoxItem Content="English" Tag="en_US" />
-                        </local:MyComboBox>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="28" />
+                            <RowDefinition Height="7" />
+                            <RowDefinition Height="28" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="区域" Margin="0,0,25,0" />
+                        <local:MyComboBox x:Name="ComboRegion" Grid.Column="1" HorizontalAlignment="Left" Width="280" local:SettingService.Key="SystemRegion"
+                                          ToolTip="不同区域可能对应不同的功能限制。&#xa;亚洲（中国大陆）：不提供 Minecraft 下载与安装功能，但仍会显示入口并给出提示。&#xa;亚洲（其他）、非洲、美洲、欧洲、大洋洲：必须先登录微软账号，才能使用离线账户。" />
+                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="语言" Margin="0,0,25,0" />
+                        <local:MyComboBox x:Name="ComboLanguage" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Width="280" local:SettingService.Key="SystemLanguage"
+                                          ToolTip="目前仅保存语言设置，界面文本暂未接入多语言。" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,10,0,0" TextWrapping="Wrap" Opacity="0.55" FontSize="12"
+                                   Text="语言选择目前仅作为配置保存，尚未接入多语言框架。" />
                     </Grid>
                 </StackPanel>
-            </local:MyCard> -->
+            </local:MyCard>
             <local:MyCard x:Name="CardDebug" Margin="0,0,0,15" Title="调试选项" CanSwap="True" IsSwapped="True">
                 <StackPanel Margin="25,40,25,15">
                     <Grid x:Name="PanDebugAnim" Height="22" Margin="0,0,0,10">

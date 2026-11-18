@@ -14,11 +14,25 @@ Public Class PageDownloadInstall
 
     Public Overridable Sub LoaderInit() Handles Me.Initialized
         ControlInit()
-        PageLoaderInit(LoadMinecraft, PanLoad, PanAllBack, Nothing, DlClientListLoader, AddressOf LoadMinecraft_OnFinish)
+        If IsGameDownloadRestricted Then
+            PageLoaderInit(LoadMinecraft, PanLoad, PanAllBack, Nothing, RestrictedMcDownloadLoader)
+        Else
+            PageLoaderInit(LoadMinecraft, PanLoad, PanAllBack, Nothing, DlClientListLoader, AddressOf LoadMinecraft_OnFinish)
+        End If
     End Sub
+
+    ''' <summary>
+    ''' 在限制区域使用，用于在页面中显示下载限制提示。
+    ''' </summary>
+    Private ReadOnly RestrictedMcDownloadLoader As New LoaderTask(Of String, DlClientListResult)("McDownload Restricted", Sub() Throw New Exception(GameDownloadRestrictedMessage))
 
     Private IsLoad As Boolean = False
     Public Overridable Sub Init() Handles Me.Loaded
+        If IsGameDownloadRestricted Then
+            IsLoad = True
+            PanBack.ScrollToHome()
+            Return
+        End If
         If IsLoad Then
             IsSelectNameEdited = False
             ExitSelectPage()
@@ -1143,6 +1157,10 @@ Public Class PageDownloadInstall
         If e.Key = Key.Enter AndAlso IsInSelectPage AndAlso BtnStart.IsEnabled Then BtnStart_Click()
     End Sub
     Private Sub BtnStart_Click() Handles BtnStart.Click
+        If IsGameDownloadRestricted Then
+            Hint(GameDownloadRestrictedMessage, HintType.Red)
+            Return
+        End If
         '提交安装申请
         Dim InstanceName As String = TextSelectName.Text
         Dim Request As New McInstallRequest With {

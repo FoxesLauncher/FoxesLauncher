@@ -142,11 +142,18 @@ Public Class MyComboBox
 #Region "设置"
 
     Private Sub RefreshSetting(NewValue As String) Implements ISettingControl.RefreshSetting
-        Dim TargetItem = Items.OfType(Of DependencyObject)().FirstOrDefault(Function(i) Val(If(SettingService.GetValue(i), -1)) = NewValue)
+        Dim TargetItem = Items.OfType(Of DependencyObject)().FirstOrDefault(
+            Function(i)
+                Dim ItemValue As String = SettingService.GetValue(i)
+                Return ItemValue IsNot Nothing AndAlso ItemValue = NewValue
+            End Function)
         If TargetItem IsNot Nothing Then
             SelectedItem = TargetItem
-        ElseIf Items.Count > NewValue Then
-            SelectedIndex = NewValue
+            Return
+        End If
+        Dim Index As Integer
+        If Integer.TryParse(NewValue, Index) AndAlso Index >= 0 AndAlso Index < Items.Count Then
+            SelectedIndex = Index
         Else
             Logger.Warn($"尝试显示设置 {SettingService.GetKey(Me)}，但没有找到设置值 {NewValue} 的对应项")
             SelectedIndex = -1

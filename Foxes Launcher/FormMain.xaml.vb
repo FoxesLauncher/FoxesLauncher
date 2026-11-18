@@ -411,6 +411,8 @@ Public Class FormMain
         '加载池
         RunInNewThread(
         Sub()
+            '区域与语言提示
+            PromptRegionLanguageIfNeeded()
             'EULA 提示
             Const EulaVersion As Integer = 2
             If Settings.Get(Of Integer)("SystemEulaVersion") < EulaVersion Then
