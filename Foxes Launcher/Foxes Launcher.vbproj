@@ -809,6 +809,9 @@
     <None Include="Resources\forge-installer.jar" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\Heads\Himic.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="Images\Heads\Logo.png" />
   </ItemGroup>
   <ItemGroup>

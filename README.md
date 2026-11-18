@@ -10,7 +10,7 @@
 [![Build](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml/badge.svg)](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Upstream License](https://img.shields.io/badge/upstream-PCL%20Distribution%20License-blue.svg)](LICENCE)
-[![Version](https://img.shields.io/badge/version-2.99.0.1-informational.svg)](https://github.com/FoxesLauncher/FoxesLauncher/releases)
+[![Version](https://img.shields.io/badge/version-0.0.1.0-informational.svg)](https://github.com/FoxesLauncher/FoxesLauncher/releases)
 
 ---
 
@@ -99,7 +99,7 @@ Foxes Launcher\bin\Foxes Launcher.exe
 
 ### 版本与更新
 
-当前版本为 `2.99.0.1`，版本号定义在 `Foxes Launcher/Modules/Base/ModBase.vb`，程序集版本定义在 `Foxes Launcher/My Project/AssemblyInfo.vb`。发布构建由 [Build 工作流](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml) 生成。
+当前版本为 `0.0.1.0`，版本号定义在 `Foxes Launcher/Modules/Base/ModBase.vb`，程序集版本定义在 `Foxes Launcher/My Project/AssemblyInfo.vb`。发布构建由 [Build 工作流](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml) 生成。
 
 ### 变更日志
 
@@ -200,7 +200,7 @@ When unset, the corresponding features will use empty values or remain unavailab
 
 ### Version and Updates
 
-The current version is `2.99.0.1`. The version name is defined in `Foxes Launcher/Modules/Base/ModBase.vb`, and the assembly version is defined in `Foxes Launcher/My Project/AssemblyInfo.vb`. Release builds are produced by the [Build workflow](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml).
+The current version is `0.0.1.0`. The version name is defined in `Foxes Launcher/Modules/Base/ModBase.vb`, and the assembly version is defined in `Foxes Launcher/My Project/AssemblyInfo.vb`. Release builds are produced by the [Build workflow](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml).
 
 ### Changelog
 
