@@ -215,6 +215,9 @@
 
     <Compile Include="Controls\MyVirtualizingElement.vb" />
     <Compile Include="Modules\Base\FxlLogger.vb" />
+    <Compile Include="Modules\Base\ModLanguage.vb" />
+    <Compile Include="Modules\Base\I18nExtension.vb" />
+    <Compile Include="Modules\Base\FxlExceptions.vb" />
     <Compile Include="Modules\Resource\LocalResourceFile.vb" />
     <Compile Include="Modules\Resource\ResourceProject.vb" />
     <Compile Include="Modules\Resource\ResourceVersion.vb" />
@@ -764,6 +767,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\icon.ico" />
+    <EmbeddedResource Include="Resources\Languages\*.json">
+      <LogicalName>FXL.Resources.Languages.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Font.ttf" />
