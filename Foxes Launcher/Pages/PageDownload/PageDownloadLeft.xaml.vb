@@ -39,7 +39,7 @@ Public Class PageDownloadLeft
                 If FrmDownloadDataPack Is Nothing Then FrmDownloadDataPack = New PageDownloadDataPack
                 Return FrmDownloadDataPack
             Case Else
-                Throw New Exception("未知的下载子页面种类：" & ID)
+                Throw New Exception(T("未知的下载子页面种类：{0}", ID))
         End Select
     End Function
 
@@ -140,7 +140,7 @@ Public Class PageDownloadLeft
                 End If
                 ItemDataPack.Checked = True
         End Select
-        Hint("正在刷新……", Log:=False)
+        Hint(T("正在刷新……"), Log:=False)
     End Sub
 
     '点击返回

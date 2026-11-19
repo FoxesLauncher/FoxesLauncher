@@ -200,76 +200,76 @@ Public Class ResourceProject
                     Select(Of Integer)(Function(t) t("id")).Distinct.OrderByDescending(Function(c) c)
                     Select Case Category
                             'Mod
-                        Case 406 : Tags.Add("世界元素")
-                        Case 407 : Tags.Add("生物群系")
-                        Case 410 : Tags.Add("维度")
-                        Case 408 : Tags.Add("矿物/资源")
-                        Case 409 : Tags.Add("天然结构")
-                        Case 412 : Tags.Add("科技")
-                        Case 415 : Tags.Add("管道/物流")
-                        Case 4843 : Tags.Add("自动化")
-                        Case 417 : Tags.Add("能源")
-                        Case 4558 : Tags.Add("红石")
-                        Case 436 : Tags.Add("食物/烹饪")
-                        Case 416 : Tags.Add("农业")
-                        Case 414 : Tags.Add("运输")
-                        Case 420 : Tags.Add("仓储")
-                        Case 419 : Tags.Add("魔法")
-                        Case 422 : Tags.Add("冒险")
-                        Case 424 : Tags.Add("装饰")
-                        Case 411 : Tags.Add("生物")
-                        Case 434 : Tags.Add("装备")
-                        Case 6814 : Tags.Add("性能优化")
-                        Case 9026 : Tags.Add("创造模式")
-                        Case 423 : Tags.Add("信息显示")
-                        Case 435 : Tags.Add("服务器")
-                        Case 5191 : Tags.Add("改良")
-                        Case 421 : Tags.Add("支持库")
+                        Case 406 : Tags.Add(T("世界元素"))
+                        Case 407 : Tags.Add(T("生物群系"))
+                        Case 410 : Tags.Add(T("维度"))
+                        Case 408 : Tags.Add(T("矿物/资源"))
+                        Case 409 : Tags.Add(T("天然结构"))
+                        Case 412 : Tags.Add(T("科技"))
+                        Case 415 : Tags.Add(T("管道/物流"))
+                        Case 4843 : Tags.Add(T("自动化"))
+                        Case 417 : Tags.Add(T("能源"))
+                        Case 4558 : Tags.Add(T("红石"))
+                        Case 436 : Tags.Add(T("食物/烹饪"))
+                        Case 416 : Tags.Add(T("农业"))
+                        Case 414 : Tags.Add(T("运输"))
+                        Case 420 : Tags.Add(T("仓储"))
+                        Case 419 : Tags.Add(T("魔法"))
+                        Case 422 : Tags.Add(T("冒险"))
+                        Case 424 : Tags.Add(T("装饰"))
+                        Case 411 : Tags.Add(T("生物"))
+                        Case 434 : Tags.Add(T("装备"))
+                        Case 6814 : Tags.Add(T("性能优化"))
+                        Case 9026 : Tags.Add(T("创造模式"))
+                        Case 423 : Tags.Add(T("信息显示"))
+                        Case 435 : Tags.Add(T("服务器"))
+                        Case 5191 : Tags.Add(T("改良"))
+                        Case 421 : Tags.Add(T("支持库"))
                             '整合包
-                        Case 4484 : Tags.Add("多人")
-                        Case 4479 : Tags.Add("硬核")
-                        Case 4483 : Tags.Add("战斗")
-                        Case 4478 : Tags.Add("任务")
-                        Case 4472 : Tags.Add("科技")
-                        Case 4473 : Tags.Add("魔法")
-                        Case 4475 : Tags.Add("冒险")
-                        Case 4476 : Tags.Add("探索")
-                        Case 4477 : Tags.Add("小游戏")
-                        Case 4474 : Tags.Add("科幻")
-                        Case 4736 : Tags.Add("空岛")
-                        Case 5128 : Tags.Add("原版改良")
+                        Case 4484 : Tags.Add(T("多人"))
+                        Case 4479 : Tags.Add(T("硬核"))
+                        Case 4483 : Tags.Add(T("战斗"))
+                        Case 4478 : Tags.Add(T("任务"))
+                        Case 4472 : Tags.Add(T("科技"))
+                        Case 4473 : Tags.Add(T("魔法"))
+                        Case 4475 : Tags.Add(T("冒险"))
+                        Case 4476 : Tags.Add(T("探索"))
+                        Case 4477 : Tags.Add(T("小游戏"))
+                        Case 4474 : Tags.Add(T("科幻"))
+                        Case 4736 : Tags.Add(T("空岛"))
+                        Case 5128 : Tags.Add(T("原版改良"))
                         Case 4487 : Tags.Add("FTB")
-                        Case 4480 : Tags.Add("基于地图")
-                        Case 4481 : Tags.Add("轻量")
-                        Case 4482 : Tags.Add("大型")
+                        Case 4480 : Tags.Add(T("基于地图"))
+                        Case 4481 : Tags.Add(T("轻量"))
+                        Case 4482 : Tags.Add(T("大型"))
                             '资源包
-                        Case 403 : Tags.Add("原版风")
-                        Case 400 : Tags.Add("写实风")
-                        Case 401 : Tags.Add("现代风")
-                        Case 402 : Tags.Add("中世纪")
-                        Case 399 : Tags.Add("蒸汽朋克")
-                        Case 5244 : Tags.Add("含字体")
-                        Case 404 : Tags.Add("动态效果")
-                        Case 4465 : Tags.Add("兼容 Mod")
+                        Case 403 : Tags.Add(T("原版风"))
+                        Case 400 : Tags.Add(T("写实风"))
+                        Case 401 : Tags.Add(T("现代风"))
+                        Case 402 : Tags.Add(T("中世纪"))
+                        Case 399 : Tags.Add(T("蒸汽朋克"))
+                        Case 5244 : Tags.Add(T("含字体"))
+                        Case 404 : Tags.Add(T("动态效果"))
+                        Case 4465 : Tags.Add(T("兼容 Mod"))
                         Case 393 : Tags.Add("16x")
                         Case 394 : Tags.Add("32x")
                         Case 395 : Tags.Add("64x")
                         Case 396 : Tags.Add("128x")
                         Case 397 : Tags.Add("256x")
-                        Case 398 : Tags.Add("超高清")
-                        Case 5193 : Tags.Add("数据包") '有这个 Tag 的项会从资源包请求中被移除
+                        Case 398 : Tags.Add(T("超高清"))
+                        Case 5193 : Tags.Add(T("数据包")) '有这个 Tag 的项会从资源包请求中被移除
                             '光影包
-                        Case 6553 : Tags.Add("写实风")
-                        Case 6554 : Tags.Add("幻想风")
-                        Case 6555 : Tags.Add("原版风")
+                        Case 6553 : Tags.Add(T("写实风"))
+                        Case 6554 : Tags.Add(T("幻想风"))
+                        Case 6555 : Tags.Add(T("原版风"))
                             '数据包
-                        Case 6948 : Tags.Add("冒险")
-                        Case 6949 : Tags.Add("幻想")
-                        Case 6950 : Tags.Add("支持库")
-                        Case 6952 : Tags.Add("魔法")
-                        Case 6946 : Tags.Add("Mod 相关")
-                        Case 6951 : Tags.Add("科技")
-                        Case 6953 : Tags.Add("实用")
+                        Case 6948 : Tags.Add(T("冒险"))
+                        Case 6949 : Tags.Add(T("幻想"))
+                        Case 6950 : Tags.Add(T("支持库"))
+                        Case 6952 : Tags.Add(T("魔法"))
+                        Case 6946 : Tags.Add(T("Mod 相关"))
+                        Case 6951 : Tags.Add(T("科技"))
+                        Case 6953 : Tags.Add(T("实用"))
                     End Select
                 Next
 #End Region
@@ -311,75 +311,75 @@ Public Class ResourceProject
                     Select Case Category
                         Case "datapack" : Types = ResourceTypes.DataPack
                             '共用
-                        Case "technology" : Tags.Add("科技")
-                        Case "magic" : Tags.Add("魔法")
-                        Case "adventure" : Tags.Add("冒险")
-                        Case "utility" : Tags.Add("实用")
-                        Case "optimization" : Tags.Add("性能优化")
-                        Case "vanilla-like" : Tags.Add("原版风")
-                        Case "realistic" : Tags.Add("写实风")
+                        Case "technology" : Tags.Add(T("科技"))
+                        Case "magic" : Tags.Add(T("魔法"))
+                        Case "adventure" : Tags.Add(T("冒险"))
+                        Case "utility" : Tags.Add(T("实用"))
+                        Case "optimization" : Tags.Add(T("性能优化"))
+                        Case "vanilla-like" : Tags.Add(T("原版风"))
+                        Case "realistic" : Tags.Add(T("写实风"))
                             'Mod/数据包
-                        Case "worldgen" : Tags.Add("世界元素")
-                        Case "food" : Tags.Add("食物/烹饪")
-                        Case "game-mechanics" : Tags.Add("游戏机制")
-                        Case "transportation" : Tags.Add("运输")
-                        Case "storage" : Tags.Add("仓储")
-                        Case "decoration" : If Types <> ResourceTypes.ResourcePack Then Tags.Add("装饰")
-                        Case "mobs" : If Types <> ResourceTypes.ResourcePack Then Tags.Add("生物")
-                        Case "equipment" : If Types <> ResourceTypes.ResourcePack Then Tags.Add("装备")
-                        Case "social" : Tags.Add("服务器")
-                        Case "library" : Tags.Add("支持库")
+                        Case "worldgen" : Tags.Add(T("世界元素"))
+                        Case "food" : Tags.Add(T("食物/烹饪"))
+                        Case "game-mechanics" : Tags.Add(T("游戏机制"))
+                        Case "transportation" : Tags.Add(T("运输"))
+                        Case "storage" : Tags.Add(T("仓储"))
+                        Case "decoration" : If Types <> ResourceTypes.ResourcePack Then Tags.Add(T("装饰"))
+                        Case "mobs" : If Types <> ResourceTypes.ResourcePack Then Tags.Add(T("生物"))
+                        Case "equipment" : If Types <> ResourceTypes.ResourcePack Then Tags.Add(T("装备"))
+                        Case "social" : Tags.Add(T("服务器"))
+                        Case "library" : Tags.Add(T("支持库"))
                             '整合包
-                        Case "multiplayer" : Tags.Add("多人")
-                        Case "challenging" : Tags.Add("硬核")
-                        Case "combat" : Tags.Add("战斗")
-                        Case "quests" : Tags.Add("任务")
-                        Case "kitchen-sink" : Tags.Add("水槽包")
-                        Case "lightweight" : Tags.Add("轻量")
+                        Case "multiplayer" : Tags.Add(T("多人"))
+                        Case "challenging" : Tags.Add(T("硬核"))
+                        Case "combat" : Tags.Add(T("战斗"))
+                        Case "quests" : Tags.Add(T("任务"))
+                        Case "kitchen-sink" : Tags.Add(T("水槽包"))
+                        Case "lightweight" : Tags.Add(T("轻量"))
                             '资源包
-                        Case "simplistic" : Tags.Add("简洁")
-                        Case "combat" : Tags.Add("战斗")
-                        Case "tweaks" : Tags.Add("改良")
+                        Case "simplistic" : Tags.Add(T("简洁"))
+                        Case "combat" : Tags.Add(T("战斗"))
+                        Case "tweaks" : Tags.Add(T("改良"))
 
-                        Case "8x-" : Tags.Add("极简")
+                        Case "8x-" : Tags.Add(T("极简"))
                         Case "16x" : Tags.Add("16x")
                         Case "32x" : Tags.Add("32x")
                         Case "48x" : Tags.Add("48x")
                         Case "64x" : Tags.Add("64x")
                         Case "128x" : Tags.Add("128x")
                         Case "256x" : Tags.Add("256x")
-                        Case "512x+" : Tags.Add("超高清")
+                        Case "512x+" : Tags.Add(T("超高清"))
 
-                        Case "audio" : Tags.Add("含声音")
-                        Case "fonts" : Tags.Add("含字体")
-                        Case "models" : Tags.Add("含模型")
-                        Case "gui" : Tags.Add("含 UI")
-                        Case "locale" : Tags.Add("含语言")
-                        Case "core-shaders" : Tags.Add("核心着色器")
-                        Case "modded" : Tags.Add("兼容 Mod")
+                        Case "audio" : Tags.Add(T("含声音"))
+                        Case "fonts" : Tags.Add(T("含字体"))
+                        Case "models" : Tags.Add(T("含模型"))
+                        Case "gui" : Tags.Add(T("含 UI"))
+                        Case "locale" : Tags.Add(T("含语言"))
+                        Case "core-shaders" : Tags.Add(T("核心着色器"))
+                        Case "modded" : Tags.Add(T("兼容 Mod"))
                             '光影包
-                        Case "fantasy" : Tags.Add("幻想风")
-                        Case "semi-realistic" : Tags.Add("半写实风")
-                        Case "cartoon" : Tags.Add("卡通风")
+                        Case "fantasy" : Tags.Add(T("幻想风"))
+                        Case "semi-realistic" : Tags.Add(T("半写实风"))
+                        Case "cartoon" : Tags.Add(T("卡通风"))
                             '暂时不添加性能负荷 Tag
                             'Case "potato" : Tags.Add("极低")
                             'Case "low" : Tags.Add("低")
                             'Case "medium" : Tags.Add("中")
                             'Case "high" : Tags.Add("高")
-                        Case "colored-lighting" : Tags.Add("彩色光照")
-                        Case "path-tracing" : Tags.Add("路径追踪")
+                        Case "colored-lighting" : Tags.Add(T("彩色光照"))
+                        Case "path-tracing" : Tags.Add(T("路径追踪"))
                         Case "pbr" : Tags.Add("PBR")
-                        Case "reflections" : Tags.Add("反射")
+                        Case "reflections" : Tags.Add(T("反射"))
 
                         Case "iris" : Tags.Add("Iris")
                         Case "optifine" : Tags.Add("OptiFine")
-                        Case "vanilla" : Tags.Add("原版可用")
+                        Case "vanilla" : Tags.Add(T("原版可用"))
                     End Select
                 Next
                 If Types = ResourceTypes.DataPack AndAlso ModLoaders <> ModLoaders.None Then Types = ResourceTypes.DataPack Or ResourceTypes.Mod
 #End Region
             End If
-            If Not Tags.Any() Then Tags.Add("其他")
+            If Not Tags.Any() Then Tags.Add(T("其他"))
             Tags.Sort()
         End If
         '保存缓存
@@ -389,7 +389,7 @@ Public Class ResourceProject
     ''' 从工程 ID 联网获取对应工程的信息。
     ''' </summary>
     Public Shared Function FromProjectId(ProjectId As String, Platform As ResourcePlatforms) As ResourceProject
-        If Not Platform.Flags.IsSingle Then Throw New ArgumentException($"必须指定单一平台，当前值为 {Platform}")
+        If Not Platform.Flags.IsSingle Then Throw New ArgumentException(T("必须指定单一平台，当前值为 {0}", Platform))
         If Cache.ContainsKey(ProjectId) Then '存在缓存
             Return Cache(ProjectId)
         ElseIf Platform = ResourcePlatforms.CurseForge Then 'CurseForge
@@ -402,7 +402,7 @@ Public Class ResourceProject
     ''' 从工程 ID 列表联网获取工程信息，结果不按原顺序排列。
     ''' </summary>
     Public Shared Iterator Function FromProjectIds(ProjectIds As IEnumerable(Of String), Platform As ResourcePlatforms) As IEnumerable(Of ResourceProject)
-        If Not Platform.Flags.IsSingle Then Throw New ArgumentException($"必须指定单一平台，当前值为 {Platform}")
+        If Not Platform.Flags.IsSingle Then Throw New ArgumentException(T("必须指定单一平台，当前值为 {0}", Platform))
         '获取缓存
         Dim MissingProjectIds As New List(Of String)
         For Each ProjectId In ProjectIds
@@ -456,7 +456,7 @@ Public Class ResourceProject
         '获取版本描述
         Dim GameVersionDescription As String
         If Drops Is Nothing OrElse Not Drops.Any() Then
-            GameVersionDescription = "仅快照版本" '#5412
+            GameVersionDescription = T("仅快照版本") '#5412
         Else
             Dim Segments As New List(Of String)
             Dim IsOld As Boolean = False
@@ -483,7 +483,7 @@ Public Class ResourceProject
                 ElseIf AllDrops IsNot Nothing AndAlso StartDrop >= AllDrops.First Then
                     If EndDrop < 120 Then
                         Segments.Clear()
-                        Segments.Add("全版本")
+                        Segments.Add(T("全版本"))
                         Exit For
                     Else
                         Segments.Add(EndName & "+")
@@ -505,21 +505,21 @@ Public Class ResourceProject
         Select Case ModLoadersForDesc.Count
             Case 0
                 If ModLoadersForDesc.IsSingle Then
-                    ModLoaderDescriptionFull = "仅 " & ModLoadersForDesc.Single.ToString
+                    ModLoaderDescriptionFull =T("仅 {0}", ModLoadersForDesc.Single.ToString)
                     ModLoaderDescriptionPart = ModLoadersForDesc.Single.ToString
                 Else
-                    ModLoaderDescriptionFull = "未知"
+                    ModLoaderDescriptionFull = T("未知")
                     ModLoaderDescriptionPart = ""
                 End If
             Case 1
-                ModLoaderDescriptionFull = "仅 " & ModLoadersForDesc.Single.ToString
+                ModLoaderDescriptionFull =T("仅 {0}", ModLoadersForDesc.Single.ToString)
                 ModLoaderDescriptionPart = ModLoadersForDesc.Single.ToString
             Case Else
                 Dim NewestDrop As Integer = If(Drops.Any, Drops.First, 9999)
                 If ModLoadersForDesc.Contains(ModLoaders.Forge) AndAlso
                    (NewestDrop < 140 OrElse ModLoadersForDesc.Contains(ModLoaders.Fabric)) AndAlso
                    (NewestDrop < 200 OrElse ModLoadersForDesc.Contains(ModLoaders.NeoForge)) Then
-                    ModLoaderDescriptionFull = "任意"
+                    ModLoaderDescriptionFull = T("任意")
                     ModLoaderDescriptionPart = ""
                 Else
                     ModLoaderDescriptionFull = ModLoadersForDesc.Join(" / ")
@@ -561,8 +561,8 @@ Public Class ResourceProject
             NewItem.LabSource.Text = Platform.ToString
             NewItem.LabTime.Text = StringUtils.FormatTimeSpan(LastUpdate - Date.Now, True)
             NewItem.LabDownload.Text =
-                If(DownloadCount > 100000000, Math.Round(DownloadCount / 100000000, 2) & " 亿",
-                If(DownloadCount > 100000, Math.Floor(DownloadCount / 10000) & " 万", DownloadCount))
+                If(DownloadCount > 100000000, T("{0} 亿", Math.Round(DownloadCount / 100000000, 2)),
+                If(DownloadCount > 100000, T("{0} 万", Math.Floor(DownloadCount / 10000)), DownloadCount))
             Return NewItem
         End Function) With {.Height = 64}
     End Function
@@ -640,7 +640,7 @@ Public Class ResourceProject
                 '将 “Forge” 等提示改为 “Forge 版”
                 If IsModLoaderDescription AndAlso Not Ex.Contains("版") AndAlso
                     Ex.Lower.Replace("neoforge", "").Replace("forge", "").Replace("fabric", "").Replace("quilt", "").Length <= 3 Then
-                    Ex = Ex.Replace("Edition", "").Replace("edition", "").Trim.Capitalize & " 版"
+                    Ex =T("{0} 版", Ex.Replace("Edition", "").Replace("edition", "").Trim.Capitalize)
                 End If
                 '将 “forge” 等词语的首字母大写
                 Ex = Ex.Replace("neoforge", "NeoForge").Replace("forge", "Forge").Replace("neo", "Neo").Replace("fabric", "Fabric").Replace("quilt", "Quilt")

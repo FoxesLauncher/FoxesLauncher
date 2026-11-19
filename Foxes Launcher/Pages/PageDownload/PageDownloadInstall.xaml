@@ -45,7 +45,7 @@
                                 <Setter Property="HorizontalAlignment" Value="Right" />
                                 <Setter Property="VerticalAlignment" Value="Top" />
                                 <Setter Property="Margin" Value="0,5,32,0" />
-                                <Setter Property="ToolTip" Value="撤销更改" />
+                                <Setter Property="ToolTip" Value="{DynamicResource 撤销更改}" />
                                 <Setter Property="Cursor" Value="Hand" />
                             </Style>
                             <Style x:Key="ModifyClearButton" TargetType="{x:Type local:MyIconButton}">
@@ -54,7 +54,7 @@
                                 <Setter Property="HorizontalAlignment" Value="Right" />
                                 <Setter Property="VerticalAlignment" Value="Top" />
                                 <Setter Property="Margin" Value="0,5,32,0" />
-                                <Setter Property="ToolTip" Value="取消安装" />
+                                <Setter Property="ToolTip" Value="{DynamicResource 取消安装}" />
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel.RenderTransform>
@@ -70,10 +70,10 @@
                                                 Theme="Black" LogoScale="0.55" Logo="{StaticResource ModifyRestoreLogo}" />
                         </local:MyCard>
                         <local:MyHint x:Name="HintSelectName" Theme="Red" Visibility="Collapsed" />
-                        <local:MyHint Text="如果不安装 Fabric API，大多数 Mod 都会无法使用！" Margin="0,10,0,0" x:Name="HintFabricAPI" Theme="Red" />
-                        <local:MyHint Text="必须安装 OptiFabric 才能正常使用 OptiFine！" Margin="0,10,0,0" x:Name="HintOptiFabric" Theme="Red" />
-                        <local:MyHint Text="安装结束后，请在 Mod 下载中搜索 OptiFabric Origins 并下载，否则 OptiFine 会无法使用！" Margin="0,10,0,0" x:Name="HintOptiFabricOld" Theme="Yellow" />
-                        <local:MyHint Text="OptiFine 与一部分 Mod 的兼容性不佳，请谨慎安装。" Margin="0,10,0,0" x:Name="HintModOptiFine" Theme="Yellow" />
+                        <local:MyHint Text="{DynamicResource 如果不安装 Fabric API，大多数 Mod 都会无法使用！}" Margin="0,10,0,0" x:Name="HintFabricAPI" Theme="Red" />
+                        <local:MyHint Text="{DynamicResource 必须安装 OptiFabric 才能正常使用 OptiFine！}" Margin="0,10,0,0" x:Name="HintOptiFabric" Theme="Red" />
+                        <local:MyHint Text="{DynamicResource 安装结束后，请在 Mod 下载中搜索 OptiFabric Origins 并下载，否则 OptiFine 会无法使用！}" Margin="0,10,0,0" x:Name="HintOptiFabricOld" Theme="Yellow" />
+                        <local:MyHint Text="{DynamicResource OptiFine 与一部分 Mod 的兼容性不佳，请谨慎安装。}" Margin="0,10,0,0" x:Name="HintModOptiFine" Theme="Yellow" />
                         <local:MyCard Title="Minecraft" Height="40" Margin="0,12,0,0" x:Name="CardMinecraft" Visibility="Collapsed">
                             <Grid x:Name="PanMinecraftInfo" Height="18" Margin="132,11,35,0" VerticalAlignment="Top">
                                 <Grid.ColumnDefinitions>
@@ -319,12 +319,12 @@
                     </StackPanel>
                 </Grid>
             </local:MyScrollViewer>
-            <local:MyExtraTextButton x:Name="BtnStart" Text="开始下载"
+            <local:MyExtraTextButton x:Name="BtnStart" Text="{DynamicResource 开始下载}"
                 HorizontalAlignment="Center" VerticalAlignment="Bottom"
                 LogoScale="0.95" Logo="M955 610h-59c-15 0-29 13-29 29v196c0 15-13 29-29 29h-649c-15 0-29-13-29-29v-196c0-15-13-29-29-29h-59c-15 0-29 13-29 29V905c0 43 35 78 78 78h787c43 0 78-35 78-78V640c0-15-13-29-29-29zM492 740c11 11 29 11 41 0l265-265c11-11 11-29 0-41l-41-41c-11-11-29-11-41 0l-110 110c-11 11-33 3-33-13V68C571 53 555 39 541 39h-59c-15 0-29 13-29 29v417c0 17-21 25-33 13l-110-110c-11-11-29-11-41 0L226 433c-11 11-11 29 0 41L492 740z" />
         </Grid>
         <local:MyCard HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,0" SnapsToDevicePixels="True" x:Name="PanLoad" UseAnimation="False">
-            <local:MyLoading Text="正在加载" Margin="20,20,20,17" x:Name="LoadMinecraft" HorizontalAlignment="Center" VerticalAlignment="Center" ShowProgress="True" />
+            <local:MyLoading Text="{DynamicResource 正在加载}" Margin="20,20,20,17" x:Name="LoadMinecraft" HorizontalAlignment="Center" VerticalAlignment="Center" ShowProgress="True" />
             <local:MyLoading Visibility="Collapsed" x:Name="LoadOptiFine" HasAnimation="False" />
             <local:MyLoading Visibility="Collapsed" x:Name="LoadForge" HasAnimation="False" />
             <local:MyLoading Visibility="Collapsed" x:Name="LoadNeoForge" HasAnimation="False" />

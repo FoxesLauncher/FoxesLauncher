@@ -1,6 +1,5 @@
 Public Class ResourceSearcher
     Private Const RESULT_PAGE_SIZE = 40
-    Private Const MSG_NO_CHINESE_RESULT As String = "无搜索结果，请尝试搜索其英文名称"
 
     '输入
     Public Class SearchRequest
@@ -159,7 +158,7 @@ Public Class ResourceSearcher
     ''' 根据搜索请求获取一系列的工程列表。
     ''' </summary>
     Public Shared Function GetLoader(InputDelegate As Func(Of SearchRequest)) As LoaderTask(Of SearchRequest, Integer)
-        Return New LoaderTask(Of SearchRequest, Integer)("社区资源获取", AddressOf Run, InputDelegate) With {.ReloadTimeout = 60 * 1000}
+        Return New LoaderTask(Of SearchRequest, Integer)(T("社区资源获取"), AddressOf Run, InputDelegate) With {.ReloadTimeout = 60 * 1000}
     End Function
     Private Shared Sub Run(Task As LoaderTask(Of SearchRequest, Integer))
         Dim Request As SearchRequest = Task.Input
@@ -172,7 +171,7 @@ Public Class ResourceSearcher
             Return
         ElseIf Not Request.CanContinue Then
             If Not Storage.Results.Any() Then
-                Throw New Exception("没有符合条件的结果")
+                Throw New Exception(T("没有符合条件的结果"))
             Else
                 Logger.Info($"已有 {Storage.Results.Count} 个结果，少于所需的 {Request.TargetResultCount} 个结果，但无法继续获取，结束处理")
                 Return
@@ -280,7 +279,7 @@ Public Class ResourceSearcher
             End If
             '结束
             If String.IsNullOrEmpty(CurseForgeAltSearchText) AndAlso String.IsNullOrEmpty(ModrinthAltSearchText) AndAlso Not ModrinthSlugs.Any Then
-                Throw New Exception(MSG_NO_CHINESE_RESULT)
+                Throw New Exception(T("无搜索结果，请尝试搜索其英文名称"))
             End If
         End If
         Task.Progress = 0.05
@@ -424,21 +423,21 @@ NextPage:
                     Throw Errors.First.Ex
                 Else
                     If IsChineseSearch AndAlso Not (Request.Type = ResourceTypes.Mod OrElse Request.Type = ResourceTypes.DataPack) Then
-                        Throw New Exception(MSG_NO_CHINESE_RESULT)
+                        Throw New Exception(T("无搜索结果，请尝试搜索其英文名称"))
                     ElseIf Request.Sources = ResourcePlatforms.CurseForge AndAlso Request.Tag.StartsWithF("/") Then
-                        Throw New Exception("CurseForge 不兼容所选的类型")
+                        Throw New Exception(T("CurseForge 不兼容所选的类型"))
                     ElseIf Request.Sources = ResourcePlatforms.Modrinth AndAlso Request.Tag.EndsWithF("/") Then
-                        Throw New Exception("Modrinth 不兼容所选的类型")
+                        Throw New Exception(T("Modrinth 不兼容所选的类型"))
                     Else
-                        Throw New Exception("没有搜索结果")
+                        Throw New Exception(T("没有搜索结果"))
                     End If
                 End If
             ElseIf Errors.Any() Then
                 '有结果但是有错误
                 If Errors.Any(Function(e) e.Source = ResourcePlatforms.CurseForge) Then
-                    Storage.ErrorMessage = $"无法连接到 CurseForge，所以目前仅显示了来自 Modrinth 的内容，搜索结果可能不全。{vbCrLf}请稍后再试，或使用 VPN 改善网络环境。"
+                    Storage.ErrorMessage = T("无法连接到 CurseForge，所以目前仅显示了来自 Modrinth 的内容，搜索结果可能不全。{0}请稍后再试，或使用 VPN 改善网络环境。", vbCrLf)
                 Else
-                    Storage.ErrorMessage = $"无法连接到 Modrinth，所以目前仅显示了来自 CurseForge 的内容，搜索结果可能不全。{vbCrLf}请稍后再试，或使用 VPN 改善网络环境。"
+                    Storage.ErrorMessage = T("无法连接到 Modrinth，所以目前仅显示了来自 CurseForge 的内容，搜索结果可能不全。{0}请稍后再试，或使用 VPN 改善网络环境。", vbCrLf)
                 End If
             End If
 
