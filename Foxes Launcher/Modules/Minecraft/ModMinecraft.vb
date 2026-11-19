@@ -64,10 +64,10 @@ Public Module ModMinecraft
 
             '扫描当前文件夹
             Try
-                If DirectoryUtils.Exists(Paths.Base & "versions\") Then CacheMcFolderList.Add(New McFolder With {.Name = "当前文件夹", .Location = Paths.Base, .Type = McFolder.Types.Vanilla})
+                If DirectoryUtils.Exists(Paths.Base & "versions\") Then CacheMcFolderList.Add(New McFolder With {.Name = T("当前文件夹"), .Location = Paths.Base, .Type = McFolder.Types.Vanilla})
                 For Each Folder As DirectoryInfo In DirectoryUtils.GetInfo(Paths.Base).GetDirectories
                     If DirectoryUtils.Exists(Folder.FullName & "versions\") OrElse Folder.Name = ".minecraft" Then
-                        CacheMcFolderList.Add(New McFolder With {.Name = "当前文件夹", .Location = PathUtils.AddSlashSuffix(PathUtils.ForCompare(Folder.FullName)), .Type = McFolder.Types.Vanilla})
+                        CacheMcFolderList.Add(New McFolder With {.Name = T("当前文件夹"), .Location = PathUtils.AddSlashSuffix(PathUtils.ForCompare(Folder.FullName)), .Type = McFolder.Types.Vanilla})
                     End If
                 Next
             Catch ex As Exception
@@ -78,7 +78,7 @@ Public Module ModMinecraft
             Dim MojangPath As String = Paths.AppData & ".minecraft\"
             If (Not CacheMcFolderList.Any OrElse Not PathUtils.IsSame(MojangPath, CacheMcFolderList(0).Location)) AndAlso '当前文件夹不是官启文件夹
                 DirectoryUtils.Exists(MojangPath & "versions\") Then '具有权限且存在 versions 文件夹
-                CacheMcFolderList.Add(New McFolder With {.Name = "官方启动器文件夹", .Location = MojangPath, .Type = McFolder.Types.Vanilla})
+                CacheMcFolderList.Add(New McFolder With {.Name = T("官方启动器文件夹"), .Location = MojangPath, .Type = McFolder.Types.Vanilla})
             End If
 
 #End Region
@@ -89,7 +89,7 @@ Public Module ModMinecraft
             For Each Folder As String In Settings.Get(Of String)("LaunchFolders").ToString.Split("|"c, True)
                 If Folder = "" Then Continue For
                 If Not Folder.Contains(">") OrElse Not Folder.EndsWithF("\") Then
-                    Hint("无效的 Minecraft 文件夹：" & Folder, HintType.Red)
+                    Hint(T("无效的 Minecraft 文件夹：{0}", Folder), HintType.Red)
                     Continue For
                 End If
                 Dim FolderName As String = Folder.BeforeFirst(">"), FolderPath As String = Folder.AfterFirst(">")
@@ -106,7 +106,7 @@ Public Module ModMinecraft
                     Next
                     If Not Renamed Then CacheMcFolderList.Add(New McFolder With {.Name = FolderName, .Location = PathUtils.AddSlashSuffix(PathUtils.ForCompare(FolderPath)), .Type = McFolder.Types.Custom})
                 Catch ex As Exception
-                    MyMsgBox("失效的 Minecraft 文件夹：" & vbCrLf & FolderPath & vbCrLf & vbCrLf & ex.GetDisplay(False), "Minecraft 文件夹失效", IsWarn:=True)
+                    MyMsgBox(T("失效的 Minecraft 文件夹：") & vbCrLf & FolderPath & vbCrLf & vbCrLf & ex.GetDisplay(False), T("Minecraft 文件夹失效"), IsWarn:=True)
                     Logger.Warn(ex, $"无法访问 Minecraft 文件夹 {FolderPath}")
                 End Try
             Next
@@ -124,7 +124,7 @@ Public Module ModMinecraft
             '若没有可用文件夹，则创建 .minecraft
             If Not CacheMcFolderList.Any() Then
                 DirectoryUtils.Create(Paths.Base & ".minecraft\versions\")
-                CacheMcFolderList.Add(New McFolder With {.Name = "当前文件夹", .Location = Paths.Base & ".minecraft\", .Type = McFolder.Types.Vanilla})
+                CacheMcFolderList.Add(New McFolder With {.Name = T("当前文件夹"), .Location = Paths.Base & ".minecraft\", .Type = McFolder.Types.Vanilla})
             End If
 
             For Each Folder As McFolder In CacheMcFolderList
@@ -292,7 +292,7 @@ Public Module ModMinecraft
         ''' <summary>
         ''' 显示的描述文本。
         ''' </summary>
-        Public Info As String = "该版本未被加载，请向作者反馈此问题"
+        Public Info As String = T("该版本未被加载，请向作者反馈此问题")
 
         ''' <summary>
         ''' 该版本的列表检查原始结果，不受自定义影响。
@@ -328,11 +328,11 @@ Public Module ModMinecraft
                 Try
                     Dim Result = New McVersion(Name, JsonObject, JsonVersion)
                     _Version = Result
-                    If Result.VanillaName = "Unknown" Then Info = "FXL 无法识别该版本的 MC 版本号"
+                    If Result.VanillaName = "Unknown" Then Info = T("FXL 无法识别该版本的 MC 版本号")
                 Catch ex As Exception
                     Logger.Warn(ex, "识别 Minecraft 版本时出错")
                     _Version = New McVersion("Unknown")
-                    Info = "无法识别：" & ex.Message
+                    Info =T("无法识别：{0}", ex.Message)
                 End Try
                 Return _Version
             End Get
@@ -372,7 +372,7 @@ Public Module ModMinecraft
                     Exit For
                 Next
                 If JsonPath Is Nothing Then
-                    Throw New Exception($"未找到版本 JSON 文件：{PathVersion}{Name}.json")
+                    Throw New Exception(T("未找到版本 JSON 文件：{0}{1}.json", PathVersion, Name))
                 Else
                     Logger.Warn($"未找到同名版本 JSON，自动换用 {JsonPath}")
                 End If
@@ -467,7 +467,7 @@ Recheck:
                             If InstanceNameInheritFrom <> "" Then
                                 Dim InheritInstance As New McInstance(InstanceNameInheritFrom)
                                 '继续循环
-                                If InheritInstance.InheritName = InstanceNameInheritFrom Then Throw New Exception("版本依赖项出现嵌套：" & InstanceNameInheritFrom)
+                                If InheritInstance.InheritName = InstanceNameInheritFrom Then Throw New Exception(T("版本依赖项出现嵌套：{0}", InstanceNameInheritFrom))
                                 InstanceNameInheritFrom = InheritInstance.InheritName
                                 '合并 Libraries 项：子版本放在前面，父版本放在后面（5978#：如果多个 jar 包中含有相同的类，Java 8 和之前的版本按照 -cp 指定的顺序选择第一个）
                                 Dim CurrentLib As JArray = _JsonObject("libraries").DeepClone()
@@ -484,7 +484,7 @@ Recheck:
                             Logger.Warn(ex, $"合并版本依赖项 JSON 失败（{If(InstanceNameInheritFrom, "null")}）")
                         End Try
                     Catch ex As Exception
-                        Throw New Exception("初始化版本 JSON 时失败（" & If(Name, "null") & "）", ex)
+                        Throw New Exception(T("初始化版本 JSON 时失败（{0}）", If(Name, "null")), ex)
                     End Try
                 End If
                 Return _JsonObject
@@ -582,12 +582,12 @@ Recheck:
             '检查文件夹
             If Not DirectoryUtils.Exists(PathVersion) Then
                 State = McInstanceState.Error
-                Info = "未找到版本 " & Name
+                Info =T("未找到版本 {0}", Name)
                 Return False
             End If
             '确认 Json 可用性
             Try
-                If JsonObject("mainClass") Is Nothing Then Throw New Exception("版本 JSON 中没有 mainClass 项！") '这里也会触发 JsonObject 的 Get 事件
+                If JsonObject("mainClass") Is Nothing Then Throw New Exception(T("版本 JSON 中没有 mainClass 项！")) '这里也会触发 JsonObject 的 Get 事件
             Catch ex As Exception
                 Logger.Warn(ex, $"版本 JSON 可用性检查失败（{PathVersion}）")
                 JsonText = ""
@@ -598,11 +598,11 @@ Recheck:
             End Try
             '检查版本号获取
             Try
-                If String.IsNullOrEmpty(Version.VanillaName) Then Throw New Exception("无法获取版本号，结果为空")
+                If String.IsNullOrEmpty(Version.VanillaName) Then Throw New Exception(T("无法获取版本号，结果为空"))
             Catch ex As Exception
                 Logger.Warn(ex, $"版本号获取失败（{Name}）")
                 State = McInstanceState.Error
-                Info = "版本号获取失败：" & ex.GetDisplay(False)
+                Info =T("版本号获取失败：{0}", ex.GetDisplay(False))
                 Return False
             End Try
             '检查依赖版本
@@ -610,14 +610,14 @@ Recheck:
                 If Not InheritName = "" Then
                     If Not FileUtils.Exists($"{PathUtils.RemoveLastPart(PathVersion)}\{InheritName}\{InheritName}.json") Then
                         State = McInstanceState.Error
-                        Info = "需要安装 " & InheritName & " 作为前置版本"
+                        Info =T("需要安装 {0} 作为前置版本", InheritName)
                         Return False
                     End If
                 End If
             Catch ex As Exception
                 Logger.Warn(ex, $"依赖版本检查出错（{Name}）")
                 State = McInstanceState.Error
-                Info = "未知错误：" & ex.GetDisplay(False)
+                Info =T("未知错误：{0}", ex.GetDisplay(False))
                 Return False
             End Try
 
@@ -734,8 +734,8 @@ ExitDataLoad:
                 If State = McInstanceState.Fool Then
                     Info = GetMcFoolName(Version.VanillaName)
                 ElseIf State <> McInstanceState.Error Then
-                    If Settings.Get(Of Integer)("VersionServerLogin", Instance:=Me) = 3 Then Info += ", 统一通行证验证"
-                    If Settings.Get(Of Integer)("VersionServerLogin", Instance:=Me) = 4 Then Info += ", Authlib 验证"
+                    If Settings.Get(Of Integer)("VersionServerLogin", Instance:=Me) = 3 Then Info += T(", 统一通行证验证")
+                    If Settings.Get(Of Integer)("VersionServerLogin", Instance:=Me) = 4 Then Info += T(", Authlib 验证")
                 End If
             End If
         End Sub
@@ -746,36 +746,36 @@ ExitDataLoad:
         Public Function VersionDisplayName() As String
             'Mod Loader 信息
             Dim ModLoaderInfo As String = ""
-            If Version.ModLoaders.HasFlagF(ModLoaders.Forge) Then ModLoaderInfo += ", Forge" & If(Version.ModLoaderVersions(ModLoaders.Forge) = "未知版本", "", " " & Version.ModLoaderVersions(ModLoaders.Forge))
-            If Version.ModLoaders.HasFlagF(ModLoaders.NeoForge) Then ModLoaderInfo += ", NeoForge" & If(Version.ModLoaderVersions(ModLoaders.NeoForge) = "未知版本", "", " " & Version.ModLoaderVersions(ModLoaders.NeoForge))
-            If Version.ModLoaders.HasFlagF(ModLoaders.Fabric) Then ModLoaderInfo += ", Fabric" & If(Version.ModLoaderVersions(ModLoaders.Fabric) = "未知版本", "", " " & Version.ModLoaderVersions(ModLoaders.Fabric))
-            If Version.HasOptiFine Then ModLoaderInfo += ", OptiFine" & If(Version.OptiFine = "未知版本", "", " " & Version.OptiFine.Replace("-", " ").Replace("_", " "))
+            If Version.ModLoaders.HasFlagF(ModLoaders.Forge) Then ModLoaderInfo += ", Forge" & If(Version.ModLoaderVersions(ModLoaders.Forge) = T("未知版本"), "", " " & Version.ModLoaderVersions(ModLoaders.Forge))
+            If Version.ModLoaders.HasFlagF(ModLoaders.NeoForge) Then ModLoaderInfo += ", NeoForge" & If(Version.ModLoaderVersions(ModLoaders.NeoForge) = T("未知版本"), "", " " & Version.ModLoaderVersions(ModLoaders.NeoForge))
+            If Version.ModLoaders.HasFlagF(ModLoaders.Fabric) Then ModLoaderInfo += ", Fabric" & If(Version.ModLoaderVersions(ModLoaders.Fabric) = T("未知版本"), "", " " & Version.ModLoaderVersions(ModLoaders.Fabric))
+            If Version.HasOptiFine Then ModLoaderInfo += ", OptiFine" & If(Version.OptiFine = T("未知版本"), "", " " & Version.OptiFine.Replace("-", " ").Replace("_", " "))
             If Version.ModLoaders.HasFlagF(ModLoaders.LiteLoader) Then ModLoaderInfo += ", LiteLoader"
             '基础信息
             Dim Info As String
             Select Case State
                 Case McInstanceState.Snapshot, McInstanceState.Original, McInstanceState.Forge, McInstanceState.NeoForge, McInstanceState.Fabric, McInstanceState.OptiFine, McInstanceState.LiteLoader
                     If Version.VanillaName.ContainsIgnoreCase("pre") Then
-                        Info = "预发布版 " & Version.VanillaName
+                        Info =T("预发布版 {0}", Version.VanillaName)
                     ElseIf Version.VanillaName.ContainsIgnoreCase("rc") Then
-                        Info = "发布候选 " & Version.VanillaName
+                        Info =T("发布候选 {0}", Version.VanillaName)
                     ElseIf Version.VanillaName.ContainsIgnoreCase("experimental") Then
-                        Info = "实验性快照" & Version.VanillaName
+                        Info =T("实验性快照{0}", Version.VanillaName)
                     ElseIf Version.VanillaName = "pending" Then
-                        Info = "实验性快照"
+                        Info = T("实验性快照")
                     ElseIf Version.IsSnapshot Then
-                        Info = If(Version.Reliable, "快照版 " & Version.VanillaName.Replace("-snapshot", ""), "快照版")
+                        Info = If(Version.Reliable, T("快照版 {0}", Version.VanillaName.Replace("-snapshot", "")), T("快照版"))
                     Else
-                        Info = If(Version.Reliable, "正式版 " & Version.VanillaName, "正式版")
+                        Info = If(Version.Reliable, T("正式版 {0}", Version.VanillaName), T("正式版"))
                     End If
                 Case McInstanceState.Old
-                    Info = "远古版本"
+                    Info = T("远古版本")
                 Case McInstanceState.Fool
-                    Info = "愚人节版本 " & Version.VanillaName
+                    Info =T("愚人节版本 {0}", Version.VanillaName)
                 Case McInstanceState.Error
                     Return Me.Info '已有错误信息
                 Case Else
-                    Return "发生了未知错误，请向作者反馈此问题"
+                    Return T("发生了未知错误，请向作者反馈此问题")
             End Select
             Return (Info & ModLoaderInfo).Replace("_", "-")
         End Function
@@ -901,25 +901,25 @@ ExitDataLoad:
     Public Function GetMcFoolName(Name As String) As String
         Name = Name.Lower
         If Name.StartsWithF("2.0") Then
-            Return "2013 | 这个秘密计划了两年的更新将游戏推向了一个新高度！"
+            Return T("2013 | 这个秘密计划了两年的更新将游戏推向了一个新高度！")
         ElseIf Name = "15w14a" Then
-            Return "2015 | 作为一款全年龄向的游戏，我们需要和平，需要爱与拥抱。"
+            Return T("2015 | 作为一款全年龄向的游戏，我们需要和平，需要爱与拥抱。")
         ElseIf Name = "1.rv-pre1" Then
-            Return "2016 | 是时候将现代科技带入 Minecraft 了！"
+            Return T("2016 | 是时候将现代科技带入 Minecraft 了！")
         ElseIf Name = "3d shareware v1.34" Then
-            Return "2019 | 我们从地下室的废墟里找到了这个开发于 1994 年的杰作！"
+            Return T("2019 | 我们从地下室的废墟里找到了这个开发于 1994 年的杰作！")
         ElseIf Name.StartsWithF("20w14inf") OrElse Name = "20w14∞" Then
-            Return "2020 | 我们加入了 20 亿个新的维度，让无限的想象变成了现实！"
+            Return T("2020 | 我们加入了 20 亿个新的维度，让无限的想象变成了现实！")
         ElseIf Name = "22w13oneblockatatime" Then
-            Return "2022 | 一次一个方块更新！迎接全新的挖掘、合成与骑乘玩法吧！"
+            Return T("2022 | 一次一个方块更新！迎接全新的挖掘、合成与骑乘玩法吧！")
         ElseIf Name = "23w13a_or_b" Then
-            Return "2023 | 研究表明：玩家喜欢作出选择——越多越好！"
+            Return T("2023 | 研究表明：玩家喜欢作出选择——越多越好！")
         ElseIf Name = "24w14potato" Then
-            Return "2024 | 毒马铃薯一直都被大家忽视和低估，于是我们超级加强了它！"
+            Return T("2024 | 毒马铃薯一直都被大家忽视和低估，于是我们超级加强了它！")
         ElseIf Name = "25w14craftmine" Then
-            Return "2025 | 你可以合成任何东西——包括合成你的世界！"
+            Return T("2025 | 你可以合成任何东西——包括合成你的世界！")
         ElseIf Name = "26w14a" Then
-            Return "2026 | 为什么需要物品栏？让方块们跟着你走吧！"
+            Return T("2026 | 为什么需要物品栏？让方块们跟着你走吧！")
         Else
             Return ""
         End If
@@ -963,7 +963,7 @@ ExitDataLoad:
                         FolderList.Add(Folder.Name)
                     Next
                 Catch ex As Exception
-                    Throw New Exception("无法读取版本文件夹，可能是由于没有权限（" & PathMc & "versions）", ex)
+                    Throw New Exception(T("无法读取版本文件夹，可能是由于没有权限（{0}versions）", PathMc), ex)
                 End Try
             End If
             '不可用
@@ -1089,7 +1089,7 @@ OnLoaded:
                                     Dim CachedVersion = ReadCachedInfo($"Version{Loader}")
                                     If CachedVersion IsNot Nothing Then Version.ModLoaderVersions(Loader) = CachedVersion
                                 Next
-                                If ReadIni(Instance.PathVersion & "FXL\Setup.ini", "VersionLiteLoader", False) Then Version.ModLoaderVersions(ModLoaders.LiteLoader) = "未知版本"
+                                If ReadIni(Instance.PathVersion & "FXL\Setup.ini", "VersionLiteLoader", False) Then Version.ModLoaderVersions(ModLoaders.LiteLoader) = T("未知版本")
                             End If
                             Version.ReleaseTime = ReadIni(Instance.PathVersion & "FXL\Setup.ini", "ReleaseTime", New Date(1970, 1, 1, 15, 0, 0))
                             Version.IsFool = Version.IsFool OrElse Instance.State = McInstance.McInstanceState.Fool
@@ -1369,19 +1369,19 @@ OnLoaded:
     ''' 要求玩家选择一个皮肤文件，并进行相关校验。
     ''' </summary>
     Public Function McSkinSelect() As McSkinInfo
-        Dim FileName As String = Dialogs.SelectFile("选择皮肤文件", False, filter:={({"png", "jpg", "jpeg", "webp"}, "皮肤文件")}).FirstOrDefault()
+        Dim FileName As String = Dialogs.SelectFile(T("选择皮肤文件"), False, filter:={({"png", "jpg", "jpeg", "webp"}, T("皮肤文件"))}).FirstOrDefault()
 
         '验证有效性
         If String.IsNullOrEmpty(FileName) Then Return New McSkinInfo With {.IsVaild = False}
         Try
             Dim Image As New MyBitmap(FileName)
             If Image.Pic.Width <> 64 OrElse Not (Image.Pic.Height = 32 OrElse Image.Pic.Height = 64) Then
-                Hint("皮肤图片大小应为 64x32 像素或 64x64 像素！", HintType.Red)
+                Hint(T("皮肤图片大小应为 64x32 像素或 64x64 像素！"), HintType.Red)
                 Return New McSkinInfo With {.IsVaild = False}
             End If
             Dim FileInfo = FileUtils.GetInfo(FileName)
             If FileInfo.Length > 24 * 1024 Then
-                Hint("皮肤文件大小需小于 24 KB，而所选文件大小为 " & Math.Round(FileInfo.Length / 1024, 2) & " KB", HintType.Red)
+                Hint(T("皮肤文件大小需小于 24 KB，而所选文件大小为 {0} KB", Math.Round(FileInfo.Length / 1024, 2)), HintType.Red)
                 Return New McSkinInfo With {.IsVaild = False}
             End If
         Catch ex As Exception
@@ -1390,9 +1390,9 @@ OnLoaded:
         End Try
 
         '获取皮肤种类
-        Dim IsSlim As Integer = MyMsgBox("此皮肤为 Steve 模型（粗手臂）还是 Alex 模型（细手臂）？", "选择皮肤种类", "Steve 模型", "Alex 模型", "我不知道", HighLight:=False)
+        Dim IsSlim As Integer = MyMsgBox(T("此皮肤为 Steve 模型（粗手臂）还是 Alex 模型（细手臂）？"), T("选择皮肤种类"), T("Steve 模型"), T("Alex 模型"), T("我不知道"), HighLight:=False)
         If IsSlim = 3 Then
-            Hint("请在皮肤下载页面确认皮肤种类后再使用此皮肤！")
+            Hint(T("请在皮肤下载页面确认皮肤种类后再使用此皮肤！"))
             Return New McSkinInfo With {.IsVaild = False}
         End If
 
@@ -1403,8 +1403,8 @@ OnLoaded:
     ''' 获取 Uuid 对应的皮肤文件地址，失败将抛出异常。
     ''' </summary>
     Public Function McSkinGetAddress(UUID As String, Type As String) As String
-        If UUID = "" Then Throw New Exception("UUID 为空。")
-        If UUID.StartsWithF("00000") AndAlso Type <> "Auth" Then Throw New Exception("离线 UUID 无正版皮肤文件：" & UUID)
+        If UUID = "" Then Throw New Exception(T("UUID 为空。"))
+        If UUID.StartsWithF("00000") AndAlso Type <> "Auth" Then Throw New Exception(T("离线 UUID 无正版皮肤文件：{0}", UUID))
         '尝试读取缓存
         Dim CacheSkinAddress As String = ReadIni(PathTemp & "Cache\Skin\Index" & Type & ".ini", UUID)
         If Not CacheSkinAddress = "" Then Return CacheSkinAddress
@@ -1418,10 +1418,10 @@ OnLoaded:
             Case "Auth"
                 Url = If(McInstanceSelected Is Nothing, Settings.Get(Of String)("CacheAuthServerServer"), Settings.Get(Of String)("VersionServerAuthServer", Instance:=McInstanceSelected)) & "/sessionserver/session/minecraft/profile/"
             Case Else
-                Throw New ArgumentException("皮肤地址种类无效：" & If(Type, "null"))
+                Throw New ArgumentException(T("皮肤地址种类无效：{0}", If(Type, "null")))
         End Select
         Dim SkinString = NetRequestByClientRetry(Url & UUID, RequireJson:=True)
-        If SkinString = "" Then Throw New Exception("皮肤返回值为空，可能是未设置自定义皮肤的用户")
+        If SkinString = "" Then Throw New SkinNotSetException(T("皮肤返回值为空，可能是未设置自定义皮肤的用户"))
         '处理皮肤地址
         Dim SkinValue As String
         Try
@@ -1431,15 +1431,15 @@ OnLoaded:
                     Exit Try
                 End If
             Next
-            Throw New Exception("未从皮肤返回值中找到符合条件的 Property")
+            Throw New Exception(T("未从皮肤返回值中找到符合条件的 Property"))
         Catch ex As Exception
             Logger.Warn(ex, $"无法完成解析的皮肤返回值，可能是未设置自定义皮肤的用户：{SkinString}")
-            Throw New Exception("皮肤返回值中不包含皮肤数据项，可能是未设置自定义皮肤的用户", ex)
+            Throw New SkinNotSetException(T("皮肤返回值中不包含皮肤数据项，可能是未设置自定义皮肤的用户"), ex)
         End Try
         SkinString = Encoding.UTF8.GetString(Convert.FromBase64String(SkinValue))
         Dim SkinJson As JObject = SkinString.Lower.DeserializeJson()
         If SkinJson("textures") Is Nothing OrElse SkinJson("textures")("skin") Is Nothing OrElse SkinJson("textures")("skin")("url") Is Nothing Then
-            Throw New Exception("用户未设置自定义皮肤")
+            Throw New SkinNotSetException(T("用户未设置自定义皮肤"))
         Else
             Dim SkinUrl As String = SkinJson("textures")("skin")("url").ToString
             SkinValue = If(SkinUrl.Contains("minecraft.net/"), SkinUrl.Replace("http://", "https://"), SkinUrl)
@@ -1782,7 +1782,7 @@ OnLoaded:
                 If FileUtils.Exists(TargetFile) Then
                     Logger.Warn(ex, "获取统一通行证下载信息失败")
                 Else
-                    Throw New Exception("获取统一通行证下载信息失败", ex)
+                    Throw New Exception(T("获取统一通行证下载信息失败"), ex)
                 End If
             End Try
         End If
@@ -1805,7 +1805,7 @@ OnLoaded:
                 If FileUtils.Exists(TargetFile) Then
                     Logger.Warn(ex, "获取 Authlib-Injector 下载信息失败")
                 Else
-                    Throw New Exception("获取 Authlib-Injector 下载信息失败", ex)
+                    Throw New Exception(T("获取 Authlib-Injector 下载信息失败"), ex)
                 End If
             End Try
         End If
@@ -1945,7 +1945,7 @@ OnLoaded:
             }".DeserializeJson()
             'End If
         Else
-            Throw New Exception("该版本不存在资源文件索引信息")
+            Throw New Exception(T("该版本不存在资源文件索引信息"))
         End If
     End Function
     ''' <summary>
@@ -2000,7 +2000,7 @@ OnLoaded:
         Try
 
             '初始化
-            If Not FileUtils.Exists($"{McFolderSelected}assets\indexes\{IndexName}.json") Then Throw New FileNotFoundException("未找到 Asset Index", McFolderSelected & "assets\indexes\" & IndexName & ".json")
+            If Not FileUtils.Exists($"{McFolderSelected}assets\indexes\{IndexName}.json") Then Throw New FileNotFoundException(T("未找到 Asset Index"), McFolderSelected & "assets\indexes\" & IndexName & ".json")
             Dim Result As New List(Of McAssetsToken)
             Dim Json As JObject = FileUtils.ReadAsJson($"{McFolderSelected}assets\indexes\{IndexName}.json")
 
@@ -2087,9 +2087,9 @@ OnLoaded:
             '进行提示
             If Version Is Nothing Then Return
             Dim Time As Date = Version("releaseTime")
-            Dim MsgBoxText As String = $"新版本：{VersionName}{vbCrLf}" &
-                If((Date.Now - Time).TotalDays > 1, "更新时间：" & Time.ToString, "更新于：" & StringUtils.FormatTimeSpan(Time - Date.Now, False))
-            Dim MsgResult = MyMsgBox(MsgBoxText, "Minecraft 更新提示", "确定", "下载", If((Date.Now - Time).TotalHours > 3, "更新日志", ""),
+            Dim MsgBoxText As String = T("新版本：{0}{1}", VersionName, vbCrLf) &
+                If((Date.Now - Time).TotalDays > 1, T("更新时间：{0}", Time.ToString), T("更新于：{0}", StringUtils.FormatTimeSpan(Time - Date.Now, False)))
+            Dim MsgResult = MyMsgBox(MsgBoxText, T("Minecraft 更新提示"), T("确定"), T("下载"), If((Date.Now - Time).TotalHours > 3, T("更新日志"), ""),
                 Button3Action:=Sub() McUpdateLogShow(Version))
             '弹窗结果
             If MsgResult = 2 Then

@@ -69,12 +69,12 @@ Public Module ModJava
     ''' </summary>
     Public Sub ManuallyImportJava()
         '选择
-        Dim NewJavaPath As String = Dialogs.SelectFile("选择 java.exe（可能在 bin 文件夹中）", False, filter:="java.exe|java.exe").FirstOrDefault()
+        Dim NewJavaPath As String = Dialogs.SelectFile(T("选择 java.exe（可能在 bin 文件夹中）"), False, filter:="java.exe|java.exe").FirstOrDefault()
         If String.IsNullOrEmpty(NewJavaPath) Then Return
         '验证 Java 可用
         Dim NewJava As New Java(PathUtils.RemoveLastPart(NewJavaPath))
         If Not NewJava.CheckAsync().Run() Then
-            Hint("该 Java 存在异常，无法使用", HintType.Red)
+            Hint(T("该 Java 存在异常，无法使用"), HintType.Red)
             Return
         End If
         '不再移除它
@@ -85,7 +85,7 @@ Public Module ModJava
             List.Remove(NewJava)
             List.Insert(0, NewJava)
         End Sub)
-        Hint($"已将 Java 加入列表：{NewJavaPath}", HintType.Green)
+        Hint(T("已将 Java 加入列表：{0}", NewJavaPath), HintType.Green)
         UpdateJavaLists()
     End Sub
 
@@ -95,7 +95,7 @@ Public Module ModJava
     Public Sub ManuallyRemoveJava(JavaEntry As Java)
         Configs.JavaList.Edit(Sub(ByRef List) List.Remove(JavaEntry)) '从 Java 列表中移除
         Configs.JavaRemovedList.Edit(Function(List) List.Append(JavaEntry.Folder).DistinctBy(Function(s) s.Lower()).ToList()) '记录已移除
-        Hint($"已将 Java 移除出列表：{JavaEntry}", HintType.Green)
+        Hint(T("已将 Java 移除出列表：{0}", JavaEntry), HintType.Green)
         UpdateJavaLists()
         PageInstanceLeft.ReloadCurrentJava() '如果强制指定了该 Java，这会把它自动重置掉
     End Sub
@@ -110,9 +110,9 @@ Public Module ModJava
             JavaListRefreshWorker.Start(cancellationToken:=CancellationToken)
             JavaListRefreshWorker.WaitIfRunningAsync(cancellationToken:=CancellationToken).Run() 'worker 开始/结束时会自动重载 UI
             If Configs.JavaList.Get().Any Then
-                Hint("已找到 " & Configs.JavaList.Get().Count & " 个 Java！", HintType.Green)
+                Hint(T("已找到 {0} 个 Java！", Configs.JavaList.Get().Count), HintType.Green)
             Else
-                Hint("未找到可用的 Java！", HintType.Red)
+                Hint(T("未找到可用的 Java！"), HintType.Red)
             End If
         End Sub)
     End Sub
@@ -251,7 +251,7 @@ Public Module ModJava
                 '1.18+：Java 17+
                 AddConstraint(ValueRange(Of Version).AtLeast(New Version(17, 0)))
             End If
-            If Instance.Version.ModLoaderVersions(ModLoaders.Fabric) <> "未知版本" AndAlso McUtils.CompareVersion(Instance.Version.ModLoaderVersions(ModLoaders.Fabric), "0.17.0") < 0 Then
+            If Instance.Version.ModLoaderVersions(ModLoaders.Fabric) <> T("未知版本") AndAlso McUtils.CompareVersion(Instance.Version.ModLoaderVersions(ModLoaders.Fabric), "0.17.0") < 0 Then
                 'Fabric Loader 0.16.x 及更早版本的 Mixin/ASM 不兼容 Java 25
                 AddConstraint(ValueRange(Of Version).LessThan(New Version(25, 0)))
             End If
@@ -295,8 +295,8 @@ Public Module ModJava
                     '未能找到
                     If TryFixOrHint Then
                         SwitchToInstanceSetup(Instance)
-                        MyMsgBox($"该版本的版本设置选择了 {vbLQ}使用版本文件夹中的 Java{vbRQ}，但版本文件夹里没能找到 Java。{vbCrLf}请先修改启动选项中的 Java 设置，或在版本文件夹中放一个 Java，然后再试。",
-                            "未找到 Java", IsWarn:=True, ForceWait:=True)
+                        MyMsgBox(T("该版本的版本设置选择了 {0}使用版本文件夹中的 Java{1}，但版本文件夹里没能找到 Java。{2}请先修改启动选项中的 Java 设置，或在版本文件夹中放一个 Java，然后再试。", vbLQ, vbRQ, vbCrLf),
+                            T("未找到 Java"), IsWarn:=True, ForceWait:=True)
                     End If
                     Return Nothing
 
@@ -307,8 +307,8 @@ Public Module ModJava
                     If ChosenJava Is Nothing Then
                         If TryFixOrHint Then
                             SwitchToInstanceSetup(Instance)
-                            MyMsgBox($"该版本的版本设置选择了 {vbLQ}使用指定的 Java{vbRQ}，但还没有指定任何 Java。{vbCrLf}请先选择你想使用的 Java，然后再试。",
-                                "未选择 Java", IsWarn:=True, ForceWait:=True)
+                            MyMsgBox(T("该版本的版本设置选择了 {0}使用指定的 Java{1}，但还没有指定任何 Java。{2}请先选择你想使用的 Java，然后再试。", vbLQ, vbRQ, vbCrLf),
+                                T("未选择 Java"), IsWarn:=True, ForceWait:=True)
                         End If
                         p?.Skip() : Return Nothing '<==== 设置中未指定 Java
                     End If
@@ -342,7 +342,7 @@ Public Module ModJava
                     Dim RecommendedComponent As String =
                         If(Target.Is(Of McInstance), GetJavaRequirement(Instance).RecommendedComponent, Nothing)
                     Logger.Info($"自动选择以下范围的 Java：{Range} {RecommendedComponent}")
-                    If Range.IsEmpty Then Throw New Exception("Java 版本需求存在冲突，导致没有任何可能适配的 Java，请查看 FXL 的日志了解详细信息！")
+                    If Range.IsEmpty Then Throw New Exception(T("Java 版本需求存在冲突，导致没有任何可能适配的 Java，请查看 FXL 的日志了解详细信息！"))
 
                     '搜索 Java
                     Dim SelectJavaFromJavaList =
@@ -433,22 +433,22 @@ Public Module ModJava
                                 End If
                             ElseIf Range.HasLower Then '只有下界
                                 If HasPureLower Then
-                                    Description = $" Java {Range.Lower.Major} 或更高版本的 Java"
+                                    Description = T("Java {0} 或更高版本的 Java", Range.Lower.Major)
                                 ElseIf Range.IsLowerInclusive Then
-                                    Description = $" Java {Range.Lower} 或更高版本的 Java"
+                                    Description = T("Java {0} 或更高版本的 Java", Range.Lower)
                                 Else
-                                    Description = $"版本高于 {Range.Lower} 的 Java"
+                                    Description = T("版本高于 {0} 的 Java", Range.Lower)
                                 End If
                             Else '只有上界
                                 If HasPureUpper Then
-                                    Description = $" Java {Range.Upper.Major - 1} 或更低版本的 Java"
+                                    Description = T("Java {0} 或更低版本的 Java", Range.Upper.Major - 1)
                                 ElseIf Range.IsUpperInclusive Then
-                                    Description = $" Java {Range.Upper} 或更低版本的 Java"
+                                    Description = T("Java {0} 或更低版本的 Java", Range.Upper)
                                 Else
-                                    Description = $"版本低于 {Range.Upper} 的 Java"
+                                    Description = T("版本低于 {0} 的 Java", Range.Upper)
                                 End If
                             End If
-                            MyMsgBox($"FXL 没能找到合适的 Java。{vbCrLf}请在网上搜索并手动安装{Description}， 然后在【设置 → 启动 → 高级选项 → Java 列表】中导入它。", "需要手动安装 Java")
+                            MyMsgBox(T("FXL 没能找到合适的 Java。{0}请在网上搜索并手动安装{1}， 然后在【设置 → 启动 → 高级选项 → Java 列表】中导入它。", vbCrLf, Description), T("需要手动安装 Java"))
                             Return Nothing
                         End If
 
@@ -461,7 +461,7 @@ Public Module ModJava
                         End Try
                         Result = SelectJavaFromJavaList()
                         If Result IsNot Nothing Then p?.Finish() : Return Result
-                        Throw New Exception($"下载 Java {JavaToDownload.ComponentName} 后仍然无法找到合适的 Java")
+                        Throw New Exception(T("下载 Java {0} 后仍然无法找到合适的 Java", JavaToDownload.ComponentName))
                     End SyncLock
             End Select
         Catch ex As Exception
@@ -494,7 +494,7 @@ Public Module ModJava
             End If
             Dim ForcedJava = New Java(ForcedJavaSetting.DeserializeJson(Of JObject)()("Path").ToString)
             If Not ForcedJava.CheckAsync(c).Run() Then
-                Hint("该版本的设置中强制指定的 Java 存在异常，该设置已重置", HintType.Red)
+                Hint(T("该版本的设置中强制指定的 Java 存在异常，该设置已重置"), HintType.Red)
                 p?.Set(0.4) : GoTo NoForcedJava
             End If
             Logger.Info($"将版本独立设置改为老版本中强制指定的 Java：{ForcedJava}")
@@ -565,9 +565,9 @@ NoForcedJava:
         Logger.Info($"该 Java 需要下载 {FilesToDownload.Count} 个文件，目标文件夹：{BaseDir}")
 
         '构建加载器
-        Dim Loader = New LoaderCombo(Of Integer)("下载 Java", {
-            New LoaderDownload("下载 Java 文件", FilesToDownload) With {.ProgressWeight = 10},
-            New LoaderWorker("刷新 Java 列表", JavaListRefreshWorker)
+        Dim Loader = New LoaderCombo(Of Integer)(T("下载 Java"), {
+            New LoaderDownload(T("下载 Java 文件"), FilesToDownload) With {.ProgressWeight = 10},
+            New LoaderWorker(T("刷新 Java 列表"), JavaListRefreshWorker)
         }) With {.OnStateChanged =
         Sub(RawLoader As LoaderCombo(Of Integer))
             If RawLoader.State = LoadState.Failed OrElse RawLoader.State = LoadState.Canceled Then

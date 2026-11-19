@@ -68,8 +68,8 @@ Public Module ModWatcher
             Me.Instance = Instance
             Me.WindowTitle = WindowTitle
             Me.PID = Loader.Input.Id
-            WatcherLog("开始 Minecraft 日志监控")
-            If Me.WindowTitle <> "" Then WatcherLog("要求窗口标题：" & WindowTitle)
+            WatcherLog(T("开始 Minecraft 日志监控"))
+            If Me.WindowTitle <> "" Then WatcherLog(T("要求窗口标题：{0}", WindowTitle))
 
             '更改列表
             Dim NewWatcherList As New List(Of Watcher)
@@ -107,7 +107,7 @@ Public Module ModWatcher
                         Next
                     Loop
                     If State = MinecraftState.Crashed Then WatcherStateChanged()
-                    WatcherLog("Minecraft 日志监控已退出")
+                    WatcherLog(T("Minecraft 日志监控已退出"))
                 Catch ex As Exception
                     Logger.Error(ex, "Minecraft 日志监控主循环出错")
                     State = MinecraftState.Ended
@@ -158,7 +158,7 @@ Public Module ModWatcher
                 If State = MinecraftState.Loading Then ProgressUpdate()
                 '游戏退出检查
                 If GameProcess.HasExited Then
-                    WatcherLog("Minecraft 已退出，返回值：" & GameProcess.ExitCode)
+                    WatcherLog(T("Minecraft 已退出，返回值：{0}", GameProcess.ExitCode))
                     'If Process.ExitCode = 1 Then
                     '    '返回值为 1，考虑是任务管理器结束
                     '    WatcherLog("Minecraft 返回值为 1，考虑为任务管理器结束") '并不，崩了照样是 1
@@ -166,11 +166,11 @@ Public Module ModWatcher
                     'Else
                     If State = MinecraftState.Loading Then
                         '窗口未出现
-                        WatcherLog("Minecraft 尚未加载完成，可能已崩溃", LogLevel.Error)
+                        WatcherLog(T("Minecraft 尚未加载完成，可能已崩溃"), LogLevel.Error)
                         Crashed()
                     ElseIf GameProcess.ExitCode <> 0 AndAlso State = MinecraftState.Running AndAlso Instance.ReleaseTime.Year >= 2012 Then
                         '返回值不为 0 且未结束
-                        WatcherLog("Minecraft 返回值异常，可能已崩溃", LogLevel.Error)
+                        WatcherLog(T("Minecraft 返回值异常，可能已崩溃"), LogLevel.Error)
                         Crashed()
                     ElseIf State <> MinecraftState.Crashed Then
                         '正常关闭
@@ -193,20 +193,20 @@ Public Module ModWatcher
             Logger.Trace(Text)
             '进度处理
             If LogProgress < 1 Then
-                WatcherLog("日志 1/5：已出现日志输出")
+                WatcherLog(T("日志 1/5：已出现日志输出"))
                 LogProgress = 1
             End If '可能第一句就是后面需要判断的 Log（重现：启动 1.15.2 原版）
             If LogProgress < 2 AndAlso Text.Contains("Setting user:") Then
-                WatcherLog("日志 2/5：游戏用户已设置") '仅确保支持 Minecraft 1.7+
+                WatcherLog(T("日志 2/5：游戏用户已设置")) '仅确保支持 Minecraft 1.7+
                 LogProgress = 2
             ElseIf LogProgress < 3 AndAlso Text.ContainsIgnoreCase("lwjgl version") Then
-                WatcherLog("日志 3/5：LWJGL 版本已确认")
+                WatcherLog(T("日志 3/5：LWJGL 版本已确认"))
                 LogProgress = 3
             ElseIf LogProgress < 4 AndAlso (Text.Contains("OpenAL initialized") OrElse Text.Contains("Starting up SoundSystem")) Then
-                WatcherLog("日志 4/5：OpenAL 已加载") '仅确保支持 Minecraft 1.7+
+                WatcherLog(T("日志 4/5：OpenAL 已加载")) '仅确保支持 Minecraft 1.7+
                 LogProgress = 4
             ElseIf LogProgress < 5 AndAlso ((Text.Contains("Created") AndAlso Text.Contains("textures") AndAlso Text.Contains("-atlas")) OrElse Text.Contains("Found animation info")) Then
-                WatcherLog("日志 5/5：材质已加载") '仅确保支持 Minecraft 1.7+
+                WatcherLog(T("日志 5/5：材质已加载")) '仅确保支持 Minecraft 1.7+
                 LogProgress = 5
             End If
             '输出日志
@@ -214,20 +214,20 @@ Public Module ModWatcher
             '关闭与崩溃检测
             If Not Text.Contains("[CHAT]") Then
                 If Text.Contains("Someone is closing me!") OrElse Text.Contains("Restarting Minecraft with command") Then '#1258
-                    WatcherLog("识别为关闭的 Log：" & Text)
+                    WatcherLog(T("识别为关闭的 Log：{0}", Text))
                     State = MinecraftState.Ended
                 ElseIf Text.Contains("Crash report saved to") OrElse Text.Contains("This crash report has been saved to:") Then
                     ' Text.Contains("Minecraft ran into a problem! Report saved to:") Then
                     'Minecraft 崩溃，忽略 VanillaFix
-                    WatcherLog("识别为崩溃的 Log：" & Text, LogLevel.Error)
+                    WatcherLog(T("识别为崩溃的 Log：{0}", Text), LogLevel.Error)
                     Crashed()
                 ElseIf Text.Contains("Could not save crash report to") Then
                     'Minecraft 崩溃，无法保存崩溃日志
-                    WatcherLog("识别为崩溃的 Log：" & Text, LogLevel.Error)
+                    WatcherLog(T("识别为崩溃的 Log：{0}", Text), LogLevel.Error)
                     Crashed()
                 ElseIf Text.Contains("/ERROR]: Unable to launch") OrElse Text.Contains("An exception was thrown, the game will display an error screen and halt.") Then
                     'Forge 崩溃
-                    WatcherLog("识别为崩溃的 Log：" & Text, LogLevel.Error)
+                    WatcherLog(T("识别为崩溃的 Log：{0}", Text), LogLevel.Error)
                     Crashed()
                     'ElseIf Text.Contains("Shutdown failure!") Then
                     '    'Minecraft 强行崩溃，由于点 X 强行关闭也会触发这句话，所以不可用
@@ -245,7 +245,7 @@ Public Module ModWatcher
             Dim CurrentProgress As Double
             If IsWindowAppeared OrElse LogProgress = 5 Then
                 CurrentProgress = 0.95
-                WatcherLog("Minecraft 加载已完成")
+                WatcherLog(T("Minecraft 加载已完成"))
                 State = MinecraftState.Running
             Else
                 CurrentProgress = Math.Min(LogProgress, 3) / 3 * 0.9
@@ -279,7 +279,7 @@ Public Module ModWatcher
                 If Not MinecraftWindowName.StartsWithF("FML") AndAlso Not MinecraftWindowName.StartsWithF("Quilt Loader") Then
                     '已找到 Minecraft 窗口
                     WindowHandle = MinecraftWindowHandle
-                    WatcherLog($"Minecraft 窗口已加载：{MinecraftWindowName}（{MinecraftWindowHandle.ToInt64}）")
+                    WatcherLog(T("Minecraft 窗口已加载：{0}（{1}）", MinecraftWindowName, MinecraftWindowHandle.ToInt64))
                     IsWindowFinished = True
                     '最大化
                     If Settings.Get(Of Integer)("LaunchArgumentWindowType") = 4 Then
@@ -290,7 +290,7 @@ Public Module ModWatcher
                                 '……虽然我很想这样说，但总有人反馈，算了
                                 Thread.Sleep(2000)
                                 ShowWindow(WindowHandle, 3)
-                                WatcherLog($"已最大化 Minecraft 窗口：{MinecraftWindowHandle.ToInt64}")
+                                WatcherLog(T("已最大化 Minecraft 窗口：{0}", MinecraftWindowHandle.ToInt64))
                             Catch ex As Exception
                                 Logger.Warn(ex, "最大化 Minecraft 窗口时出现错误")
                             End Try
@@ -298,7 +298,7 @@ Public Module ModWatcher
                     End If
                 ElseIf Not IsWindowAppeared Then
                     '已找到 Mod Loader 窗口
-                    WatcherLog("Mod Loader 窗口已加载：" & MinecraftWindowName & "（" & MinecraftWindowHandle.ToInt64 & "）")
+                    WatcherLog(T("Mod Loader 窗口已加载：{0}（{1}）", MinecraftWindowName, MinecraftWindowHandle.ToInt64))
                 End If
                 IsWindowAppeared = True
             Catch ex As Exception
@@ -357,14 +357,14 @@ Public Module ModWatcher
             If State = MinecraftState.Crashed OrElse State = MinecraftState.Ended Then Return
             State = MinecraftState.Crashed
             '崩溃分析
-            WatcherLog("Minecraft 已崩溃，将在 2 秒后开始崩溃分析", LogLevel.Error)
-            Hint("检测到 Minecraft 出现错误，错误分析已开始……", HintType.Red)
+            WatcherLog(T("Minecraft 已崩溃，将在 2 秒后开始崩溃分析"), LogLevel.Error)
+            Hint(T("检测到 Minecraft 出现错误，错误分析已开始……"), HintType.Red)
             FeedbackInfo()
             RunInNewThread(
             Sub()
                 Try
                     Thread.Sleep(2000)
-                    WatcherLog("崩溃分析开始")
+                    WatcherLog(T("崩溃分析开始"))
                     Dim Analyzer As New CrashAnalyzer(Instance)
                     Analyzer.Collect(Instance.PathIndie, LatestLog.ToList)
                     Analyzer.Prepare()
@@ -380,10 +380,10 @@ Public Module ModWatcher
         '强制关闭
         Public Sub Kill()
             State = MinecraftState.Canceled
-            WatcherLog("尝试强制结束 Minecraft 进程")
+            WatcherLog(T("尝试强制结束 Minecraft 进程"))
             Try
                 If Not GameProcess.HasExited Then GameProcess.Kill()
-                WatcherLog("已强制结束 Minecraft 进程")
+                WatcherLog(T("已强制结束 Minecraft 进程"))
             Catch ex As Exception
                 Logger.Error(ex, "强制结束 Minecraft 进程失败", LogBehavior.Toast)
             End Try
