@@ -25,7 +25,7 @@ Public Class PageInstanceOverall
 
         '刷新设置项目
         ComboDisplayType.SelectedIndex = ReadIni(PageInstanceLeft.Instance.PathVersion & "FXL\Setup.ini", "DisplayType", McInstanceCardType.Auto)
-        BtnDisplayStar.Text = If(PageInstanceLeft.Instance.IsStar, "从收藏夹中移除", "加入收藏夹")
+        BtnDisplayStar.Text = If(PageInstanceLeft.Instance.IsStar, T("从收藏夹中移除"), T("加入收藏夹"))
         BtnFolderMods.Visibility = If(PageInstanceLeft.Instance.Modable, Visibility.Visible, Visibility.Collapsed)
         '刷新版本显示
         PanDisplayItem.Children.Clear()
@@ -72,7 +72,7 @@ Public Class PageInstanceOverall
             '改为隐藏
             Try
                 If Not Settings.Get(Of Boolean)("HintHide") Then
-                    If MyMsgBox("确认要从版本列表中隐藏该版本吗？隐藏该版本后，它将不再出现于 FXL 显示的版本列表中。" & vbCrLf & "此后，在版本列表页面按下 F11 才可以查看被隐藏的版本。", "隐藏版本提示",, "取消") <> 1 Then
+                    If MyMsgBox(T("确认要从版本列表中隐藏该版本吗？隐藏该版本后，它将不再出现于 FXL 显示的版本列表中。") & vbCrLf & T("此后，在版本列表页面按下 F11 才可以查看被隐藏的版本。"), T("隐藏版本提示"),, T("取消")) <> 1 Then
                         ComboDisplayType.SelectedIndex = 0
                         Return
                     End If
@@ -91,7 +91,7 @@ Public Class PageInstanceOverall
     Private Sub BtnDisplayDesc_Click(sender As Object, e As EventArgs) Handles BtnDisplayDesc.Click
         Try
             Dim OldInfo As String = ReadIni(PageInstanceLeft.Instance.PathVersion & "FXL\Setup.ini", "CustomInfo")
-            Dim NewInfo As String = MyMsgBoxInput("更改描述", "修改版本的描述文本，留空则使用 FXL 的默认描述。", OldInfo, New ObjectModel.Collection(Of Validate), "默认描述")
+            Dim NewInfo As String = MyMsgBoxInput(T("更改描述"), T("修改版本的描述文本，留空则使用 FXL 的默认描述。"), OldInfo, New ObjectModel.Collection(Of Validate), T("默认描述"))
             If NewInfo IsNot Nothing AndAlso OldInfo <> NewInfo Then WriteIni(PageInstanceLeft.Instance.PathVersion & "FXL\Setup.ini", "CustomInfo", NewInfo)
             PageInstanceLeft.Instance = New McInstance(PageInstanceLeft.Instance.Name).Load()
             Reload()
@@ -105,19 +105,19 @@ Public Class PageInstanceOverall
     Private Sub BtnDisplayRename_Click(sender As Object, e As EventArgs) Handles BtnDisplayRename.Click
         Try
             If McInstanceLock.IsLocked(PageInstanceLeft.Instance) Then
-                Hint("该版本正在被修改，请稍后再重命名！", HintType.Red)
+                Hint(T("该版本正在被修改，请稍后再重命名！"), HintType.Red)
                 Return
             End If
             '确认输入的新名称
             Dim OldName As String = PageInstanceLeft.Instance.Name
             '修改此部分的同时修改快速安装的版本名检测*
-            Dim NewName As String = MyMsgBoxInput("重命名版本", "", OldName, New ObjectModel.Collection(Of Validate) From {
+            Dim NewName As String = MyMsgBoxInput(T("重命名版本"), "", OldName, New ObjectModel.Collection(Of Validate) From {
                 New ValidateFolderName(McFolderSelected & "versions", IgnoreList:=New List(Of String) From {OldName})
             })
             If String.IsNullOrWhiteSpace(NewName) Then Return
             Dim NewInstance = PageInstanceLeft.Instance.Rename(NewName)
             '刷新与提示
-            Hint("重命名成功！", HintType.Green)
+            Hint(T("重命名成功！"), HintType.Green)
             PageInstanceLeft.Instance = NewInstance
             If Not IsNothing(McInstanceSelected) AndAlso McInstanceSelected.Equals(PageInstanceLeft.Instance) Then WriteIni(McFolderSelected & "FXL.ini", "Version", NewName)
             Reload()
@@ -133,7 +133,7 @@ Public Class PageInstanceOverall
         '选择 自定义 时修改图片
         Try
             If ComboDisplayLogo.SelectedItem Is ItemDisplayLogoCustom Then
-                Dim FileName As String = Dialogs.SelectFile("选择图片", False, filter:={({"png", "jpeg", "jpg", "gif", "webp"}, "常用图片文件")}).FirstOrDefault()
+                Dim FileName As String = Dialogs.SelectFile(T("选择图片"), False, filter:={({"png", "jpeg", "jpg", "gif", "webp"}, T("常用图片文件"))}).FirstOrDefault()
                 If String.IsNullOrEmpty(FileName) Then
                     Reload() '还原选项
                     Return
@@ -214,19 +214,19 @@ Public Class PageInstanceOverall
     Private Sub BtnManageScript_Click() Handles BtnManageScript.Click
         Try
             '弹窗要求指定脚本的保存位置
-            Dim SavePath As String = Dialogs.SaveFile("选择脚本保存位置", "启动 " & PageInstanceLeft.Instance.Name & ".bat", filter:={("bat", "批处理文件")})
+            Dim SavePath As String = Dialogs.SaveFile(T("选择脚本保存位置"), T("启动 {0}.bat", PageInstanceLeft.Instance.Name), filter:={("bat", T("批处理文件"))})
             If SavePath Is Nothing Then Return
             '检查中断（等玩家选完弹窗指不定任务就结束了呢……）
             If McLaunchLoader.State = LoadState.Loading Then
-                Hint("请在当前启动任务结束后再试！", HintType.Red)
+                Hint(T("请在当前启动任务结束后再试！"), HintType.Red)
                 Return
             End If
             '生成脚本
             If McLaunchStart(New McLaunchOptions With {.SaveBatch = SavePath, .Instance = PageInstanceLeft.Instance}) Then
                 If Settings.Get(Of McLoginType)("LoginType") = McLoginType.Legacy Then
-                    Hint("正在导出启动脚本……")
+                    Hint(T("正在导出启动脚本……"))
                 Else
-                    Hint("正在导出启动脚本……（注意，使用脚本启动可能会导致登录失效！）")
+                    Hint(T("正在导出启动脚本……（注意，使用脚本启动可能会导致登录失效！）"))
                 End If
             End If
         Catch ex As Exception
@@ -238,31 +238,31 @@ Public Class PageInstanceOverall
     Private Sub BtnManageCheck_Click(sender As Object, e As EventArgs) Handles BtnManageCheck.Click
         Try
             If McInstanceLock.IsLocked(PageInstanceLeft.Instance) Then
-                Hint("该版本正在被修改，请稍后再补全文件！", HintType.Red)
+                Hint(T("该版本正在被修改，请稍后再补全文件！"), HintType.Red)
                 Return
             End If
             '忽略文件检查提示
             If ShouldIgnoreFileCheck(PageInstanceLeft.Instance) Then
-                Hint("请先关闭 [版本设置 → 设置 → 高级启动选项 → 关闭文件校验]，然后再尝试补全文件！", HintType.Blue)
+                Hint(T("请先关闭 [版本设置 → 设置 → 高级启动选项 → 关闭文件校验]，然后再尝试补全文件！"), HintType.Blue)
                 Return
             End If
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar
-                If OngoingLoader.Name <> PageInstanceLeft.Instance.Name & " 文件补全" Then Continue For
-                Hint("正在处理中，请稍候！", HintType.Red)
+                If OngoingLoader.Tag?.ToString() <> "FileCompletion:" & PageInstanceLeft.Instance.Name Then Continue For
+                Hint(T("正在处理中，请稍候！"), HintType.Red)
                 Return
             Next
             '启动
-            Dim Loader As New LoaderCombo(Of String)(PageInstanceLeft.Instance.Name & " 文件补全", DlClientFix(PageInstanceLeft.Instance, True, False))
+            Dim Loader As New LoaderCombo(Of String)(T("{0} 文件补全", PageInstanceLeft.Instance.Name), DlClientFix(PageInstanceLeft.Instance, True, False)) With {.Tag = "FileCompletion:" & PageInstanceLeft.Instance.Name}
             Loader.OnStateChanged =
             Sub()
                 Select Case Loader.State
                     Case LoadState.Finished
-                        Hint(Loader.Name & "成功！", HintType.Green)
+                        Hint(T("{0}成功！", Loader.Name), HintType.Green)
                     Case LoadState.Failed
-                        Hint(Loader.Name & "失败：" & Loader.Error.GetDisplay(False), HintType.Red)
+                        Hint(T("{0}失败：{1}", Loader.Name, Loader.Error.GetDisplay(False)), HintType.Red)
                     Case LoadState.Canceled
-                        Hint(Loader.Name & "已取消！", HintType.Blue)
+                        Hint(T("{0}已取消！", Loader.Name), HintType.Blue)
                 End Select
             End Sub
             Loader.Start(PageInstanceLeft.Instance.Name)
@@ -279,21 +279,21 @@ Public Class PageInstanceOverall
     Private Sub BtnManageDelete_Click(sender As Object, e As EventArgs) Handles BtnManageDelete.Click
         Try
             If McInstanceLock.IsLocked(PageInstanceLeft.Instance) Then
-                Hint("该版本正在被修改，请稍后再删除！", HintType.Red)
+                Hint(T("该版本正在被修改，请稍后再删除！"), HintType.Red)
                 Return
             End If
             Dim IsShiftPressed As Boolean = My.Computer.Keyboard.ShiftKeyDown
             Dim IsHintIndie As Boolean = PageInstanceLeft.Instance.State <> McInstance.McInstanceState.Error AndAlso PageInstanceLeft.Instance.PathIndie <> McFolderSelected
             Dim SavesFolder = DirectoryUtils.GetInfo(PageInstanceLeft.Instance.PathIndie & "saves\")
-            Dim SaveEntries = If(IsHintIndie AndAlso SavesFolder.Exists, SavesFolder.EnumerateDirectories.OrderByDescending(Function(Save) Save.LastWriteTime).Select(Function(Save) $"{Save.Name}（上次修改：{StringUtils.FormatTimeSpan(Save.LastWriteTime - Date.Now, False)}）").ToList, New List(Of String))
-            Select Case MyMsgBox($"你确定要{If(IsShiftPressed, "永久", "")}删除版本 {PageInstanceLeft.Instance.Name} 吗？" &
-                        If(IsHintIndie, vbCrLf & "该版本对应的存档、资源包、Mod 等文件也将被一并删除！" &
-                            If(SaveEntries.Any, vbCrLf & vbCrLf & "这会删除以下存档：" & vbCrLf & "· " & SaveEntries.Join(vbCrLf & "· "), ""), ""),
-                        "版本删除确认", , "取消",, IsHintIndie OrElse IsShiftPressed)
+            Dim SaveEntries = If(IsHintIndie AndAlso SavesFolder.Exists, SavesFolder.EnumerateDirectories.OrderByDescending(Function(Save) Save.LastWriteTime).Select(Function(Save) T("{0}（上次修改：{1}）", Save.Name, StringUtils.FormatTimeSpan(Save.LastWriteTime - Date.Now, False))).ToList, New List(Of String))
+            Select Case MyMsgBox(T("你确定要{0}删除版本 {1} 吗？", If(IsShiftPressed, T("永久"), ""), PageInstanceLeft.Instance.Name) &
+                        If(IsHintIndie, vbCrLf & T("该版本对应的存档、资源包、Mod 等文件也将被一并删除！") &
+                            If(SaveEntries.Any, vbCrLf & vbCrLf & T("这会删除以下存档：") & vbCrLf & "· " & SaveEntries.Join(vbCrLf & "· "), ""), ""),
+                        T("版本删除确认"), , T("取消"),, IsHintIndie OrElse IsShiftPressed)
                 Case 1
                     PageInstanceLeft.Instance.ResetSettingsCache()
                     DirectoryUtils.Delete(PageInstanceLeft.Instance.PathVersion, Not IsShiftPressed)
-                    Hint("已删除版本 " & PageInstanceLeft.Instance.Name & "！", HintType.Green)
+                    Hint(T("已删除版本 {0}！", PageInstanceLeft.Instance.Name), HintType.Green)
                 Case 2
                     Return
             End Select

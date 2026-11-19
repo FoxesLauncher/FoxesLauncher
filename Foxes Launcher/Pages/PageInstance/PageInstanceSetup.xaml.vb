@@ -24,14 +24,14 @@ Public Class PageInstanceSetup
         TextArgumentJavaRange.ValidateRules = New ObjectModel.Collection(Of Validate) From {New ValidateFunc(
         Function(Str As String)
             Try
-                If String.IsNullOrWhiteSpace(Str) Then Return "不能为空"
+                If String.IsNullOrWhiteSpace(Str) Then Return T("不能为空")
                 Dim Range = ValueRange(Of Version).FromString(Str, Function(s) StringUtils.ParseVersionWithDefaults(s))
-                If Range.IsEmpty Then Return "范围下限的版本号比上限更高，导致该范围无法匹配到任何版本"
-                If Range.HasLower AndAlso Range.Lower.Major <= 1 AndAlso (Range.Lower.Minor > 0 OrElse Range.Lower.Build > 0 OrElse Range.Lower.Revision > 0) Then Return "不应使用 1.x 格式进行匹配（例如，若想匹配 Java 17，应填写 17 而非 1.17）"
-                If Range.HasUpper AndAlso Range.Upper.Major <= 1 AndAlso (Range.Upper.Minor > 0 OrElse Range.Upper.Build > 0 OrElse Range.Upper.Revision > 0) Then Return "不应使用 1.x 格式进行匹配（例如，若想匹配 Java 17，应填写 17 而非 1.17）"
-                If Range.HasUpper AndAlso Range.Upper.Major <= 4 Then Return "该范围所要求的 Java 版本过低"
-                If Range.HasUpper AndAlso Range.IsUpperInclusive AndAlso Range.Upper.Minor <= 0 AndAlso Range.Upper.Build <= 0 Then Return $"右侧闭区间的意图并不明确。如果不想允许 Java {Range.Upper.Major}，请改为 {vbLQ}{Range.Upper.Major}){vbRQ}。如果想允许 Java {Range.Upper.Major}，请改为 {vbLQ}{Range.Upper.Major + 1}){vbRQ}。"
-                If Range.Intersect(ValueRange(Of Version).OpenClosed(New Version(5, 0), New Version(99, 0))).IsEmpty() Then Return "该范围无法匹配到任何常见的 Java"
+                If Range.IsEmpty Then Return T("范围下限的版本号比上限更高，导致该范围无法匹配到任何版本")
+                If Range.HasLower AndAlso Range.Lower.Major <= 1 AndAlso (Range.Lower.Minor > 0 OrElse Range.Lower.Build > 0 OrElse Range.Lower.Revision > 0) Then Return T("不应使用 1.x 格式进行匹配（例如，若想匹配 Java 17，应填写 17 而非 1.17）")
+                If Range.HasUpper AndAlso Range.Upper.Major <= 1 AndAlso (Range.Upper.Minor > 0 OrElse Range.Upper.Build > 0 OrElse Range.Upper.Revision > 0) Then Return T("不应使用 1.x 格式进行匹配（例如，若想匹配 Java 17，应填写 17 而非 1.17）")
+                If Range.HasUpper AndAlso Range.Upper.Major <= 4 Then Return T("该范围所要求的 Java 版本过低")
+                If Range.HasUpper AndAlso Range.IsUpperInclusive AndAlso Range.Upper.Minor <= 0 AndAlso Range.Upper.Build <= 0 Then Return T("右侧闭区间的意图并不明确。如果不想允许 Java {0}，请改为 {1}{2}){3}。如果想允许 Java {4}，请改为 {5}{6}){7}。", Range.Upper.Major, vbLQ, Range.Upper.Major, vbRQ, Range.Upper.Major, vbLQ, Range.Upper.Major + 1, vbRQ)
+                If Range.Intersect(ValueRange(Of Version).OpenClosed(New Version(5, 0), New Version(99, 0))).IsEmpty() Then Return T("该范围无法匹配到任何常见的 Java")
                 Return ""
             Catch ex As Exception
                 Return ex.Message
@@ -87,7 +87,7 @@ Public Class PageInstanceSetup
             JavaListRefreshWorker.Start()
 
             Logger.Info("已初始化版本独立设置")
-            Hint("已初始化版本独立设置！", HintType.Green, False)
+            Hint(T("已初始化版本独立设置！"), HintType.Green, False)
         Catch ex As Exception
             Logger.Error(ex, "初始化版本独立设置失败", LogBehavior.Alert)
         End Try
@@ -130,8 +130,9 @@ Public Class PageInstanceSetup
             SliderRamCustom.MaxValue = Math.Floor((RamTotal - 16) / 2) + 33
         End If
         '设置文本
-        LabRamGame.Text = If(RamGame = Math.Floor(RamGame), RamGame & ".0", RamGame) & " GB" &
-                          If(RamGame <> RamGameActual, " (可用 " & If(RamGameActual = Math.Floor(RamGameActual), RamGameActual & ".0", RamGameActual) & " GB)", "")
+        Dim RamGameText = If(RamGame = Math.Floor(RamGame), RamGame & ".0", RamGame)
+        Dim RamActualText = If(RamGameActual = Math.Floor(RamGameActual), RamGameActual & ".0", RamGameActual)
+        LabRamGame.Text = If(RamGame <> RamGameActual, T("{0} GB（可用 {1} GB）", RamGameText, RamActualText), RamGameText & " GB")
         LabRamUsed.Text = If(RamUsed = Math.Floor(RamUsed), RamUsed & ".0", RamUsed) & " GB"
         LabRamTotal.Text = " / " & If(RamTotal = Math.Floor(RamTotal), RamTotal & ".0", RamTotal) & " GB"
         If ShowAnim Then
@@ -375,11 +376,11 @@ PreFin:
     'LittleSkin
     Private Sub BtnServerAuthLittle_Click(sender As Object, e As EventArgs) Handles BtnServerAuthLittle.Click
         If TextServerAuthServer.Text <> "" AndAlso TextServerAuthServer.Text <> "https://littleskin.cn/api/yggdrasil" AndAlso
-            MyMsgBox("即将把第三方登录设置覆盖为 LittleSkin 登录。" & vbCrLf & "除非你是服主，或者服主要求你这样做，否则请不要继续。" & vbCrLf & vbCrLf & "是否确实需要覆盖当前设置？",
-                     "设置覆盖确认", "继续", "取消") = 2 Then Return
+            MyMsgBox(T("即将把第三方登录设置覆盖为 LittleSkin 登录。") & vbCrLf & T("除非你是服主，或者服主要求你这样做，否则请不要继续。") & vbCrLf & vbCrLf & T("是否确实需要覆盖当前设置？"),
+                     T("设置覆盖确认"), T("继续"), T("取消")) = 2 Then Return
         TextServerAuthServer.Text = "https://littleskin.cn/api/yggdrasil"
         TextServerAuthRegister.Text = "https://littleskin.cn/auth/register"
-        TextServerAuthName.Text = "LittleSkin 登录"
+        TextServerAuthName.Text = T("LittleSkin 登录")
     End Sub
 
 #End Region
@@ -403,18 +404,18 @@ PreFin:
                 '显示当前会选择的 Java
                 If Not JavaWorker.LastSucceeded OrElse JavaWorker.Running Then
                     If Not JavaWorker.Running Then JavaWorker.Start()
-                    HintArgumentJava.Text = $"正在查找 Java……"
+                    HintArgumentJava.Text = T("正在查找 Java……")
                     HintArgumentJava.Theme = MyHint.Themes.Blue
                 ElseIf JavaWorker.LastResult Is Nothing Then
                     If ComboArgumentJava.SelectedIndex = 0 Then
-                        HintArgumentJava.Text = $"你的电脑上没有可供该版本使用的 Java，FXL 会在启动游戏时自动下载。"
+                        HintArgumentJava.Text = T("你的电脑上没有可供该版本使用的 Java，FXL 会在启动游戏时自动下载。")
                         HintArgumentJava.Theme = MyHint.Themes.Yellow
                     Else
-                        HintArgumentJava.Text = $"该版本的版本文件夹中没有发现任何 Java！{vbCrLf}请点击此处打开版本文件夹，然后将 Java 文件夹复制进去。"
+                        HintArgumentJava.Text = T("该版本的版本文件夹中没有发现任何 Java！{0}请点击此处打开版本文件夹，然后将 Java 文件夹复制进去。", vbCrLf)
                         HintArgumentJava.Theme = MyHint.Themes.Red
                     End If
                 Else
-                    HintArgumentJava.Text = $"将会使用：{JavaWorker.LastResult}"
+                    HintArgumentJava.Text = T("将会使用：{0}", JavaWorker.LastResult)
                     HintArgumentJava.Theme = MyHint.Themes.Blue
                 End If
             Case 1
@@ -429,20 +430,20 @@ PreFin:
                 End If
                 '输入的范围有误
                 If Not String.IsNullOrEmpty(TextArgumentJavaRange.ValidateResult) Then
-                    HintArgumentJava.Text = $"Java 版本范围错误：{TextArgumentJavaRange.ValidateResult}"
+                    HintArgumentJava.Text = T("Java 版本范围错误：{0}", TextArgumentJavaRange.ValidateResult)
                     HintArgumentJava.Theme = MyHint.Themes.Red
                     Return
                 End If
                 '显示当前会选择的 Java
                 If Not JavaWorker.LastSucceeded OrElse JavaWorker.Running Then
                     If Not JavaWorker.Running Then JavaWorker.Start()
-                    HintArgumentJava.Text = $"正在查找 Java……"
+                    HintArgumentJava.Text = T("正在查找 Java……")
                     HintArgumentJava.Theme = MyHint.Themes.Blue
                 ElseIf JavaWorker.LastResult Is Nothing Then
-                    HintArgumentJava.Text = $"你的电脑上没有任何 Java 符合该版本范围！{vbCrLf}如果 Mojang 提供了对应版本的 Java，FXL 会在启动游戏时自动下载。"
+                    HintArgumentJava.Text = T("你的电脑上没有任何 Java 符合该版本范围！{0}如果 Mojang 提供了对应版本的 Java，FXL 会在启动游戏时自动下载。", vbCrLf)
                     HintArgumentJava.Theme = MyHint.Themes.Yellow
                 Else
-                    HintArgumentJava.Text = $"将会使用：{JavaWorker.LastResult}"
+                    HintArgumentJava.Text = T("将会使用：{0}", JavaWorker.LastResult)
                     HintArgumentJava.Theme = MyHint.Themes.Blue
                 End If
             Case 3
@@ -468,7 +469,7 @@ PreFin:
         If JavaListRefreshWorker.Running Then
             BtnArgumentJavaSearch.IsEnabled = False
             ComboArgumentJavaSelect.IsEnabled = False
-            LabArgumentJava.Text = "搜索中 …"
+            LabArgumentJava.Text = T("搜索中 …")
             Return
         End If
         '========================================== 显示结果 ==========================================
@@ -477,9 +478,9 @@ PreFin:
         Dim SelectedJava As Java = Configs.JavaForced.Get(PageInstanceLeft.Instance.Config)
         '更新下拉框文本
         If Not Configs.JavaList.Get().Any() Then
-            LabArgumentJava.Text = "未找到 Java，点击以导入已有的 Java"
+            LabArgumentJava.Text = T("未找到 Java，点击以导入已有的 Java")
         ElseIf SelectedJava Is Nothing Then
-            LabArgumentJava.Text = "点击选择 Java …"
+            LabArgumentJava.Text = T("点击选择 Java …")
         Else
             LabArgumentJava.Text = SelectedJava.ToString
         End If
@@ -502,19 +503,19 @@ PreFin:
                 Dim IsOfficial As Boolean = PathUtils.IsParentOf($"{Paths.AppData}.minecraft\runtime\", JavaEntry.Folder)
                 Dim DeleteButton As New MyIconButton With {.Logo = Logo.IconButtonStop, .Height = 24, .Width = 24}
                 DeleteButton.IsEnabled = Not IsOfficial
-                DeleteButton.ToolTip = If(DeleteButton.IsEnabled, "从列表中移除", "无法移除官方 Java")
+                DeleteButton.ToolTip = If(DeleteButton.IsEnabled, T("从列表中移除"), T("无法移除官方 Java"))
                 AddHandler DeleteButton.Click, Sub() ManuallyRemoveJava(JavaEntry)
                 ToolTipService.SetShowOnDisabled(DeleteButton, True)
                 Buttons.Add(DeleteButton)
                 '打开文件夹按钮
                 Dim OpenButton As New MyIconButton With {.Logo = Logo.IconButtonOpen, .LogoScale = 1.1, .Height = 24, .Width = 24}
-                OpenButton.ToolTip = "打开文件夹"
+                OpenButton.ToolTip = T("打开文件夹")
                 AddHandler OpenButton.Click, Sub() OpenExplorer(JavaEntry.JavaExePath)
                 Buttons.Add(OpenButton)
                 JavaItem.Buttons = Buttons
             Next
             Dim ImportItem As New MyListItem With {
-                .FontSize = 13, .Height = 24, .IsScaleAnimationEnabled = False, .Title = " 导入电脑中已有的 Java…", .Type = MyListItem.CheckType.Clickable}
+                .FontSize = 13, .Height = 24, .IsScaleAnimationEnabled = False, .Title = T("导入电脑中已有的 Java…"), .Type = MyListItem.CheckType.Clickable}
             AddHandler ImportItem.MouseLeftButtonUp,
             Sub(sender As Object, e As MouseButtonEventArgs)
                 e.Handled = True
@@ -536,10 +537,10 @@ PreFin:
         If AniControlEnabled <> 0 Then Return
         Static IsReverting As Boolean = False
         If IsReverting Then Return
-        If MyMsgBox("调整版本隔离设置后，你需要游戏存档、Mod 等文件手动迁移到新的游戏文件夹中。" & vbCrLf &
-                    "如果发现存档消失，把这项设置改回来就能恢复。" & vbCrLf &
-                    "如果你不会迁移存档，不建议修改这项设置！",
-                    "警告", "我知道我在做什么", "取消", IsWarn:=True) = 2 Then
+        If MyMsgBox(T("调整版本隔离设置后，你需要游戏存档、Mod 等文件手动迁移到新的游戏文件夹中。") & vbCrLf &
+                    T("如果发现存档消失，把这项设置改回来就能恢复。") & vbCrLf &
+                    T("如果你不会迁移存档，不建议修改这项设置！"),
+                    T("警告"), T("我知道我在做什么"), T("取消"), IsWarn:=True) = 2 Then
             IsReverting = True
             If e.RemovedItems.Count > 0 Then ComboArgumentIndieV2.SelectedItem = e.RemovedItems(0)
             IsReverting = False

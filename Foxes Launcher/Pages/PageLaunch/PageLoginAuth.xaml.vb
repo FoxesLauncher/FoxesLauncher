@@ -1,6 +1,10 @@
 Public Class PageLoginAuth
     Private IsFirstLoad As Boolean = True
     ''' <summary>
+    ''' 当前链接按钮是否处于“注册账号”模式（否则为“找回密码”）。
+    ''' </summary>
+    Private IsRegisterMode As Boolean = True
+    ''' <summary>
     ''' 刷新页面显示的所有信息。
     ''' </summary>
     Public Sub Reload(KeepInput As Boolean)
@@ -38,8 +42,8 @@ Public Class PageLoginAuth
     ''' 当前页面的登录信息是否有效。
     ''' </summary>
     Public Shared Function IsVaild(LoginData As McLoginServer) As String
-        If LoginData.UserName = "" Then Return "账号不能为空！"
-        If LoginData.Password = "" Then Return "密码不能为空！"
+        If LoginData.UserName = "" Then Return T("账号不能为空！")
+        If LoginData.Password = "" Then Return T("密码不能为空！")
         Return ""
     End Function
     Public Function IsVaild() As String
@@ -67,10 +71,11 @@ Public Class PageLoginAuth
 
     '链接处理
     Private Sub ComboName_TextChanged() Handles ComboName.TextChanged
-        BtnLink.Content = If(ComboName.Text = "", "注册账号", "找回密码")
+        IsRegisterMode = ComboName.Text = ""
+        BtnLink.Content = If(IsRegisterMode, T("注册账号"), T("找回密码"))
     End Sub
     Private Sub Btn_Click(sender As Object, e As EventArgs) Handles BtnLink.Click
-        If BtnLink.Content = "注册账号" Then
+        If IsRegisterMode Then
             OpenWebsite(If(McInstanceSelected IsNot Nothing, Settings.Get(Of String)("VersionServerAuthRegister", Instance:=McInstanceSelected), Settings.Get(Of String)("CacheAuthServerRegister")))
         Else
             Dim Website As String = If(McInstanceSelected IsNot Nothing, Settings.Get(Of String)("VersionServerAuthRegister", Instance:=McInstanceSelected), Settings.Get(Of String)("CacheAuthServerRegister"))

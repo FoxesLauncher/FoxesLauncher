@@ -36,7 +36,11 @@ Public Class PageLaunchRight
                 '联网下载
                 Url = Settings.Get(Of String)("UiCustomNet")
             Case 3
-                '预设
+                '预设（来自外部的单语言资源，仅对简体中文用户可用）
+                If Not ModLanguage.IsDefaultLanguage Then
+                    Logger.Info("主页预设仅对简体中文用户可用，已跳过")
+                    Exit Select
+                End If
                 Dim Preset As Integer = Settings.Get(Of Integer)("UiCustomPreset")
                 If Preset <= 1 Then '旧版的“你知道吗”“回声洞”预设已移除
                     Preset = 2
@@ -127,7 +131,7 @@ Public Class PageLaunchRight
             Else
                 '缓存不可用
                 Logger.Info("主页自定义数据来源：联网全新下载")
-                Hint("正在加载主页……")
+                Hint(T("正在加载主页……"))
                 RunInUiWait(Sub() LoadContent(Nothing)) '在加载结束前清空页面
                 Settings.Set("CacheSavedPageVersion", "")
                 OnlineLoader.Start((Url, True)) '下载完成后将会再次触发更新
@@ -140,7 +144,7 @@ Public Class PageLaunchRight
     Private RefreshLock As New Object
 
     '联网获取主页文件
-    Private OnlineLoader As New LoaderTask(Of (Address As String, ShouldRefresh As Boolean), Integer)("下载主页", AddressOf OnlineLoaderSub) With {.ReloadTimeout = 10 * 60 * 1000}
+    Private OnlineLoader As New LoaderTask(Of (Address As String, ShouldRefresh As Boolean), Integer)(T("下载主页"), AddressOf OnlineLoaderSub) With {.ReloadTimeout = 10 * 60 * 1000}
     Private Sub OnlineLoaderSub(Task As LoaderTask(Of (Address As String, ShouldRefresh As Boolean), Integer))
         Dim Address As String = Task.Input.Address '#3721 中连续触发两次导致内容变化
         Dim ShouldRefresh As Boolean = Task.Input.ShouldRefresh
@@ -159,7 +163,7 @@ Public Class PageLaunchRight
             Dim Version As String = ""
             Try
                 Version = NetRequestByClientRetry(VersionAddress)
-                If Version.Length > 1000 Then Throw New Exception($"获取的主页版本过长（{Version.Length} 字符）")
+                If Version.Length > 1000 Then Throw New Exception(T("获取的主页版本过长（{0} 字符）", Version.Length))
                 Dim CurrentVersion As String = Settings.Get(Of String)("CacheSavedPageVersion")
                 If Version <> "" AndAlso CurrentVersion <> "" AndAlso Version = CurrentVersion Then
                     Logger.Info($"当前缓存的主页已为最新，当前版本：{Version}，检查源：{VersionAddress}")
@@ -239,7 +243,7 @@ Public Class PageLaunchRight
                 '加载计时
                 Dim LoadCostTime = (Date.Now - LoadStartTime).Milliseconds
                 Logger.Info($"实例化：加载主页 UI 完成，耗时 {LoadCostTime}ms")
-                If LoadCostTime > 3000 Then Hint($"主页加载过于缓慢（花费了 {Math.Round(LoadCostTime / 1000, 1)} 秒），请向主页作者反馈此问题，或暂时停止使用该主页")
+                If LoadCostTime > 3000 Then Hint(T("主页加载过于缓慢（花费了 {0} 秒），请向主页作者反馈此问题，或暂时停止使用该主页", Math.Round(LoadCostTime / 1000, 1)))
             End SyncLock
         Catch ex As Exception
             Logger.Warn(ex, $"加载失败的主页内容：{vbCrLf}{Content}")
@@ -252,8 +256,8 @@ Public Class PageLaunchRight
     Private Sub OnLoadContentFailed(ex As Exception)
         If ModeDebug OrElse Settings.Get(Of Integer)("UiCustomType") = 1 Then
             Logger.Warn(ex, "加载主页失败")
-            If MyMsgBox(If(TypeOf ex Is UnauthorizedAccessException, ex.Message, $"主页内容编写有误，请根据下列错误信息进行检查：{vbCrLf}{ex.GetDisplay(False)}"),
-                        "加载主页失败", "重试", "取消") = 1 Then ForceRefresh()
+            If MyMsgBox(If(TypeOf ex Is UnauthorizedAccessException, ex.Message, T("主页内容编写有误，请根据下列错误信息进行检查：{0}{1}", vbCrLf, ex.GetDisplay(False))),
+                        T("加载主页失败"), T("重试"), T("取消")) = 1 Then ForceRefresh()
         Else
             Logger.Error(ex, "加载主页失败", LogBehavior.Toast)
         End If
