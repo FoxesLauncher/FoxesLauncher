@@ -24,7 +24,7 @@ Public Class MyMsgRegionLanguage
             For Each Entry In LanguageEntries
                 ComboLanguage.Items.Add(New MyComboBoxItem With {.Content = Entry.Name, .Tag = Entry.Code})
             Next
-            ComboLanguage.SelectedIndex = Math.Max(0, LanguageEntries.FindIndex(Function(e) e.Code = CurrentLanguage))
+            ComboLanguage.SelectedIndex = Math.Max(0, LanguageEntries.FindIndex(Function(e) e.Code = ModRegion.CurrentLanguage))
 
         Catch ex As Exception
             Logger.Error(ex, "区域与语言弹窗初始化失败", LogBehavior.Toast)

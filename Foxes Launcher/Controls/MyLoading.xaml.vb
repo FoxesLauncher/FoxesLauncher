@@ -41,26 +41,44 @@ Public Class MyLoading
         End Set
     End Property
 
-    Private _Text As String = "加载中"
     Public Property Text As String
         Get
-            Return _Text
+            Return GetValue(TextProperty)
         End Get
         Set(value As String)
-            _Text = value
-            RefreshText()
+            SetValue(TextProperty, value)
         End Set
     End Property
+    Public Shared ReadOnly TextProperty As DependencyProperty = DependencyProperty.Register("Text", GetType(String), GetType(MyLoading), New PropertyMetadata("", AddressOf OnTextChanged))
+    Private Shared Sub OnTextChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        DirectCast(d, MyLoading).RefreshText()
+    End Sub
 
-    Private _TextError As String = "加载失败"
     Public Property TextError As String
         Get
-            Return _TextError
+            Return GetValue(TextErrorProperty)
         End Get
         Set(value As String)
-            _TextError = value
-            RefreshText()
+            SetValue(TextErrorProperty, value)
         End Set
+    End Property
+    Public Shared ReadOnly TextErrorProperty As DependencyProperty = DependencyProperty.Register("TextError", GetType(String), GetType(MyLoading), New PropertyMetadata("", AddressOf OnTextChanged))
+
+    ''' <summary>
+    ''' 未显式设置时的默认文本。
+    ''' </summary>
+    Public ReadOnly Property DefaultText As String
+        Get
+            Return T("加载中")
+        End Get
+    End Property
+    ''' <summary>
+    ''' 未显式设置时的默认错误文本。
+    ''' </summary>
+    Public ReadOnly Property DefaultTextError As String
+        Get
+            Return T("加载失败")
+        End Get
     End Property
     ''' <summary>
     ''' 是否在使用 Loader 时使用 Loader 的错误输出来替换默认的错误文本显示。
@@ -74,18 +92,19 @@ Public Class MyLoading
                 If TextErrorInherit AndAlso State.IsLoader Then
                     Dim Ex As Exception = CType(State, Object).Error
                     If Ex Is Nothing Then
-                        LabText.Text = "未知错误"
+                        LabText.Text = T("未知错误")
                     Else
                         LabText.Text = Ex.GetDisplay(False)
                     End If
                 Else
-                    LabText.Text = TextError
+                    LabText.Text = If(String.IsNullOrEmpty(TextError), DefaultTextError, TextError)
                 End If
             Else
+                Dim TextValue As String = If(String.IsNullOrEmpty(Text), DefaultText, Text)
                 If ShowProgress AndAlso State.IsLoader Then
-                    LabText.Text = Text & " - " & Math.Floor(CType(State, Object).Progress * 100) & "%"
+                    LabText.Text = TextValue & " - " & Math.Floor(CType(State, Object).Progress * 100) & "%"
                 Else
-                    LabText.Text = Text
+                    LabText.Text = TextValue
                 End If
             End If
         End Sub)

@@ -6,7 +6,20 @@ Public Class MyComboBox
     '基础
     Public Uuid As Integer = GetUuid()
     Private TextBox As MyTextBox
-    Public Property HintText As String = ""
+    Public Property HintText As String
+        Get
+            Return GetValue(HintTextProperty)
+        End Get
+        Set(value As String)
+            SetValue(HintTextProperty, value)
+        End Set
+    End Property
+    Public Shared ReadOnly HintTextProperty As DependencyProperty = DependencyProperty.Register("HintText", GetType(String), GetType(MyComboBox), New PropertyMetadata("", AddressOf OnHintTextChanged))
+    Private Shared Sub OnHintTextChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        Dim Combo = DirectCast(d, MyComboBox)
+        Dim Value As String = DirectCast(If(e.NewValue, ""), String)
+        If Combo.TextBox IsNot Nothing Then Combo.TextBox.HintText = Value
+    End Sub
     Public Overrides Sub OnApplyTemplate()
         MyBase.OnApplyTemplate()
         If Not IsEditable Then Return
@@ -46,7 +59,7 @@ Public Class MyComboBox
                     TextBox.Text = value
                 End If
             Else
-                Throw New NotSupportedException("该 ComboBox 不支持修改文本。")
+                Throw New NotSupportedException(T("该 ComboBox 不支持修改文本。"))
             End If
         End Set
     End Property

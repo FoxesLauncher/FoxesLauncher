@@ -13,7 +13,7 @@ Public Class MyVirtualizingElement(Of T As FrameworkElement)
     Public Function Init() As T
         Dim Element As T = Initializer()
         If Parent IsNot Nothing Then
-            If TypeOf Parent IsNot Panel Then Throw New Exception("MyVirtualizingElement 的父级必须是一个 Panel")
+            If TypeOf Parent IsNot Panel Then Throw New Exception(ModLanguage.T("MyVirtualizingElement 的父级必须是一个 Panel"))
             Dim ParentPanel As Panel = Parent
             Dim CurrentIndex As Integer = ParentPanel.Children.IndexOf(Me)
             ParentPanel.Children.RemoveAt(CurrentIndex)
@@ -43,7 +43,7 @@ Public Class MyVirtualizingElement
     Public Function Init() As FrameworkElement
         Dim Element As FrameworkElement = Initializer()
         If Parent IsNot Nothing Then
-            If TypeOf Parent IsNot Panel Then Throw New Exception("MyVirtualizingElement 的父级必须是一个 Panel")
+            If TypeOf Parent IsNot Panel Then Throw New Exception(ModLanguage.T("MyVirtualizingElement 的父级必须是一个 Panel"))
             Dim ParentPanel As Panel = Parent
             Dim CurrentIndex As Integer = ParentPanel.Children.IndexOf(Me)
             ParentPanel.Children.RemoveAt(CurrentIndex)

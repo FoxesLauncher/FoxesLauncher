@@ -21,7 +21,7 @@
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" FontSize="23" TextTrimming="None" Foreground="{DynamicResource ColorBrush2}" HorizontalAlignment="Left" Name="LabTitle" Margin="7,-1,70,9" Text="区域与语言" VerticalAlignment="Top" SnapsToDevicePixels="False" UseLayoutRounding="False" />
+            <TextBlock Grid.Row="0" FontSize="23" TextTrimming="None" Foreground="{DynamicResource ColorBrush2}" HorizontalAlignment="Left" Name="LabTitle" Margin="7,-1,70,9" Text="{DynamicResource 区域与语言}" VerticalAlignment="Top" SnapsToDevicePixels="False" UseLayoutRounding="False" />
             <Rectangle x:Name="ShapeLine" Grid.Row="1" Height="2" Fill="{Binding Foreground, ElementName=LabTitle}" />
             <StackPanel Grid.Row="3" Margin="7,0,7,17">
                 <Grid>
@@ -34,14 +34,14 @@
                         <RowDefinition Height="10" />
                         <RowDefinition Height="28" />
                     </Grid.RowDefinitions>
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="区域" Margin="0,0,20,0" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 区域}" Margin="0,0,20,0" />
                     <my:MyComboBox x:Name="ComboRegion" Grid.Column="1" HorizontalAlignment="Left" Width="280" />
-                    <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="语言" Margin="0,0,20,0" />
+                    <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 语言}" Margin="0,0,20,0" />
                     <my:MyComboBox x:Name="ComboLanguage" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Width="280" />
                 </Grid>
             </StackPanel>
             <StackPanel Grid.Row="4" Name="PanBtn" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="150,0,8,0" Orientation="Horizontal">
-                <my:MyButton ColorType="Normal" x:FieldModifier="public" Text="确定" x:Name="Btn1" Margin="12,0,0,0" TextPadding="7" SnapsToDevicePixels="False" Padding="5,0" UseLayoutRounding="False" />
+                <my:MyButton ColorType="Normal" x:FieldModifier="public" Text="{DynamicResource 确定}" x:Name="Btn1" Margin="12,0,0,0" TextPadding="7" SnapsToDevicePixels="False" Padding="5,0" UseLayoutRounding="False" />
             </StackPanel>
         </Grid>
     </Border>

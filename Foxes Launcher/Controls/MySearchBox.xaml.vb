@@ -3,18 +3,27 @@ Class MySearchBox
 
     Public Event TextChanged(sender As Object, e As EventArgs)
     Private Sub MySearchBox_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
-        TextBox.Focus()
+        If TextBox IsNot Nothing Then
+            TextBox.HintText = HintText
+            TextBox.Focus()
+        End If
     End Sub
 
     '属性
     Public Property HintText() As String
         Get
-            Return TextBox.HintText
+            Return GetValue(HintTextProperty)
         End Get
         Set(value As String)
-            TextBox.HintText = value
+            SetValue(HintTextProperty, value)
         End Set
     End Property
+    Public Shared ReadOnly HintTextProperty As DependencyProperty = DependencyProperty.Register("HintText", GetType(String), GetType(MySearchBox), New PropertyMetadata("", AddressOf OnHintTextChanged))
+    Private Shared Sub OnHintTextChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        Dim SearchBox = DirectCast(d, MySearchBox)
+        Dim Value As String = DirectCast(If(e.NewValue, ""), String)
+        If SearchBox.TextBox IsNot Nothing Then SearchBox.TextBox.HintText = Value
+    End Sub
     Public Property Text() As String
         Get
             Return TextBox.Text
