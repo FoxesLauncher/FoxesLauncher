@@ -36,7 +36,7 @@ Public Class PageSelectRight
                 Dim CardName As String = ""
                 Select Case Card.Key
                     Case McInstanceCardType.OriginalLike
-                        CardName = "常规版本"
+                        CardName = T("常规版本")
                     Case McInstanceCardType.API
                         Dim IsForgeExists As Boolean = False
                         Dim IsNeoForgeExists As Boolean = False
@@ -49,32 +49,32 @@ Public Class PageSelectRight
                             If Instance.Version.ModLoaders.HasFlagF(ModLoaders.NeoForge) Then IsNeoForgeExists = True
                         Next
                         If If(IsLiteExists, 1, 0) + If(IsForgeExists, 1, 0) + If(IsFabricExists, 1, 0) + If(IsNeoForgeExists, 1, 0) > 1 Then
-                            CardName = "可安装 Mod"
+                            CardName = T("可安装 Mod")
                         ElseIf IsForgeExists Then
-                            CardName = "Forge 版本"
+                            CardName = T("Forge 版本")
                         ElseIf IsNeoForgeExists Then
-                            CardName = "NeoForge 版本"
+                            CardName = T("NeoForge 版本")
                         ElseIf IsLiteExists Then
-                            CardName = "LiteLoader 版本"
+                            CardName = T("LiteLoader 版本")
                         Else
-                            CardName = "Fabric 版本"
+                            CardName = T("Fabric 版本")
                         End If
                     Case McInstanceCardType.Error
-                        CardName = "错误的版本"
+                        CardName = T("错误的版本")
                     Case McInstanceCardType.Hidden
-                        CardName = "隐藏的版本"
+                        CardName = T("隐藏的版本")
                     Case McInstanceCardType.Rubbish
-                        CardName = "不常用版本"
+                        CardName = T("不常用版本")
                     Case McInstanceCardType.Star
-                        CardName = "收藏夹"
+                        CardName = T("收藏夹")
                     Case McInstanceCardType.Fool
-                        CardName = "愚人节版本"
+                        CardName = T("愚人节版本")
                     Case Else
-                        Throw New ArgumentException("未知的卡片种类（" & Card.Key & "）")
+                        Throw New ArgumentException(T("未知的卡片种类（{0}）", Card.Key))
                 End Select
 #End Region
                 '建立控件
-                Dim CardTitle As String = CardName & If(CardName = "收藏夹", "", " (" & Instances.Count & ")")
+                Dim CardTitle As String = CardName & If(CardName = T("收藏夹"), "", " (" & Instances.Count & ")")
                 Dim NewCard As New MyCard With {.Title = CardTitle, .Margin = New Thickness(0, 0, 0, 15)}
                 Dim NewStack As New StackPanel With {.Margin = New Thickness(20, MyCard.SwapedHeight, 18, 0), .VerticalAlignment = VerticalAlignment.Top, .RenderTransform = New TranslateTransform(0, 0)}
                 NewCard.Children.Add(NewStack)
@@ -99,12 +99,12 @@ Public Class PageSelectRight
                 PanEmpty.Visibility = Visibility.Visible
                 PanBack.Visibility = Visibility.Collapsed
                 If ShowHidden Then
-                    LabEmptyTitle.Text = "无隐藏版本"
-                    LabEmptyContent.Text = "没有版本被隐藏，你可以在版本设置的版本分类选项中隐藏版本。" & vbCrLf & "再次按下 F11 即可退出隐藏版本查看模式。"
+                    LabEmptyTitle.Text = T("无隐藏版本")
+                    LabEmptyContent.Text = T("没有版本被隐藏，你可以在版本设置的版本分类选项中隐藏版本。") & vbCrLf & T("再次按下 F11 即可退出隐藏版本查看模式。")
                     BtnEmptyDownload.Visibility = Visibility.Collapsed
                 Else
-                    LabEmptyTitle.Text = "无可用版本"
-                    LabEmptyContent.Text = "未找到任何版本的游戏，请先下载任意版本的游戏。" & vbCrLf & "若有已存在的游戏，请在左边的列表中选择添加文件夹，选择 .minecraft 文件夹将其导入。"
+                    LabEmptyTitle.Text = T("无可用版本")
+                    LabEmptyContent.Text = T("未找到任何版本的游戏，请先下载任意版本的游戏。") & vbCrLf & T("若有已存在的游戏，请在左边的列表中选择添加文件夹，选择 .minecraft 文件夹将其导入。")
                     BtnEmptyDownload.Visibility = If(Settings.Get(Of Boolean)("UiHiddenPageDownload") AndAlso Not PageSetupUI.HiddenForceShow, Visibility.Collapsed, Visibility.Visible)
                 End If
             Else
@@ -123,11 +123,11 @@ Public Class PageSelectRight
         '图标按钮
         Dim BtnStar As New MyIconButton
         If Instance.IsStar Then
-            BtnStar.ToolTip = "取消收藏"
+            BtnStar.ToolTip = T("取消收藏")
             BtnStar.LogoScale = 1.1
             BtnStar.Logo = Logo.IconButtonLikeFill
         Else
-            BtnStar.ToolTip = "收藏"
+            BtnStar.ToolTip = T("收藏")
             BtnStar.LogoScale = 1.1
             BtnStar.Logo = Logo.IconButtonLikeLine
         End If
@@ -138,11 +138,11 @@ Public Class PageSelectRight
             LoaderFolderRun(McInstanceListLoader, McFolderSelected, LoaderFolderRunType.ForceRun, MaxDepth:=1, ExtraPath:="versions\")
         End Sub
         Dim BtnDel As New MyIconButton With {.LogoScale = 1.1, .Logo = Logo.IconButtonDelete}
-        BtnDel.ToolTip = "删除"
+        BtnDel.ToolTip = T("删除")
         AddHandler BtnDel.Click, Sub() DeleteInstance(sender, Instance)
         If Instance.State <> McInstance.McInstanceState.Error Then
             Dim BtnCont As New MyIconButton With {.LogoScale = 1.1, .Logo = Logo.IconButtonSetup}
-            BtnCont.ToolTip = "设置"
+            BtnCont.ToolTip = T("设置")
             AddHandler BtnCont.Click,
             Sub()
                 PageInstanceLeft.Instance = Instance
@@ -156,7 +156,7 @@ Public Class PageSelectRight
             sender.Buttons = {BtnStar, BtnDel, BtnCont}
         Else
             Dim BtnCont As New MyIconButton With {.LogoScale = 1.15, .Logo = Logo.IconButtonOpen}
-            BtnCont.ToolTip = "打开文件夹"
+            BtnCont.ToolTip = T("打开文件夹")
             AddHandler BtnCont.Click, Sub() PageInstanceOverall.OpenInstanceFolder(Instance)
             AddHandler sender.MouseRightButtonUp, Sub() PageInstanceOverall.OpenInstanceFolder(Instance)
             sender.Buttons = {BtnStar, BtnDel, BtnCont}
@@ -171,7 +171,7 @@ Public Class PageSelectRight
     Public Shared Sub Item_Click(sender As MyListItem, e As EventArgs)
         Dim Instance As McInstance = sender.Tag
         If McInstanceLock.IsLocked(Instance) Then
-            Hint("该版本正在被修改，请稍后再选择！", HintType.Red)
+            Hint(T("该版本正在被修改，请稍后再选择！"), HintType.Red)
             Return
         End If
         If New McInstance(Instance.PathVersion).Check Then
@@ -192,21 +192,21 @@ Public Class PageSelectRight
     Public Shared Sub DeleteInstance(Item As MyListItem, Instance As McInstance)
         Try
             If McInstanceLock.IsLocked(Instance) Then
-                Hint("该版本正在被修改，请稍后再删除！", HintType.Red)
+                Hint(T("该版本正在被修改，请稍后再删除！"), HintType.Red)
                 Return
             End If
             Dim IsShiftPressed As Boolean = My.Computer.Keyboard.ShiftKeyDown
             Dim IsHintIndie As Boolean = Instance.State <> McInstance.McInstanceState.Error AndAlso Instance.PathIndie <> McFolderSelected
             Dim SavesFolder = DirectoryUtils.GetInfo(Instance.PathIndie & "saves\")
-            Dim SaveEntries = If(IsHintIndie AndAlso SavesFolder.Exists, SavesFolder.EnumerateDirectories.OrderByDescending(Function(Save) Save.LastWriteTime).Select(Function(Save) $"{Save.Name}（上次修改：{StringUtils.FormatTimeSpan(Save.LastWriteTime - Date.Now, False)}）").ToList, New List(Of String))
-            Select Case MyMsgBox($"你确定要{If(IsShiftPressed, "永久", "")}删除版本 {Instance.Name} 吗？" &
-                        If(IsHintIndie, vbCrLf & "该版本对应的存档、资源包、Mod 等文件也将被一并删除！", "") &
-                        If(SaveEntries.Any, vbCrLf & vbCrLf & "这会删除以下存档：" & vbCrLf & "· " & SaveEntries.Join(vbCrLf & "· "), ""),
-                        "版本删除确认", , "取消",, True)
+            Dim SaveEntries = If(IsHintIndie AndAlso SavesFolder.Exists, SavesFolder.EnumerateDirectories.OrderByDescending(Function(Save) Save.LastWriteTime).Select(Function(Save) T("{0}（上次修改：{1}）", Save.Name, StringUtils.FormatTimeSpan(Save.LastWriteTime - Date.Now, False))).ToList, New List(Of String))
+            Select Case MyMsgBox(T("你确定要{0}删除版本 {1} 吗？", If(IsShiftPressed, T("永久"), ""), Instance.Name) &
+                        If(IsHintIndie, vbCrLf & T("该版本对应的存档、资源包、Mod 等文件也将被一并删除！"), "") &
+                        If(SaveEntries.Any, vbCrLf & vbCrLf & T("这会删除以下存档：") & vbCrLf & "· " & SaveEntries.Join(vbCrLf & "· "), ""),
+                        T("版本删除确认"), , T("取消"),, True)
                 Case 1
                     Instance.ResetSettingsCache()
                     DirectoryUtils.Delete(Instance.PathVersion, Not IsShiftPressed)
-                    Hint("版本 " & Instance.Name & " 已删除！", HintType.Green)
+                    Hint(T("版本 {0} 已删除！", Instance.Name), HintType.Green)
                 Case 2
                     Return
             End Select

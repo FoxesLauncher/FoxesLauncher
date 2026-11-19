@@ -1,13 +1,13 @@
 <local:MyPageRight
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:FXL" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:local="clr-namespace:FXL" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d" x:Class="PageSetupSystem"
     PanScroll="PanBack">
     <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" x:Name="PanBack">
         <StackPanel x:Name="PanMain" Margin="25,10">
-            <local:MyCard Margin="0,15" Title="下载">
+            <local:MyCard Margin="0,15" Title="{DynamicResource 下载}">
                 <StackPanel Margin="25,37,25,15">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -23,30 +23,30 @@
                             <RowDefinition Height="27" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="文件下载源" Margin="0,0,25,0" />
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 文件下载源}" Margin="0,0,25,0" />
                         <local:MyComboBox x:Name="ComboDownloadSource" Grid.ColumnSpan="2" local:SettingService.Key="ToolDownloadSource" Grid.Column="1">
-                            <local:MyComboBoxItem Content="尽量使用镜像源" />
-                            <local:MyComboBoxItem Content="优先使用官方源，在加载缓慢时换用镜像源" IsSelected="True" />
-                            <local:MyComboBoxItem Content="尽量使用官方源" />
+                            <local:MyComboBoxItem Content="{DynamicResource 尽量使用镜像源}" />
+                            <local:MyComboBoxItem Content="{DynamicResource 优先使用官方源，在加载缓慢时换用镜像源}" IsSelected="True" />
+                            <local:MyComboBoxItem Content="{DynamicResource 尽量使用官方源}" />
                         </local:MyComboBox>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="版本列表源" Margin="0,0,25,0" Grid.Row="2" />
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 版本列表源}" Margin="0,0,25,0" Grid.Row="2" />
                         <local:MyComboBox x:Name="ComboDownloadVersion" Grid.ColumnSpan="2" local:SettingService.Key="ToolDownloadVersion" Grid.Column="1" Grid.Row="2">
-                            <local:MyComboBoxItem Content="尽量使用镜像源（可能缺少刚刚更新的版本）" />
-                            <local:MyComboBoxItem Content="优先使用官方源，在加载缓慢时换用镜像源" IsSelected="True" />
-                            <local:MyComboBoxItem Content="尽量使用官方源" />
+                            <local:MyComboBoxItem Content="{DynamicResource 尽量使用镜像源（可能缺少刚刚更新的版本）}" />
+                            <local:MyComboBoxItem Content="{DynamicResource 优先使用官方源，在加载缓慢时换用镜像源}" IsSelected="True" />
+                            <local:MyComboBoxItem Content="{DynamicResource 尽量使用官方源}" />
                         </local:MyComboBox>
-                        <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="最大线程数" Margin="0,0,25,0" />
+                        <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 最大线程数}" Margin="0,0,25,0" />
                         <local:MySlider x:Name="SliderDownloadThread" Grid.Row="4" local:SettingService.Key="ToolDownloadThread" MaxValue="255" Value="63" Grid.Column="1"
-                                        ToolTip="线程数越多，限速的文件下载越快，但过高的线程数会造成下载时非常严重的卡顿。&#xa;一般而言，64 线程已可以保证足够的下载速度。" />
-                        <TextBlock VerticalAlignment="Center" Grid.Row="5" HorizontalAlignment="Left" Text="速度限制" Margin="0,0,25,0" />
+                                        ToolTip="{local:I18n '线程数越多，限速的文件下载越快，但过高的线程数会造成下载时非常严重的卡顿。&#10;一般而言，64 线程已可以保证足够的下载速度。'}" />
+                        <TextBlock VerticalAlignment="Center" Grid.Row="5" HorizontalAlignment="Left" Text="{DynamicResource 速度限制}" Margin="0,0,25,0" />
                         <local:MySlider x:Name="SliderDownloadSpeed" Grid.Row="5" local:SettingService.Key="ToolDownloadSpeed" MaxValue="42" Value="42" Grid.Column="1"
-                                        ToolTip="设置下载的速度上限，以避免在下载时导致其他需要联网的程序卡死" />
-                        <TextBlock VerticalAlignment="Top" Grid.Row="6" HorizontalAlignment="Left" Text="目标文件夹" Margin="0,5,25,5" />
-                        <TextBlock Margin="0,5" HorizontalAlignment="Left" Text="请在 启动 → 版本选择 → 文件夹列表 中更改下载目标文件夹。&#xa;在某个文件夹或游戏版本上右键，即可选择打开对应文件夹。" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Opacity="0.5" />
+                                        ToolTip="{DynamicResource 设置下载的速度上限，以避免在下载时导致其他需要联网的程序卡死}" />
+                        <TextBlock VerticalAlignment="Top" Grid.Row="6" HorizontalAlignment="Left" Text="{DynamicResource 目标文件夹}" Margin="0,5,25,5" />
+                        <TextBlock Margin="0,5" HorizontalAlignment="Left" Text="{local:I18n '请在 启动 → 版本选择 → 文件夹列表 中更改下载目标文件夹。&#10;在某个文件夹或游戏版本上右键，即可选择打开对应文件夹。'}" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Opacity="0.5" />
                     </Grid>
                 </StackPanel>
             </local:MyCard>
-            <local:MyCard Margin="0,0,0,15" Title="社区资源">
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource 社区资源}">
                 <StackPanel Margin="25,37,25,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -61,31 +61,31 @@
                             <RowDefinition Height="28" />
                             <RowDefinition Height="7" />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="来源" Margin="0,0,25,0" />
+                        <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 来源}" Margin="0,0,25,0" />
                         <local:MyComboBox x:Name="ComboDownloadMod" Grid.Row="0" Grid.ColumnSpan="2" local:SettingService.Key="ToolDownloadMod" Grid.Column="1">
-                            <local:MyComboBoxItem Content="尽量使用镜像源（可能缺少刚刚更新的版本）" />
-                            <local:MyComboBoxItem Content="仅在官方源加载缓慢时改用镜像源" />
-                            <local:MyComboBoxItem Content="尽量使用官方源" IsSelected="True" />
+                            <local:MyComboBoxItem Content="{DynamicResource 尽量使用镜像源（可能缺少刚刚更新的版本）}" />
+                            <local:MyComboBoxItem Content="{DynamicResource 仅在官方源加载缓慢时改用镜像源}" />
+                            <local:MyComboBoxItem Content="{DynamicResource 尽量使用官方源}" IsSelected="True" />
                         </local:MyComboBox>
-                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="文件名格式" Margin="0,0,25,0" />
-                        <local:MyComboBox Grid.Row="2" x:Name="ComboDownloadTranslateV2" Grid.ColumnSpan="2" local:SettingService.Key="ToolDownloadTranslateV2" Grid.Column="1" 
-                                          ToolTip="下载社区资源时，其默认文件名的格式">
-                            <local:MyComboBoxItem Content="【机械动力】create-1.21.1-6.0.4" />
-                            <local:MyComboBoxItem Content="[机械动力] create-1.21.1-6.0.4" IsSelected="True" />
-                            <local:MyComboBoxItem Content="机械动力-create-1.21.1-6.0.4" />
-                            <local:MyComboBoxItem Content="create-1.21.1-6.0.4-机械动力" />
+                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 文件名格式}" Margin="0,0,25,0" />
+                        <local:MyComboBox Grid.Row="2" x:Name="ComboDownloadTranslateV2" Grid.ColumnSpan="2" local:SettingService.Key="ToolDownloadTranslateV2" Grid.Column="1"
+                                          ToolTip="{DynamicResource 下载社区资源时，其默认文件名的格式}">
+                            <local:MyComboBoxItem Content="{DynamicResource 【机械动力】create-1.21.1-6.0.4}" />
+                            <local:MyComboBoxItem Content="{DynamicResource [机械动力] create-1.21.1-6.0.4}" IsSelected="True" />
+                            <local:MyComboBoxItem Content="{DynamicResource 机械动力-create-1.21.1-6.0.4}" />
+                            <local:MyComboBoxItem Content="{DynamicResource create-1.21.1-6.0.4-机械动力}" />
                             <local:MyComboBoxItem Content="create-1.21.1-6.0.4" />
                         </local:MyComboBox>
-                        <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Mod 管理样式" Margin="0,0,25,0" />
-                        <local:MyComboBox Grid.Row="4" x:Name="ComboModLocalNameStyle" Grid.ColumnSpan="2" local:SettingService.Key="ToolModLocalNameStyle" Grid.Column="1" 
-                                          ToolTip="在 Mod 管理页面中，Mod 项的显示方式">
-                            <local:MyComboBoxItem Content="标题显示译名，详情显示文件名" IsSelected="True" />
-                            <local:MyComboBoxItem Content="标题显示文件名，详情显示译名" />
+                        <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource Mod 管理样式}" Margin="0,0,25,0" />
+                        <local:MyComboBox Grid.Row="4" x:Name="ComboModLocalNameStyle" Grid.ColumnSpan="2" local:SettingService.Key="ToolModLocalNameStyle" Grid.Column="1"
+                                          ToolTip="{DynamicResource 在 Mod 管理页面中，Mod 项的显示方式}">
+                            <local:MyComboBoxItem Content="{DynamicResource 标题显示译名，详情显示文件名}" IsSelected="True" />
+                            <local:MyComboBoxItem Content="{DynamicResource 标题显示文件名，详情显示译名}" />
                         </local:MyComboBox>
                     </Grid>
                 </StackPanel>
             </local:MyCard>
-            <local:MyCard Margin="0,0,0,15" Title="辅助功能">
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource 辅助功能}">
                 <Grid Margin="25,40,25,17">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -97,14 +97,15 @@
                         <RowDefinition Height="8" />
                         <RowDefinition Height="22" />
                     </Grid.RowDefinitions>
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="游戏更新提示" Margin="0,0,25,0" />
-                    <local:MyCheckBox Text="正式版更新提示" Grid.Column="1" x:Name="CheckUpdateRelease" local:SettingService.Key="ToolUpdateRelease" ToolTip="在 Minecraft 正式版更新时弹窗提示" />
-                    <local:MyCheckBox Text="测试版更新提示" Grid.Column="2" Height="22" x:Name="CheckUpdateSnapshot" local:SettingService.Key="ToolUpdateSnapshot" ToolTip="在 Minecraft 测试版（快照、预发布版）更新时弹窗提示" />
-                    <TextBlock VerticalAlignment="Center" Grid.Row="2" HorizontalAlignment="Left" Text="游戏语言" Margin="0,0,25,0" />
-                    <local:MyCheckBox Text="自动设置为中文" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" x:Name="CheckHelpChinese" local:SettingService.Key="ToolHelpChinese" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 游戏更新提示}" Margin="0,0,25,0" />
+                    <local:MyCheckBox Text="{DynamicResource 正式版更新提示}" Grid.Column="1" x:Name="CheckUpdateRelease" local:SettingService.Key="ToolUpdateRelease" ToolTip="{DynamicResource 在 Minecraft 正式版更新时弹窗提示}" />
+                    <local:MyCheckBox Text="{DynamicResource 测试版更新提示}" Grid.Column="2" Height="22" x:Name="CheckUpdateSnapshot" local:SettingService.Key="ToolUpdateSnapshot" ToolTip="{DynamicResource 在 Minecraft 测试版（快照、预发布版）更新时弹窗提示}" />
+                    <TextBlock VerticalAlignment="Center" Grid.Row="2" HorizontalAlignment="Left" Text="{DynamicResource 游戏语言}" Margin="0,0,25,0" />
+                    <local:MyCheckBox Text="{DynamicResource 自动设置为启动器语言}" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" x:Name="CheckHelpChinese" local:SettingService.Key="ToolHelpChinese"
+                                      ToolTip="{DynamicResource 开启后，Minecraft 的游戏语言会自动设置为启动器当前使用的语言。}" />
                 </Grid>
             </local:MyCard>
-            <local:MyCard Margin="0,0,0,15" Title="启动器">
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource 启动器}">
                 <Grid Margin="25,40,25,20">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="Name" />
@@ -116,30 +117,30 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="缓存文件夹" Margin="0,0,25,0" />
-                    <local:MyTextBox x:Name="TextSystemCache" Grid.ColumnSpan="2" local:SettingService.Key="SystemSystemCache" Grid.Column="1" ToolTip="FXL 的下载、皮肤等缓存文件的存储位置。&#xa;不推荐路径中带有空格。&#xa;留空即为默认值，重启 FXL 后生效。" HintText="默认">
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 缓存文件夹}" Margin="0,0,25,0" />
+                    <local:MyTextBox x:Name="TextSystemCache" Grid.ColumnSpan="2" local:SettingService.Key="SystemSystemCache" Grid.Column="1" ToolTip="{local:I18n 'FXL 的下载、皮肤等缓存文件的存储位置。&#10;不推荐路径中带有空格。&#10;留空即为默认值，重启 FXL 后生效。'}" HintText="{DynamicResource 默认}">
                         <local:MyTextBox.ValidateRules>
                             <local:ValidateNullable />
                             <local:ValidateFolderPath UseMinecraftCharCheck="False" />
                         </local:MyTextBox.ValidateRules>
                     </local:MyTextBox>
-                    <local:MyCheckBox Margin="0,5,0,4" Text="匿名数据收集" Grid.Row="2" Height="22" Grid.ColumnSpan="2"
-                        x:Name="CheckSystemTelemetry" local:SettingService.Key="SystemSystemTelemetry" 
-                        ToolTip="当下载失败、FXL 出错、游戏崩溃等事件时，FXL 会匿名上报情况，以便开发者排查问题……&#xa;你可以关闭上报。&#13;FXL 不会上传或收集任何个人信息，包括上报的东西里面也没有！" />
+                    <local:MyCheckBox Margin="0,5,0,4" Text="{DynamicResource 匿名数据收集}" Grid.Row="2" Height="22" Grid.ColumnSpan="2"
+                        x:Name="CheckSystemTelemetry" local:SettingService.Key="SystemSystemTelemetry"
+                        ToolTip="{local:I18n '当下载失败、FXL 出错、游戏崩溃等事件时，FXL 会匿名上报情况，以便开发者排查问题……&#10;你可以关闭上报。&#10;FXL 不会上传或收集任何个人信息，包括上报的东西里面也没有！'}" />
                     <Grid Height="35" Grid.Row="3" Grid.ColumnSpan="5" Margin="0,12,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />
                         </Grid.ColumnDefinitions>
-                        <local:MyButton Grid.Column="0" x:Name="BtnSystemUpdate" MinWidth="140" Text="检查更新" Padding="13,0" Margin="0,0,20,0" />
-                        <local:MyButton Grid.Column="1" x:Name="BtnSystemSettingExp" MinWidth="140" Text="导出设置" Padding="13,0" Margin="0,0,20,0" />
-                        <local:MyButton Grid.Column="2" x:Name="BtnSystemSettingImp" MinWidth="140" Text="导入设置" Padding="13,0" Margin="0,0,20,0" />
+                        <local:MyButton Grid.Column="0" x:Name="BtnSystemUpdate" MinWidth="140" Text="{DynamicResource 检查更新}" Padding="13,0" Margin="0,0,20,0" />
+                        <local:MyButton Grid.Column="1" x:Name="BtnSystemSettingExp" MinWidth="140" Text="{DynamicResource 导出设置}" Padding="13,0" Margin="0,0,20,0" />
+                        <local:MyButton Grid.Column="2" x:Name="BtnSystemSettingImp" MinWidth="140" Text="{DynamicResource 导入设置}" Padding="13,0" Margin="0,0,20,0" />
                     </Grid>
                 </Grid>
             </local:MyCard>
 
-            <local:MyCard x:Name="CardRegionLanguage" Margin="0,0,0,15" Title="区域与语言">
+            <local:MyCard x:Name="CardRegionLanguage" Margin="0,0,0,15" Title="{DynamicResource 区域与语言}">
                 <StackPanel Margin="25,37,25,15">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -152,25 +153,25 @@
                             <RowDefinition Height="28" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="区域" Margin="0,0,25,0" />
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 区域}" Margin="0,0,25,0" />
                         <local:MyComboBox x:Name="ComboRegion" Grid.Column="1" HorizontalAlignment="Left" Width="280" local:SettingService.Key="SystemRegion"
-                                          ToolTip="不同区域可能对应不同的功能限制。&#xa;亚洲（中国大陆）：不提供 Minecraft 下载与安装功能，但仍会显示入口并给出提示。&#xa;亚洲（其他）、非洲、美洲、欧洲、大洋洲：必须先登录微软账号，才能使用离线账户。" />
-                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="语言" Margin="0,0,25,0" />
+                                          ToolTip="{local:I18n '不同区域可能对应不同的功能限制。&#10;亚洲（中国大陆）：不提供 Minecraft 下载与安装功能，但仍会显示入口并给出提示。&#10;亚洲（其他）、非洲、美洲、欧洲、大洋洲：必须先登录微软账号，才能使用离线账户。'}" />
+                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 语言}" Margin="0,0,25,0" />
                         <local:MyComboBox x:Name="ComboLanguage" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Width="280" local:SettingService.Key="SystemLanguage"
-                                          ToolTip="目前仅保存语言设置，界面文本暂未接入多语言。" />
+                                          ToolTip="{local:I18n '选择启动器界面使用的语言。&#10;更改后需要重启启动器才能生效。'}" />
                         <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,10,0,0" TextWrapping="Wrap" Opacity="0.55" FontSize="12"
-                                   Text="语言选择目前仅作为配置保存，尚未接入多语言框架。" />
+                                   Text="{DynamicResource 更改界面语言后需要重启启动器才能完全生效。}" />
                     </Grid>
                 </StackPanel>
             </local:MyCard>
-            <local:MyCard x:Name="CardDebug" Margin="0,0,0,15" Title="调试选项" CanSwap="True" IsSwapped="True">
+            <local:MyCard x:Name="CardDebug" Margin="0,0,0,15" Title="{DynamicResource 调试选项}" CanSwap="True" IsSwapped="True">
                 <StackPanel Margin="25,40,25,15">
                     <Grid x:Name="PanDebugAnim" Height="22" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Name" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="动画速度" Margin="0,0,25,0" />
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource 动画速度}" Margin="0,0,25,0" />
                         <local:MySlider x:Name="SliderDebugAnim" local:SettingService.Key="SystemDebugAnim" MaxValue="30" Grid.Column="1" />
                     </Grid>
                     <Grid>
@@ -179,9 +180,9 @@
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <local:MyCheckBox Grid.Column="0" Text="禁止在下载时从其他文件夹复制文件" Height="22" x:Name="CheckDebugSkipCopy" local:SettingService.Key="SystemDebugSkipCopy" ToolTip="在下载时不直接复制其他 MC 文件夹中已经存在的相同文件，而是重新下载文件。&#xa;只建议在测试下载速度时开启。" />
-                        <local:MyCheckBox Grid.Column="1" Text="调试模式" Height="22" x:Name="CheckDebugMode" local:SettingService.Key="SystemDebugMode" ToolTip="显示调试信息与更多错误信息。&#xa;这会导致启动器性能略有下降，若无特殊需要不建议开启。" />
-                        <local:MyCheckBox Grid.Column="2" Text="添加延迟" Height="22" x:Name="CheckDebugDelay" local:SettingService.Key="SystemDebugDelay" ToolTip="在各个环节添加随机的延迟，拖慢加载速度，以测试部分功能是否正常运行。&#xa;这会严重影响启动器运行，若无特殊需要不建议开启。" />
+                        <local:MyCheckBox Grid.Column="0" Text="{DynamicResource 禁止在下载时从其他文件夹复制文件}" Height="22" x:Name="CheckDebugSkipCopy" local:SettingService.Key="SystemDebugSkipCopy" ToolTip="{local:I18n '在下载时不直接复制其他 MC 文件夹中已经存在的相同文件，而是重新下载文件。&#10;只建议在测试下载速度时开启。'}" />
+                        <local:MyCheckBox Grid.Column="1" Text="{DynamicResource 调试模式}" Height="22" x:Name="CheckDebugMode" local:SettingService.Key="SystemDebugMode" ToolTip="{local:I18n '显示调试信息与更多错误信息。&#10;这会导致启动器性能略有下降，若无特殊需要不建议开启。'}" />
+                        <local:MyCheckBox Grid.Column="2" Text="{DynamicResource 添加延迟}" Height="22" x:Name="CheckDebugDelay" local:SettingService.Key="SystemDebugDelay" ToolTip="{local:I18n '在各个环节添加随机的延迟，拖慢加载速度，以测试部分功能是否正常运行。&#10;这会严重影响启动器运行，若无特殊需要不建议开启。'}" />
                     </Grid>
                 </StackPanel>
             </local:MyCard>

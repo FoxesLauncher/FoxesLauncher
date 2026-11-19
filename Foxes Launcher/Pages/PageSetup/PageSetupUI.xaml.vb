@@ -18,7 +18,12 @@ Public Class PageSetupUI
     End Sub
     Public Sub Refresh()
         Try
+            '主页预设来自外部的单语言资源，仅对简体中文用户可见
+            If Not ModLanguage.IsDefaultLanguage AndAlso CInt(Settings.Get(Of Integer)("UiCustomType")) = 3 Then
+                Settings.Set("UiCustomType", 0)
+            End If
             SettingService.RefreshSettings(Me)
+            RadioCustomType3.Visibility = If(ModLanguage.IsDefaultLanguage, Visibility.Visible, Visibility.Collapsed)
             BackgroundRefresh(False, False)
 
             '标题栏
@@ -42,7 +47,7 @@ Public Class PageSetupUI
         Try
             SettingService.ResetSettings(Me)
             Logger.Info("已初始化个性化设置！")
-            Hint("已初始化个性化设置", HintType.Green, False)
+            Hint(T("已初始化个性化设置"), HintType.Green, False)
         Catch ex As Exception
             Logger.Error(ex, "初始化个性化设置失败", LogBehavior.Alert)
         End Try
@@ -63,21 +68,21 @@ Public Class PageSetupUI
             PanBackgroundBlur.Visibility = Visibility.Visible
             PanBackgroundSuit.Visibility = Visibility.Visible
             BtnBackgroundClear.Visibility = Visibility.Visible
-            CardBackground.Title = "背景图片（" & Count & " 张）"
+            CardBackground.Title =T("背景图片（{0} 张）", Count)
         Else
             PanBackgroundOpacity.Visibility = Visibility.Collapsed
             PanBackgroundBlur.Visibility = Visibility.Collapsed
             PanBackgroundSuit.Visibility = Visibility.Collapsed
             BtnBackgroundClear.Visibility = Visibility.Collapsed
-            CardBackground.Title = "背景图片"
+            CardBackground.Title = T("背景图片")
         End If
         CardBackground.TriggerForceResize()
     End Sub
     Private Sub BtnBackgroundClear_Click(sender As Object, e As EventArgs) Handles BtnBackgroundClear.Click
-        If MyMsgBox("即将删除背景图片文件夹中的所有文件。" & vbCrLf & "此操作不可撤销，是否确定？", "警告",, "取消", IsWarn:=True) = 1 Then
+        If MyMsgBox(T("即将删除背景图片文件夹中的所有文件。") & vbCrLf & T("此操作不可撤销，是否确定？"), T("警告"),, T("取消"), IsWarn:=True) = 1 Then
             DirectoryUtils.Delete(Paths.Base & "FXL\Pictures")
             BackgroundRefresh(False, True)
-            Hint("背景图片已清空！", HintType.Green)
+            Hint(T("背景图片已清空！"), HintType.Green)
         End If
     End Sub
     ''' <summary>
@@ -99,10 +104,10 @@ Public Class PageSetupUI
             If Not Pic.Any() Then
                 If Refresh Then
                     If FrmMain.ImgBack.Visibility = Visibility.Collapsed Then
-                        If IsHint Then Hint("未检测到可用背景图片！", HintType.Red)
+                        If IsHint Then Hint(T("未检测到可用背景图片！"), HintType.Red)
                     Else
                         FrmMain.ImgBack.Visibility = Visibility.Collapsed
-                        If IsHint Then Hint("背景图片已清除！", HintType.Green)
+                        If IsHint Then Hint(T("背景图片已清除！"), HintType.Green)
                     End If
                 End If
                 If Not IsNothing(FrmSetupUI) Then FrmSetupUI.BackgroundRefreshUI(False, 0)
@@ -114,7 +119,7 @@ Public Class PageSetupUI
                         FrmMain.ImgBack.Background = New MyBitmap(Address)
                         FrmMain.ImgBack.Visibility = Visibility.Visible
                         FrmMain.UpdateBackgroundAndTitleBar()
-                        If IsHint Then Hint("背景图片已刷新：" & PathUtils.GetLastPart(Address), HintType.Green, False)
+                        If IsHint Then Hint(T("背景图片已刷新：{0}", PathUtils.GetLastPart(Address)), HintType.Green, False)
                     Catch ex As Exception
                         If ex.Message.Contains("参数无效") Then
                             Logger.Error($"刷新背景图片失败，该图片文件可能并非标准格式。{vbCrLf}你可以尝试使用画图打开该文件并重新保存，这会让图片变为标准格式。{vbCrLf}文件：{Address}", LogBehavior.Alert)
@@ -133,7 +138,7 @@ Public Class PageSetupUI
 
     '顶部栏
     Private Sub BtnLogoChange_Click(sender As Object, e As EventArgs) Handles BtnLogoChange.Click
-        Dim FileName As String = Dialogs.SelectFile("选择图片", False, filter:={({"png", "jpg", "jpeg", "gif", "webp"}, "常用图片文件")}).FirstOrDefault()
+        Dim FileName As String = Dialogs.SelectFile(T("选择图片"), False, filter:={({"png", "jpg", "jpeg", "gif", "webp"}, T("常用图片文件"))}).FirstOrDefault()
         If String.IsNullOrEmpty(FileName) Then Return
         Dim TargetPath As String = Paths.Base & "FXL\Logo.png"
         Try
@@ -177,7 +182,7 @@ Refresh:
             Return
         End If
         '没有图片则要求选择
-        Dim FileName As String = Dialogs.SelectFile("选择图片", False, filter:={({"png", "jpeg", "jpg", "gif", "webp"}, "常用图片文件")}).FirstOrDefault()
+        Dim FileName As String = Dialogs.SelectFile(T("选择图片"), False, filter:={({"png", "jpeg", "jpg", "gif", "webp"}, T("常用图片文件"))}).FirstOrDefault()
         If String.IsNullOrEmpty(FileName) Then
             FrmMain.ImageTitleLogo.Source = Nothing
             e.Handled = True
@@ -194,7 +199,7 @@ Refresh:
         Try
             FileUtils.Delete(Paths.Base & "FXL\Logo.png")
             RadioLogoType1.SetChecked(True, True)
-            Hint("标题栏图片已清空！", HintType.Green)
+            Hint(T("标题栏图片已清空！"), HintType.Green)
         Catch ex As Exception
             Logger.Error(ex, "清空标题栏图片失败", LogBehavior.Alert)
         End Try
@@ -213,22 +218,20 @@ Refresh:
             PanMusicVolume.Visibility = Visibility.Visible
             PanMusicDetail.Visibility = Visibility.Visible
             BtnMusicClear.Visibility = Visibility.Visible
-            CardMusic.Title = "背景音乐（" &
-                DirectoryUtils.EnumerateFiles(Paths.Base & "FXL\Musics\", True).Count(Function(f) Not {"ini", "jpg", "txt", "cfg", "lrc", "db", "png"}.Contains(PathUtils.GetExtension(f))) &
-                " 首）"
+            CardMusic.Title = T("背景音乐（{0} 首）", DirectoryUtils.EnumerateFiles(Paths.Base & "FXL\Musics\", True).Count(Function(f) Not {"ini", "jpg", "txt", "cfg", "lrc", "db", "png"}.Contains(PathUtils.GetExtension(f))))
         Else
             PanMusicVolume.Visibility = Visibility.Collapsed
             PanMusicDetail.Visibility = Visibility.Collapsed
             BtnMusicClear.Visibility = Visibility.Collapsed
-            CardMusic.Title = "背景音乐"
+            CardMusic.Title = T("背景音乐")
         End If
         CardMusic.TriggerForceResize()
     End Sub
     Private Sub BtnMusicClear_Click(sender As Object, e As EventArgs) Handles BtnMusicClear.Click
-        If MyMsgBox("即将删除背景音乐文件夹中的所有文件。" & vbCrLf & "此操作不可撤销，是否确定？", "警告",, "取消", IsWarn:=True) = 1 Then
+        If MyMsgBox(T("即将删除背景音乐文件夹中的所有文件。") & vbCrLf & T("此操作不可撤销，是否确定？"), T("警告"),, T("取消"), IsWarn:=True) = 1 Then
             RunInThread(
             Sub()
-                Hint("正在删除背景音乐……")
+                Hint(T("正在删除背景音乐……"))
                 '停止播放音乐
                 MusicNAudio = Nothing
                 MusicWaitingList = New List(Of String)
@@ -237,7 +240,7 @@ Refresh:
                 '删除文件
                 Try
                     DirectoryUtils.Delete(Paths.Base & "FXL\Musics")
-                    Hint("背景音乐已删除！", HintType.Green)
+                    Hint(T("背景音乐已删除！"), HintType.Green)
                 Catch ex As Exception
                     Logger.Error(ex, "删除背景音乐失败", LogBehavior.Alert)
                 End Try
@@ -263,10 +266,10 @@ Refresh:
     Private Sub BtnCustomFile_Click(sender As Object, e As EventArgs) Handles BtnCustomFile.Click
         Try
             If FileUtils.Exists(Paths.Base & "FXL\Custom.xaml") Then
-                If MyMsgBox("当前已存在布局文件，继续生成教学文件将会覆盖现有布局文件！", "覆盖确认", "继续", "取消", IsWarn:=True) = 2 Then Return
+                If MyMsgBox(T("当前已存在布局文件，继续生成教学文件将会覆盖现有布局文件！"), T("覆盖确认"), T("继续"), T("取消"), IsWarn:=True) = 2 Then Return
             End If
             ExtractResources(Paths.Base & "FXL\Custom.xaml", "Custom")
-            Hint("教学文件已生成！", HintType.Green)
+            Hint(T("教学文件已生成！"), HintType.Green)
             OpenExplorer(Paths.Base & "FXL\Custom.xaml")
         Catch ex As Exception
             Logger.Error(ex, "生成教学文件失败")
@@ -274,15 +277,15 @@ Refresh:
     End Sub
     Private Sub BtnCustomRefresh_Click() Handles BtnCustomRefresh.Click
         FrmLaunchRight.ForceRefresh()
-        Hint("已刷新主页！", HintType.Green)
+        Hint(T("已刷新主页！"), HintType.Green)
     End Sub
     Private Sub BtnCustomTutorial_Click(sender As Object, e As EventArgs) Handles BtnCustomTutorial.Click
-        MyMsgBox("1. 点击 生成教学文件 按钮，这会在 FXL 文件夹下生成 Custom.xaml 布局文件。" & vbCrLf &
-                 "2. 使用记事本等工具打开这个文件并进行修改，修改完记得保存。" & vbCrLf &
-                 "3. 点击 刷新主页 按钮，查看主页现在长啥样了。" & vbCrLf &
+        MyMsgBox(T("1. 点击 生成教学文件 按钮，这会在 FXL 文件夹下生成 Custom.xaml 布局文件。") & vbCrLf &
+                 T("2. 使用记事本等工具打开这个文件并进行修改，修改完记得保存。") & vbCrLf &
+                 T("3. 点击 刷新主页 按钮，查看主页现在长啥样了。") & vbCrLf &
                  vbCrLf &
-                 "你可以在生成教学文件后直接刷新主页，对照着进行修改，更有助于理解。" & vbCrLf &
-                 "直接将主页文件拖进 FXL 窗口也可以快捷加载。", "主页自定义教程")
+                 T("你可以在生成教学文件后直接刷新主页，对照着进行修改，更有助于理解。") & vbCrLf &
+                 T("直接将主页文件拖进 FXL 窗口也可以快捷加载。"), T("主页自定义教程"))
     End Sub
     Public Shared Sub OnMainPageTypeChanged()
         If FrmSetupUI Is Nothing Then Return
@@ -299,7 +302,7 @@ Refresh:
                 FrmSetupUI.PanCustomNet.Visibility = Visibility.Collapsed
                 FrmSetupUI.HintCustom.Visibility = Visibility.Visible
                 FrmSetupUI.HintCustomWarn.Visibility = If(Settings.Get(Of Boolean)("HintCustomWarn"), Visibility.Collapsed, Visibility.Visible)
-                FrmSetupUI.HintCustom.Text = $"从 FXL 文件夹下的 Custom.xaml 读取主页内容。{vbCrLf}你可以手动编辑该文件，向主页添加文本、图片、常用网站、快捷启动等功能。"
+                FrmSetupUI.HintCustom.Text = T("从 FXL 文件夹下的 Custom.xaml 读取主页内容。{0}你可以手动编辑该文件，向主页添加文本、图片、常用网站、快捷启动等功能。", vbCrLf)
                 CustomEventService.SetEventType(FrmSetupUI.HintCustom, CustomEvent.EventType.None)
             Case 2 '联网
                 FrmSetupUI.PanCustomPreset.Visibility = Visibility.Collapsed
@@ -307,11 +310,15 @@ Refresh:
                 FrmSetupUI.PanCustomNet.Visibility = Visibility.Visible
                 FrmSetupUI.HintCustom.Visibility = Visibility.Visible
                 FrmSetupUI.HintCustomWarn.Visibility = If(Settings.Get(Of Boolean)("HintCustomWarn"), Visibility.Collapsed, Visibility.Visible)
-                FrmSetupUI.HintCustom.Text = $"从指定网址联网获取主页内容。服主也可以用于动态更新服务器公告。{vbCrLf}如果你制作了稳定运行的联网主页，可以点击这条提示投稿，若合格即可加入预设！"
+                FrmSetupUI.HintCustom.Text = T("从指定网址联网获取主页内容。服主也可以用于动态更新服务器公告。{0}如果你制作了稳定运行的联网主页，可以点击这条提示投稿，若合格即可加入预设！", vbCrLf)
                 CustomEventService.SetEventType(FrmSetupUI.HintCustom, CustomEvent.EventType.打开网页)
                 CustomEventService.SetEventData(FrmSetupUI.HintCustom, "https://github.com/FoxesLauncher/FoxesLauncher/discussions/2528")
-            Case 3 '预设
-                FrmSetupUI.PanCustomPreset.Visibility = Visibility.Visible
+            Case 3 '预设（仅简体中文可用）
+                If ModLanguage.IsDefaultLanguage Then
+                    FrmSetupUI.PanCustomPreset.Visibility = Visibility.Visible
+                Else
+                    FrmSetupUI.PanCustomPreset.Visibility = Visibility.Collapsed
+                End If
                 FrmSetupUI.PanCustomLocal.Visibility = Visibility.Collapsed
                 FrmSetupUI.PanCustomNet.Visibility = Visibility.Collapsed
                 FrmSetupUI.HintCustom.Visibility = Visibility.Collapsed
@@ -399,21 +406,21 @@ Refresh:
             End If
             If OtherAvaliableCount = 1 AndAlso Not HiddenForceShow Then
                 If Not Settings.Get(Of Boolean)("UiHiddenOtherHelp") Then
-                    FrmMain.BtnTitleSelect4.Text = "帮助"
+                    FrmMain.BtnTitleSelect4.Text = T("帮助")
                 ElseIf Not Settings.Get(Of Boolean)("UiHiddenOtherAbout") Then
-                    FrmMain.BtnTitleSelect4.Text = "关于"
+                    FrmMain.BtnTitleSelect4.Text = T("关于")
                 Else
-                    FrmMain.BtnTitleSelect4.Text = "百宝箱"
+                    FrmMain.BtnTitleSelect4.Text = T("百宝箱")
                 End If
             Else
-                FrmMain.BtnTitleSelect4.Text = "更多"
+                FrmMain.BtnTitleSelect4.Text = T("更多")
             End If
             '各个页面的入口
             If FrmMain.PageCurrent = FormMain.PageType.InstanceSelect Then FrmSelectRight.BtnEmptyDownload_Loaded()
             If FrmMain.PageCurrent = FormMain.PageType.Launch Then FrmLaunchLeft.RefreshButtonsUI()
             If FrmMain.PageCurrent = FormMain.PageType.InstanceSetup AndAlso FrmInstanceModDisabled IsNot Nothing Then FrmInstanceModDisabled.BtnDownload_Loaded()
             '备注
-            If FrmSetupUI IsNot Nothing Then FrmSetupUI.CardSwitch.Title = If(HiddenForceShow, "功能隐藏（已暂时关闭，按 F12 以重新启用）", "功能隐藏")
+            If FrmSetupUI IsNot Nothing Then FrmSetupUI.CardSwitch.Title = If(HiddenForceShow, T("功能隐藏（已暂时关闭，按 F12 以重新启用）"), T("功能隐藏"))
         Catch ex As Exception
             Logger.Error(ex, "刷新功能隐藏项目失败")
         End Try
@@ -477,7 +484,7 @@ Refresh:
 
     '警告提示
     Private Sub HiddenHint(sender As Object, user As Boolean) Handles CheckHiddenFunctionHidden.Change, CheckHiddenPageSetup.Change, CheckHiddenSetupUI.Change
-        If AniControlEnabled = 0 AndAlso sender.Checked Then Hint("按 F12 即可暂时关闭功能隐藏设置。千万别忘了，要不然设置就改不回来了……")
+        If AniControlEnabled = 0 AndAlso sender.Checked Then Hint(T("按 F12 即可暂时关闭功能隐藏设置。千万别忘了，要不然设置就改不回来了……"))
     End Sub
 
 #End Region
@@ -487,7 +494,7 @@ Refresh:
         SliderMusicVolume.GetHintText = Function(v) Math.Ceiling(v * 0.1) & "%"
         SliderLauncherTransparent.GetHintText = Function(v) Math.Round(40 + v * 0.1) & "%"
         SliderBackgroundOpacity.GetHintText = Function(v) Math.Round(v * 0.1) & "%"
-        SliderBackgroundBlur.GetHintText = Function(v) v & " 像素"
+        SliderBackgroundBlur.GetHintText = Function(v) T("{0} 像素", v)
     End Sub
 
 End Class

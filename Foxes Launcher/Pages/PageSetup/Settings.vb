@@ -102,7 +102,7 @@ Public Class Settings
         New Setting("LinkLatencyMode", 0, Source:=Sources.Registry),
         New Setting("LinkCustomPeer", ""),
         New Setting("LinkEasyTierVersion", -1, Source:=Sources.Registry),
-        New Setting("ToolHelpChinese", True, Source:=Sources.Registry),
+        New Setting("ToolHelpChinese", True, Source:=Sources.Registry), '游戏语言是否跟随启动器语言（保留旧键名以兼容已有配置）
         New Setting("ToolDownloadThread", 63, Source:=Sources.Registry),
         New Setting("ToolDownloadSpeed", 42, Source:=Sources.Registry, OnChanged:=AddressOf ModNet.UpdateNetTaskSpeedLimitHigh),
         New Setting("ToolDownloadSource", 1, Source:=Sources.Registry),
@@ -248,7 +248,7 @@ Public Class Settings
                         Logger.Warn(ex, $"写入注册表失败（{Key} → {Value}）", LogBehavior.Toast)
                     End Try
                 Case Sources.Instance
-                    If Instance Is Nothing Then Throw New Exception($"保存版本独立设置 {Key} 时未提供目标版本")
+                    If Instance Is Nothing Then Throw New Exception(T("保存版本独立设置 {0} 时未提供目标版本", Key))
                     WriteIni(Instance.PathVersion & "FXL\Setup.ini", Key, Value)
             End Select
         End Sub
@@ -260,7 +260,7 @@ Public Class Settings
     ''' </summary>
     Public Shared Sub [Set](Key As String, Value As Object, Optional Instance As McInstance = Nothing)
         Dim Entry As Setting = Nothing
-        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException("未找到设置项：" & Key)
+        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException(T("未找到设置项：{0}", Key))
         Try
             '判断是否一致
             Value = CTypeDynamic(Value, Entry.Type)
@@ -281,8 +281,8 @@ Public Class Settings
     ''' </summary>
     Public Shared Sub SetSafe(Key As String, Value As Object, Optional Instance As McInstance = Nothing)
         Dim Entry As Setting = Nothing
-        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException("未找到设置项：" & Key)
-        If Entry.Encrypted Then Throw New InvalidOperationException("禁止写入加密设置项：" & Key)
+        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException(T("未找到设置项：{0}", Key))
+        If Entry.Encrypted Then Throw New InvalidOperationException(T("禁止写入加密设置项：{0}", Key))
         [Set](Key, Value, Instance)
     End Sub
 
@@ -291,7 +291,7 @@ Public Class Settings
     ''' </summary>
     Public Shared Function [Get](Key As String, Optional Instance As McInstance = Nothing)
         Dim Entry As Setting = Nothing
-        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException("未找到设置项：" & Key)
+        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException(T("未找到设置项：{0}", Key))
         Dim Value = Entry.GetCache(Instance)
         If Value IsNot Nothing Then Return Value
         '对部分设置强制赋值
@@ -315,7 +315,7 @@ Public Class Settings
                     GotValue = RegistryUtils.TryRead($"HKEY_CURRENT_USER\Software\{RegFolder}", Key, DefaultValue)
                 Case Sources.Instance
                     If Instance Is Nothing Then
-                        Throw New Exception($"读取版本设置 {Key} 时未提供目标版本")
+                        Throw New Exception(T("读取版本设置 {0} 时未提供目标版本", Key))
                     Else
                         GotValue = ReadIni(Instance.PathVersion & "FXL\Setup.ini", Key, DefaultValue)
                     End If
@@ -350,8 +350,8 @@ Public Class Settings
     ''' </summary>
     Public Shared Function GetSafe(Key As String, Optional Instance As McInstance = Nothing)
         Dim Entry As Setting = Nothing
-        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException("未找到设置项：" & Key)
-        If Entry.Encrypted Then Throw New InvalidOperationException("禁止读取加密设置项：" & Key)
+        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException(T("未找到设置项：{0}", Key))
+        If Entry.Encrypted Then Throw New InvalidOperationException(T("禁止读取加密设置项：{0}", Key))
         Return [Get](Key, Instance)
     End Function
 
@@ -360,7 +360,7 @@ Public Class Settings
     ''' </summary>
     Public Shared Sub Reset(Key As String, Optional Instance As McInstance = Nothing)
         Dim Entry As Setting = Nothing
-        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException("未找到设置项：" & Key)
+        If Not Entries.TryGetValue(Key, Entry) Then Throw New KeyNotFoundException(T("未找到设置项：{0}", Key))
         Try
             '判断是否一致
             If Entry.GetCache(Instance) Is Nothing Then [Get](Key, Instance)
@@ -377,7 +377,7 @@ Public Class Settings
                         Logger.Warn(ex, $"删除注册表失败（{Key}）", LogBehavior.Toast)
                     End Try
                 Case Sources.Instance
-                    If Instance Is Nothing Then Throw New Exception($"重置版本设置 {Key} 时未提供目标版本")
+                    If Instance Is Nothing Then Throw New Exception(T("重置版本设置 {0} 时未提供目标版本", Key))
                     DeleteIniKey(Instance.PathVersion & "FXL\Setup.ini", Key)
             End Select
             '触发改变事件
@@ -410,7 +410,7 @@ Public Class Settings
                     Return False
                 End Try
             Case Else 'Source.Instance
-                If Instance Is Nothing Then Throw New Exception($"判断版本设置 {Key} 是否存在时未提供目标版本")
+                If Instance Is Nothing Then Throw New Exception(T("判断版本设置 {0} 是否存在时未提供目标版本", Key))
                 Return HasIniKey(Instance.PathVersion & "FXL\Setup.ini", Key)
         End Select
     End Function

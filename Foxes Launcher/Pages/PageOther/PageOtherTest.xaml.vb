@@ -75,7 +75,7 @@ Public Class PageOtherTest
     End Sub
 
     Private Sub BtnDownloadSelect_Click(sender As Object, e As EventArgs) Handles BtnDownloadSelect.Click
-        Dim Folder = Dialogs.SelectFolder("选择目标文件夹", False).FirstOrDefault
+        Dim Folder = Dialogs.SelectFolder(T("选择目标文件夹"), False).FirstOrDefault
         If Folder IsNot Nothing Then TextDownloadFolder.Text = Folder
     End Sub
 
@@ -92,14 +92,14 @@ Public Class PageOtherTest
     Private Shared Sub DownloadState(Loader As LoaderBase)
         Select Case Loader.State
             Case LoadState.Finished
-                Hint(Loader.Name & "完成！", HintType.Green)
+                Hint(T("{0}完成！", Loader.Name), HintType.Green)
                 Interaction.Beep()
             Case LoadState.Failed
                 Logger.Error(Loader.Error, Loader.Name & "失败", LogBehavior.Toast)
-                Hint(Loader.Name & "失败：" & Loader.Error.GetDisplay(False), HintType.Red)
+                Hint(T("{0}失败：{1}", Loader.Name, Loader.Error.GetDisplay(False)), HintType.Red)
                 Interaction.Beep()
             Case LoadState.Canceled
-                Hint(Loader.Name & "已取消！", HintType.Blue)
+                Hint(T("{0}已取消！", Loader.Name), HintType.Blue)
         End Select
     End Sub
 
@@ -110,11 +110,11 @@ Public Class PageOtherTest
         Try
             If String.IsNullOrWhiteSpace(FileName) Then FileName = PathUtils.GetLastPart(WebUtility.UrlDecode(Url))
             If String.IsNullOrWhiteSpace(FileName) Then
-                Hint("未能确定下载文件名，请手动指定文件名！", HintType.Red)
+                Hint(T("未能确定下载文件名，请手动指定文件名！"), HintType.Red)
                 Return
             End If
             If String.IsNullOrWhiteSpace(Folder) Then
-                Dim SelectedFile = Dialogs.SaveFile("选择文件保存位置", FileName)
+                Dim SelectedFile = Dialogs.SaveFile(T("选择文件保存位置"), FileName)
                 If SelectedFile Is Nothing Then Return
                 '用户可能在保存对话框中修改了文件名
                 FileName = PathUtils.GetLastPart(SelectedFile)
@@ -131,10 +131,10 @@ Public Class PageOtherTest
             Logger.Info($"自定义下载文件名：{FileName}")
             Logger.Info($"自定义下载文件目标：{Folder}")
             Dim Uuid As Integer = GetUuid()
-            Dim DownloadLoader As New LoaderDownload("自定义下载文件：" & FileName & " ",
-                New List(Of NetFile) From {New NetFile({Url}, Folder & FileName, Nothing, True)})
-            Dim Loader As New LoaderCombo(Of Integer)("自定义下载 (" & Uuid & ") ",
-                New List(Of LoaderBase) From {DownloadLoader}) With {.OnStateChanged = AddressOf DownloadState}
+            Dim DownloadLoader As New LoaderDownload(T("自定义下载文件：{0}", FileName) & " ",
+                New List(Of NetFile) From {New NetFile({Url}, Folder & FileName, Nothing, True)}) With {.Tag = "CustomDownload:" & FileName}
+            Dim Loader As New LoaderCombo(Of Integer)(T("自定义下载 ({0})", Uuid) & " ",
+                New List(Of LoaderBase) From {DownloadLoader}) With {.OnStateChanged = AddressOf DownloadState, .Tag = "CustomDownload:" & FileName}
             Loader.Start()
             LoaderTaskbarAdd(Loader)
             FrmMain.BtnExtraDownload.ShowRefresh()
@@ -163,22 +163,19 @@ Public Class PageOtherTest
         Sub()
             Try
                 If HasRunningMinecraft OrElse McLaunchLoader.State = LoadState.Loading Then
-                    Hint("请先关闭所有运行中的游戏！", HintType.Blue)
+                    Hint(T("请先关闭所有运行中的游戏！"), HintType.Blue)
                 ElseIf HasDownloadingTask(False) Then
-                    Hint("请在所有下载任务完成后再来清理吧！", HintType.Blue)
+                    Hint(T("请在所有下载任务完成后再来清理吧！"), HintType.Blue)
                 Else
                     If Not McFolderList.Any() Then McFolderListLoader.Start()
                     If PathTemp = Path.GetTempPath() & "FXL\" Then
                         If Settings.Get(Of Integer)("HintClearRubbish") <= 2 Then
-                            If MyMsgBox("即将清理游戏日志、错误报告、缓存等文件。" & vbCrLf &
-                                        "虽然应该没人往这些地方放重要文件，但还是问一下，是否确认继续？" & vbCrLf & vbCrLf &
-                                        "在完成清理后，需要重启 FXL。", "清理确认", "确定", "取消", "", False, True, True) = 2 Then Return
+                            If MyMsgBox(T("即将清理游戏日志、错误报告、缓存等文件。") & vbCrLf &
+                                        T("虽然应该没人往这些地方放重要文件，但还是问一下，是否确认继续？") & vbCrLf & vbCrLf &
+                                        T("在完成清理后，需要重启 FXL。"), T("清理确认"), T("确定"), T("取消"), "", False, True, True) = 2 Then Return
                             Settings.Set("HintClearRubbish", Settings.Get(Of Integer)("HintClearRubbish") + 1)
                         End If
-                    ElseIf MyMsgBox("即将清理游戏日志、错误报告、缓存等文件。" & vbCrLf & vbCrLf &
-                                    "你已将缓存文件夹手动修改为：" & PathTemp & vbCrLf &
-                                    "清理过程中，将删除该文件夹中的所有内容，且无法恢复。请确认其中没有除了 FXL 缓存以外的重要文件！" & vbCrLf & vbCrLf &
-                                    "在完成清理后，需要重启 FXL。", "清理确认", "确定", "取消", "", False, True, True) = 2 Then
+                    ElseIf MyMsgBox(T("即将清理游戏日志、错误报告、缓存等文件。") & vbCrLf & vbCrLf & T("你已将缓存文件夹手动修改为：{0}", PathTemp) & vbCrLf & T("清理过程中，将删除该文件夹中的所有内容，且无法恢复。请确认其中没有除了 FXL 缓存以外的重要文件！") & vbCrLf & vbCrLf & T("在完成清理后，需要重启 FXL。"), T("清理确认"), T("确定"), T("取消"), "", False, True, True) = 2 Then
                         Return
                     End If
                     Dim FolderList As New List(Of String)
@@ -215,7 +212,7 @@ Public Class PageOtherTest
                     Next
                     ClearFolder(PathTemp)
                     ClearFolder(OsDrive & "ProgramData\FXL\")
-                    If MyMsgBox("垃圾已经清理好啦！", "清理完成", "关闭 FXL", "重启 FXL", "", False, True, True) = 2 Then
+                    If MyMsgBox(T("垃圾已经清理好啦！"), T("清理完成"), T("关闭 FXL"), T("重启 FXL"), "", False, True, True) = 2 Then
                         StartProcess(New ProcessStartInfo(PathExe, "--wait"))
                     End If
                     FormMain.EndProgramForce(ProcessReturnValues.Success)
@@ -245,12 +242,12 @@ Public Class PageOtherTest
 
     Public Shared Sub MemoryOptimize(ShowHint As Boolean)
         If IsMemoryOptimizeRunning Then
-            If ShowHint Then Hint("内存优化尚未结束，请稍等！", HintType.Blue)
+            If ShowHint Then Hint(T("内存优化尚未结束，请稍等！"), HintType.Blue)
             Return
         End If
         IsMemoryOptimizeRunning = True
         Try
-            If ShowHint Then Hint("正在进行内存优化……", HintType.Blue)
+            If ShowHint Then Hint(T("正在进行内存优化……"), HintType.Blue)
             Dim MemoryBefore As Long
             Dim MemoryDelta As Long
             If WindowsUtils.HasAdminRole() Then
@@ -263,7 +260,7 @@ Public Class PageOtherTest
                     MemoryDelta = CLng(RunAsAdmin("--memory")) * 1024L
                 Catch ex As Exception
                     Logger.Warn(ex, "命令行形式内存优化失败", LogBehavior.Toast)
-                    If ShowHint Then Hint("获取管理员权限失败，请尝试右键 FXL，选择 [以管理员身份运行]！", HintType.Red)
+                    If ShowHint Then Hint(T("获取管理员权限失败，请尝试右键 FXL，选择 [以管理员身份运行]！"), HintType.Red)
                     Return
                 End Try
                 If MemoryDelta < 0 Then Return
@@ -271,13 +268,13 @@ Public Class PageOtherTest
             Dim MemoryNow As String = StringUtils.FormatByteSize(CLng(My.Computer.Info.AvailablePhysicalMemory))
             Logger.Info($"内存优化完成，可用内存改变量：{StringUtils.FormatByteSize(MemoryDelta)}，大致剩余内存：{MemoryNow}")
             If MemoryDelta > 0 Then
-                If ShowHint Then Hint($"内存优化完成，可用内存增加了 {StringUtils.FormatByteSize(CLng(Math.Round(MemoryDelta * 0.8)))}，目前剩余内存 {MemoryNow}！", HintType.Green)
+                If ShowHint Then Hint(T("内存优化完成，可用内存增加了 {0}，目前剩余内存 {1}！", StringUtils.FormatByteSize(CLng(Math.Round(MemoryDelta * 0.8))), MemoryNow), HintType.Green)
             ElseIf ShowHint Then
-                Hint($"内存优化完成，已经优化到了最佳状态，目前剩余内存 {MemoryNow}！", HintType.Blue)
+                Hint(T("内存优化完成，已经优化到了最佳状态，目前剩余内存 {0}！", MemoryNow), HintType.Blue)
             End If
         Catch ex As Exception
             Logger.Warn(ex, "内存优化失败", If(ShowHint, LogBehavior.Toast, LogBehavior.None))
-            If ShowHint Then Hint("内存优化失败：" & ex.Message, HintType.Red)
+            If ShowHint Then Hint(T("内存优化失败：{0}", ex.Message), HintType.Red)
         Finally
             IsMemoryOptimizeRunning = False
         End Try
@@ -285,8 +282,8 @@ Public Class PageOtherTest
 
     Public Shared Sub MemoryOptimizeInternal(ShowHint As Boolean)
         If Not WindowsUtils.HasAdminRole() Then
-            Throw New Exception("内存优化功能需要管理员权限！" & vbCrLf &
-                                "如果需要自动以管理员身份启动 FXL，可以右键 FXL，打开 属性 → 兼容性 → 以管理员身份运行此程序。")
+            Throw New Exception(T("内存优化功能需要管理员权限！") & vbCrLf &
+                                T("如果需要自动以管理员身份启动 FXL，可以右键 FXL，打开 属性 → 兼容性 → 以管理员身份运行此程序。"))
         End If
         Logger.Info("获取内存优化权限")
         Using Identity = WindowsIdentity.GetCurrent(TokenAccessLevels.Query Or TokenAccessLevels.AdjustPrivileges)
@@ -294,13 +291,13 @@ Public Class PageOtherTest
             Dim SystemName As String = Nothing
             Dim PrivilegeName As String = "SeProfileSingleProcessPrivilege"
             If Not LookupPrivilegeValue(SystemName, PrivilegeName, Token.Luid) Then
-                Throw New Exception($"获取内存优化权限失败（错误代码：{Marshal.GetLastWin32Error()}）")
+                Throw New Exception(T("获取内存优化权限失败（错误代码：{0}）", Marshal.GetLastWin32Error()))
             End If
             Dim PreviousState As IntPtr = IntPtr.Zero
             Dim ReturnLength As Integer = 0
             If Not AdjustTokenPrivileges(Identity.Token, False, Token, Marshal.SizeOf(Token), PreviousState, ReturnLength) OrElse
                Marshal.GetLastWin32Error() <> 0 Then
-                Throw New Exception($"获取内存优化权限失败（错误代码：{Marshal.GetLastWin32Error()}）")
+                Throw New Exception(T("获取内存优化权限失败（错误代码：{0}）", Marshal.GetLastWin32Error()))
             End If
         End Using
         For Level As Integer = 2 To 4
@@ -312,7 +309,7 @@ Public Class PageOtherTest
             Finally
                 Handle.Free()
             End Try
-            If Result <> 0 Then Throw New Exception($"内存优化操作 {Level} 失败（错误代码：{Result}）")
+            If Result <> 0 Then Throw New Exception(T("内存优化操作 {0} 失败（错误代码：{1}）", Level, Result))
         Next
     End Sub
 

@@ -1,6 +1,11 @@
 Public Class PageOtherHelp
     Implements IRefreshable
 
+    ''' <summary>
+    ''' 内置帮助包中“指南”分类的名称。帮助内容为简体中文，不参与界面翻译。
+    ''' </summary>
+    Private Const HelpTypeGuide As String = "指南"
+
 #Region "初始化"
 
     '滚动条
@@ -33,10 +38,10 @@ Public Class PageOtherHelp
                     If Not Types.Contains(Type) Then Types.Add(Type)
                 Next
             Next
-            '将指南页面置顶
-            If Types.Contains("指南") Then
-                Types.Remove("指南")
-                Types.Insert(0, "指南")
+            '将指南页面置顶（帮助内容包为简体中文，分类名保持原文，不参与界面翻译）
+            If Types.Contains(HelpTypeGuide) Then
+                Types.Remove(HelpTypeGuide)
+                Types.Insert(0, HelpTypeGuide)
             End If
             '转化为 UI
             For Each Type As String In Types
@@ -53,7 +58,7 @@ Public Class PageOtherHelp
                 NewCard.Children.Add(NewStack)
                 NewCard.SwapControl = NewStack
                 NewCard.SetContentBuilder(TypeItems, Function(Entry) Entry.ToListItem)
-                If Type = "指南" Then
+                If Type = HelpTypeGuide Then
                     NewCard.BuildContent()
                 Else
                     NewCard.IsSwapped = True
@@ -148,13 +153,13 @@ Public Class PageOtherHelp
             Dim SearchResult = Search(QueryList, SearchBox.Text, MaxBlurCount:=5, MinBlurSimilarity:=0.08)
             PanSearchList.Children.Clear()
             If Not SearchResult.Any() Then
-                PanSearch.Title = "无搜索结果"
+                PanSearch.Title = T("无搜索结果")
                 PanSearchList.Visibility = Visibility.Collapsed
             Else
-                PanSearch.Title = "搜索结果"
+                PanSearch.Title = T("搜索结果")
                 For Each Result In SearchResult
                     Dim Item = Result.Item.ToListItem
-                    If ModeDebug Then Item.Info = If(Result.AbsoluteRight, "完全匹配，", "") & "相似度：" & Math.Round(Result.Similarity, 3) & "，" & Item.Info
+                    If ModeDebug Then Item.Info = If(Result.AbsoluteRight, T("完全匹配，相似度：{0}，{1}", Math.Round(Result.Similarity, 3), Item.Info), T("相似度：{0}，{1}", Math.Round(Result.Similarity, 3), Item.Info))
                     PanSearchList.Children.Add(Item)
                 Next
                 PanSearchList.Visibility = Visibility.Visible
