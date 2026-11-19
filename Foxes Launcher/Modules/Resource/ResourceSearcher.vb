@@ -315,7 +315,7 @@ NextPage:
                         Dim ProjectList As New List(Of ResourceProject)
                         For Each JsonEntry As JObject In RequestResult("data")
                             Dim Project As New ResourceProject(JsonEntry)
-                            If Request.Type = ResourceTypes.ResourcePack AndAlso Project.Tags.Contains("数据包") Then Continue For 'CurseForge 将一些数据包分类成了资源包
+                            If Request.Type = ResourceTypes.ResourcePack AndAlso Project.IsDataPackCategory Then Continue For 'CurseForge 将一些数据包分类成了资源包
                             If Request.Type <> ResourceTypes.Any AndAlso Not Project.Types.HasFlagF(Request.Type) Then Continue For '过滤分区不匹配的搜索结果（#8265）
                             ProjectList.Add(Project)
                         Next

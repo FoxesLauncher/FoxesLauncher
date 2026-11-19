@@ -311,7 +311,7 @@ pause"
             WikiName = "Java版" & Id.TrimEnd("a", "b", "c", "d", "e").Replace("a", "Alpha_v")
         ElseIf Id = "inf-20100618" Then
             WikiName = "Java版Infdev_20100618"
-        ElseIf Id = "c0.30_01c" OrElse Id = "c0.30_survival" OrElse Id.Contains("生存测试") Then
+        ElseIf Id = "c0.30_01c" OrElse Id = "c0.30_survival" Then
             WikiName = "Java版Classic_0.30（生存模式）"
         ElseIf Id.StartsWithF("c0.31") Then
             WikiName = "Java版Indev_0.31_20100130"

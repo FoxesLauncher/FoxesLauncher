@@ -60,6 +60,11 @@ Public Class ResourceProject
     ''' </summary>
     Public ReadOnly Tags As List(Of String)
     ''' <summary>
+    ''' 该工程是否被来源平台标记为数据包分类。
+    ''' 与界面语言无关，用于在资源包搜索中过滤掉被误分类的数据包。
+    ''' </summary>
+    Public ReadOnly IsDataPackCategory As Boolean
+    ''' <summary>
     ''' Logo 图片的下载地址。
     ''' 若为 Nothing 则没有，保证不为空字符串。
     ''' </summary>
@@ -135,6 +140,7 @@ Public Class ResourceProject
             DownloadCount = Data("DownloadCount")
             If Data.ContainsKey("ModLoaders") Then ModLoaders = Data("ModLoaders").ToObject(Of Integer)
             Tags = CType(Data("Tags"), JArray).Select(Function(t) t.ToString).ToList
+            If Data.ContainsKey("IsDataPackCategory") Then IsDataPackCategory = Data("IsDataPackCategory").ToObject(Of Boolean)
             If Data.ContainsKey("LogoUrl") Then LogoUrl = Data("LogoUrl")
             If Data.ContainsKey("Drops") Then
                 Drops = CType(Data("Drops"), JArray).Select(Function(t) t.ToObject(Of Integer)).ToList
@@ -257,7 +263,10 @@ Public Class ResourceProject
                         Case 396 : Tags.Add("128x")
                         Case 397 : Tags.Add("256x")
                         Case 398 : Tags.Add(T("超高清"))
-                        Case 5193 : Tags.Add(T("数据包")) '有这个 Tag 的项会从资源包请求中被移除
+                        Case 5193
+                            '有这个 Tag 的项会从资源包请求中被移除
+                            Tags.Add(T("数据包"))
+                            IsDataPackCategory = True
                             '光影包
                         Case 6553 : Tags.Add(T("写实风"))
                         Case 6554 : Tags.Add(T("幻想风"))
@@ -443,6 +452,7 @@ Public Class ResourceProject
         Json("DownloadCount") = DownloadCount
         If ModLoaders <> ModLoaders.None Then Json("ModLoaders") = CInt(ModLoaders)
         Json("Tags") = New JArray(Tags)
+        If IsDataPackCategory Then Json("IsDataPackCategory") = True
         If LogoUrl IsNot Nothing Then Json("LogoUrl") = LogoUrl
         If Drops.Any Then Json("Drops") = New JArray(Drops)
         Json("CacheTime") = Date.Now '用于检查缓存时间

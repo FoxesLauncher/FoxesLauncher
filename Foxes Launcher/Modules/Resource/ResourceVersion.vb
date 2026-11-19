@@ -321,6 +321,11 @@ Public Class ResourceVersion
             If Data.ContainsKey("Size") Then .Size = Data("Size").ToObject(Of Integer)
             If Data.ContainsKey("Hash") Then .Hash = Data("Hash").ToString
             If Data.ContainsKey("GameVersions") Then .GameVersions = Data("GameVersions").ToObject(Of List(Of String))
+            If Data.ContainsKey("GameVersionSnapshots") Then
+                For Each Snapshot As JToken In DirectCast(Data("GameVersionSnapshots"), JArray)
+                    .GameVersionSnapshots.Add(Snapshot.ToString)
+                Next
+            End If
             If Data.ContainsKey("RawDependencies") Then .RawDependencies = Data("RawDependencies").ToObject(Of List(Of String))
             If Data.ContainsKey("Dependencies") Then .Dependencies = Data("Dependencies").ToObject(Of List(Of String))
         End With
@@ -340,6 +345,7 @@ Public Class ResourceVersion
             .Add("DownloadCount", DownloadCount)
             .Add("ModLoaders", CInt(ModLoaders))
             .Add("GameVersions", New JArray(GameVersions))
+            If GameVersionSnapshots.Any Then .Add("GameVersionSnapshots", New JArray(GameVersionSnapshots))
             .Add("ReleaseType", CInt(ReleaseType))
             If FileName IsNot Nothing Then .Add("FileName", FileName)
             If DownloadUrls IsNot Nothing Then .Add("DownloadUrls", New JArray(DownloadUrls))
