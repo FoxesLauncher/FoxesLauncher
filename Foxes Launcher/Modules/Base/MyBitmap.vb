@@ -92,9 +92,9 @@ Public Class MyBitmap
             If Pic Is Nothing Then
                 Pic = New System.Drawing.Bitmap(1, 1)
                 If TypeOf ex Is ArgumentException Then
-                    Throw New Exception($"图片格式不支持，或图片文件损坏（{FilePathOrResourceName}）", ex)
+                    Throw New Exception(T("图片格式不支持，或图片文件损坏（{0}）", FilePathOrResourceName), ex)
                 Else
-                    Throw New Exception($"加载 MyBitmap 意外失败（{FilePathOrResourceName}）", ex)
+                    Throw New Exception(T("加载 MyBitmap 意外失败（{0}）", FilePathOrResourceName), ex)
                 End If
             Else
                 Logger.Warn(ex, $"指定类型有误的 MyBitmap 加载（{FilePathOrResourceName}）")

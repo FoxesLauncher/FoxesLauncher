@@ -1,6 +1,6 @@
 ''' <summary>
 ''' 区域与语言设置。
-''' 区域用于决定部分功能的可用性限制，语言目前仅作为配置记录，尚未接入 i18n 框架。
+''' 区域用于决定部分功能的可用性限制，语言用于选择启动器界面语言包。
 ''' </summary>
 Public Module ModRegion
 
@@ -32,24 +32,42 @@ Public Module ModRegion
     ''' <summary>
     ''' 可选的区域列表。
     ''' </summary>
-    Public ReadOnly RegionEntries As New List(Of RegionLanguageEntry) From {
-        New RegionLanguageEntry(RegionAsiaMainlandChina, "亚洲（中国大陆）"),
-        New RegionLanguageEntry(RegionAsiaHongKongMacaoTaiwan, "亚洲（中国香港、中国澳门、中国台湾）"),
-        New RegionLanguageEntry(RegionAsiaOther, "亚洲（其他）"),
-        New RegionLanguageEntry(RegionAfrica, "非洲"),
-        New RegionLanguageEntry(RegionAmericas, "美洲"),
-        New RegionLanguageEntry(RegionEurope, "欧洲"),
-        New RegionLanguageEntry(RegionOceania, "大洋洲"),
-        New RegionLanguageEntry(RegionOther, "其他")
-    }
+    Public ReadOnly Property RegionEntries As List(Of RegionLanguageEntry)
+        Get
+            Return New List(Of RegionLanguageEntry) From {
+                New RegionLanguageEntry(RegionAsiaMainlandChina, T("亚洲（中国大陆）")),
+                New RegionLanguageEntry(RegionAsiaHongKongMacaoTaiwan, T("亚洲（中国香港、中国澳门、中国台湾）")),
+                New RegionLanguageEntry(RegionAsiaOther, T("亚洲（其他）")),
+                New RegionLanguageEntry(RegionAfrica, T("非洲")),
+                New RegionLanguageEntry(RegionAmericas, T("美洲")),
+                New RegionLanguageEntry(RegionEurope, T("欧洲")),
+                New RegionLanguageEntry(RegionOceania, T("大洋洲")),
+                New RegionLanguageEntry(RegionOther, T("其他"))
+            }
+        End Get
+    End Property
 
     ''' <summary>
     ''' 可选的语言列表。
-    ''' 目前仅实现语言选择的保存逻辑，暂未接入 i18n 框架。
+    ''' 语言包存放于 FXL\Languages 或内嵌在程序中，新增语言包后会自动出现在此列表中。
     ''' </summary>
-    Public ReadOnly LanguageEntries As New List(Of RegionLanguageEntry) From {
-        New RegionLanguageEntry(LanguageSimplifiedChineseMainland, "简体中文（中国大陆）")
-    }
+    Public ReadOnly Property LanguageEntries As List(Of RegionLanguageEntry)
+        Get
+            Dim Result As New List(Of RegionLanguageEntry)
+            For Each Code In ModLanguage.AvailableLanguages
+                Result.Add(New RegionLanguageEntry(Code, LanguageDisplayName(Code)))
+            Next
+            If Result.Count = 0 Then Result.Add(New RegionLanguageEntry(LanguageSimplifiedChineseMainland, LanguageDisplayName(LanguageSimplifiedChineseMainland)))
+            Return Result
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' 获取语言在界面上的显示名称。显示名来自语言清单，避免翻译后语言名互相看不懂。
+    ''' </summary>
+    Public Function LanguageDisplayName(Code As String) As String
+        Return ModLanguage.GetDisplayName(Code)
+    End Function
 
     ''' <summary>
     ''' 当前选择的区域代码。若配置无效，则回退到亚洲（中国大陆）。
@@ -67,9 +85,7 @@ Public Module ModRegion
     ''' </summary>
     Public ReadOnly Property CurrentLanguage As String
         Get
-            Dim Value As String = Settings.Get(Of String)("SystemLanguage")
-            If LanguageEntries.Any(Function(e) e.Code = Value) Then Return Value
-            Return LanguageSimplifiedChineseMainland
+            Return ModLanguage.CurrentLanguage
         End Get
     End Property
 
@@ -100,12 +116,20 @@ Public Module ModRegion
     ''' <summary>
     ''' 区域限制的提示文本。
     ''' </summary>
-    Public Const GameDownloadRestrictedMessage As String = "为遵守相关法律法规，FXL 在当前区域不提供 Minecraft 下载与安装功能，非常抱歉 qwq…"
+    Public ReadOnly Property GameDownloadRestrictedMessage As String
+        Get
+            Return T("为遵守相关法律法规，FXL 在当前区域不提供 Minecraft 下载与安装功能，非常抱歉 qwq…")
+        End Get
+    End Property
 
     ''' <summary>
     ''' 离线账户限制的提示文本。
     ''' </summary>
-    Public Const OfflineAccountRestrictedMessage As String = "根据你选择的区域，必须先登录正版（微软）账号，才能使用离线账户。"
+    Public ReadOnly Property OfflineAccountRestrictedMessage As String
+        Get
+            Return T("根据你选择的区域，必须先登录正版（微软）账号，才能使用离线账户。")
+        End Get
+    End Property
 
     ''' <summary>
     ''' 获取设置文件中是否已经保存了有效的区域与语言。
@@ -120,7 +144,7 @@ Public Module ModRegion
     ''' </summary>
     Public Sub NotifyRegionLanguageChanged()
         If IsApplyingInitialRegionLanguage Then Return
-        If MyMsgBox("区域或语言设置已更改，请重启启动器。", "提示", "稍后", "重启启动器") = 2 Then
+        If MyMsgBox(T("区域或语言设置已更改，请重启启动器。"), T("提示"), T("稍后"), T("重启启动器")) = 2 Then
             Try
                 StartProcess(New ProcessStartInfo(PathExe, "--wait"))
             Catch ex As Exception

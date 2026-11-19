@@ -179,7 +179,7 @@ EndHint:
         ''' 有多个按钮时，是否给第一个按钮加高亮。
         ''' </summary>
         Public HighLight As Boolean
-        Public Button1 As String = "确定"
+        Public Button1 As String = T("确定")
         Public Button2 As String = ""
         Public Button3 As String = ""
         ''' <summary>
@@ -228,10 +228,12 @@ EndHint:
     ''' <param name="Button2Action">点击第二个按钮将执行该方法，不关闭弹窗。</param>
     ''' <param name="Button3Action">点击第三个按钮将执行该方法，不关闭弹窗。</param>
     ''' <param name="IsWarn">是否为警告弹窗，若为 True，弹窗配色和背景会变为红色。</param>
-    Public Function MyMsgBox(Caption As String, Optional Title As String = "提示",
-                             Optional Button1 As String = "确定", Optional Button2 As String = "", Optional Button3 As String = "",
+    Public Function MyMsgBox(Caption As String, Optional Title As String = Nothing,
+                             Optional Button1 As String = Nothing, Optional Button2 As String = "", Optional Button3 As String = "",
                              Optional IsWarn As Boolean = False, Optional HighLight As Boolean = True, Optional ForceWait As Boolean = False,
                              Optional Button1Action As Action = Nothing, Optional Button2Action As Action = Nothing, Optional Button3Action As Action = Nothing) As Integer
+        If Title Is Nothing Then Title = T("提示")
+        If Button1 Is Nothing Then Button1 = T("确定")
         '将弹窗列入队列
         Dim Converter As New MyMsgBoxConverter With {.Type = MyMsgBoxType.Text, .Button1 = Button1, .Button2 = Button2, .Button3 = Button3, .Text = Caption, .IsWarn = IsWarn, .Title = Title, .HighLight = HighLight, .ForceWait = True, .Button1Action = Button1Action, .Button2Action = Button2Action, .Button3Action = Button3Action}
         If Button2.Length > 0 OrElse ForceWait Then
@@ -284,7 +286,9 @@ EndHint:
     ''' <param name="Button1">显示的第一个按钮，默认为“确定”。</param>
     ''' <param name="Button2">显示的第二个按钮，默认为“取消”。</param>
     ''' <param name="IsWarn">是否为警告弹窗，若为 True，弹窗配色和背景会变为红色。</param>
-    Public Function MyMsgBoxInput(Title As String, Optional Text As String = Nothing, Optional DefaultInput As String = Nothing, Optional ValidateRules As Collection(Of Validate) = Nothing, Optional HintText As String = "", Optional Button1 As String = "确定", Optional Button2 As String = "取消", Optional IsWarn As Boolean = False) As String
+    Public Function MyMsgBoxInput(Title As String, Optional Text As String = Nothing, Optional DefaultInput As String = Nothing, Optional ValidateRules As Collection(Of Validate) = Nothing, Optional HintText As String = "", Optional Button1 As String = Nothing, Optional Button2 As String = Nothing, Optional IsWarn As Boolean = False) As String
+        If Button1 Is Nothing Then Button1 = T("确定")
+        If Button2 Is Nothing Then Button2 = T("取消")
         '将弹窗列入队列
         Dim Converter As New MyMsgBoxConverter With {.Text = If(Text, ""), .HintText = If(HintText, ""), .Type = MyMsgBoxType.Input, .ValidateRules = If(ValidateRules, New Collection(Of Validate)), .Button1 = Button1, .Button2 = Button2, .Content = DefaultInput, .IsWarn = IsWarn, .Title = Title}
         WaitingMyMsgBox.Enqueue(Converter)
@@ -307,7 +311,9 @@ EndHint:
     ''' <param name="Button1">显示的第一个按钮，默认为 “确定”。</param>
     ''' <param name="Button2">显示的第二个按钮，默认为空。</param>
     ''' <param name="IsWarn">是否为警告弹窗，若为 True，弹窗配色和背景会变为红色。</param>
-    Public Function MyMsgBoxSelect(Selections As IEnumerable(Of IMyRadio), Optional Title As String = "提示", Optional Button1 As String = "确定", Optional Button2 As String = "", Optional IsWarn As Boolean = False) As Integer?
+    Public Function MyMsgBoxSelect(Selections As IEnumerable(Of IMyRadio), Optional Title As String = Nothing, Optional Button1 As String = Nothing, Optional Button2 As String = "", Optional IsWarn As Boolean = False) As Integer?
+        If Title Is Nothing Then Title = T("提示")
+        If Button1 Is Nothing Then Button1 = T("确定")
         '将弹窗列入队列
         Dim Converter As New MyMsgBoxConverter With {.Type = MyMsgBoxType.Select, .Button1 = Button1, .Button2 = Button2, .Content = Selections, .IsWarn = IsWarn, .Title = Title}
         WaitingMyMsgBox.Enqueue(Converter)
@@ -328,7 +334,9 @@ EndHint:
     ''' </summary>
     ''' <param name="Title">弹窗的标题。</param>
     ''' <param name="Button1">显示的第一个按钮，默认为 “确定”。</param>
-    Public Function MyMsgBoxRegionLanguage(Optional Title As String = "区域与语言", Optional Button1 As String = "确定") As RegionLanguageSelection
+    Public Function MyMsgBoxRegionLanguage(Optional Title As String = Nothing, Optional Button1 As String = Nothing) As RegionLanguageSelection
+        If Title Is Nothing Then Title = T("区域与语言")
+        If Button1 Is Nothing Then Button1 = T("确定")
         '主窗体尚未加载时直接返回，由调用方使用默认值
         If FrmMain Is Nothing OrElse FrmMain.PanMsg Is Nothing Then Return Nothing
         '将弹窗列入队列
@@ -513,13 +521,13 @@ EndHint:
         ''' </summary>
         Public Sub New(FilePath As String)
             RawPath = FilePath
-            If Not FileUtils.Exists(FilePath) Then Throw New FileNotFoundException("未找到帮助文件：" & FilePath, FilePath)
+            If Not FileUtils.Exists(FilePath) Then Throw New FileNotFoundException(T("未找到帮助文件：{0}", FilePath), FilePath)
             Dim JsonData As JObject = ArgumentReplace(FileUtils.ReadAsString(FilePath), AddressOf StringUtils.XmlEscape).DeserializeJson()
             '加载常规信息
             If JsonData("Title") IsNot Nothing Then
                 Title = JsonData("Title")
             Else
-                Throw New ArgumentException("未找到 Title 项")
+                Throw New ArgumentException(T("未找到 Title 项"))
             End If
             Desc = If(JsonData("Description"), "")
             Search = If(JsonData("Keywords"), "")
@@ -542,7 +550,7 @@ EndHint:
                     XamlContent = FileUtils.ReadAsString(XamlAddress)
                     IsEvent = False
                 Else
-                    Throw New FileNotFoundException("未找到帮助条目 .json 对应的 .xaml 文件（" & XamlAddress & "）")
+                    Throw New FileNotFoundException(T("未找到帮助条目 .json 对应的 .xaml 文件（{0}）", XamlAddress))
                 End If
             End If
         End Sub
@@ -654,7 +662,7 @@ NextFile:
                 Next
 
                 '回设
-                If Not Dict.Any() Then Throw New Exception("未找到可用的帮助；若不需要帮助页面，可以在 设置 → 个性化 → 功能隐藏 中将其隐藏")
+                If Not Dict.Any() Then Throw New Exception(T("未找到可用的帮助；若不需要帮助页面，可以在 设置 → 个性化 → 功能隐藏 中将其隐藏"))
                 If Loader.IsCanceled Then Return
                 Loader.Output = Dict
 
@@ -782,11 +790,11 @@ NextFile:
             Text = Text.Replace("{uuid}", Replacer(McLoginLoader.Output.Uuid?.Lower))
             Select Case McLoginLoader.Input.Type
                 Case McLoginType.Legacy
-                    Text = Text.Replace("{login}", Replacer("离线"))
+                    Text = Text.Replace("{login}", Replacer(T("离线")))
                 Case McLoginType.Ms
-                    Text = Text.Replace("{login}", Replacer("正版"))
+                    Text = Text.Replace("{login}", Replacer(T("正版")))
                 Case McLoginType.Nide
-                    Text = Text.Replace("{login}", Replacer("统一通行证"))
+                    Text = Text.Replace("{login}", Replacer(T("统一通行证")))
                 Case McLoginType.Auth
                     Text = Text.Replace("{login}", Replacer("Authlib-Injector"))
             End Select
@@ -866,7 +874,7 @@ NextFile:
     Public Sub Feedback(Optional ShowMsgbox As Boolean = True, Optional ForceOpenLog As Boolean = False)
         On Error Resume Next
         FeedbackInfo()
-        If ForceOpenLog OrElse (ShowMsgbox AndAlso MyMsgBox("若你在汇报一个 Bug，请点击 打开文件夹 按钮，并上传 Log(1~5).txt 中包含错误信息的文件。" & vbCrLf & "游戏崩溃一般与启动器无关，请不要因为游戏崩溃而提交反馈。", "反馈提交提醒", "打开文件夹", "不需要") = 1) Then
+        If ForceOpenLog OrElse (ShowMsgbox AndAlso MyMsgBox(T("若你在汇报一个 Bug，请点击 打开文件夹 按钮，并上传 Log(1~5).txt 中包含错误信息的文件。") & vbCrLf & T("游戏崩溃一般与启动器无关，请不要因为游戏崩溃而提交反馈。"), T("反馈提交提醒"), T("打开文件夹"), T("不需要")) = 1) Then
             OpenExplorer(Paths.Base & "FXL\Log1.txt")
         End If
         OpenWebsite("https://github.com/FoxesLauncher/FoxesLauncher/Issues/")
