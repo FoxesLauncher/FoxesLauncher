@@ -25,8 +25,8 @@ Public Module ModLanguage
     ''' </summary>
     Private Const ManifestFileName As String = "manifest.json"
 
-    Private ReadOnly LanguageData As New Dictionary(Of String, String)(StringComparer.Ordinal)
-    Private ReadOnly MissingKeys As New HashSet(Of String)(StringComparer.Ordinal)
+    Private LanguageData As New Dictionary(Of String, String)(StringComparer.Ordinal)
+    Private MissingKeys As New HashSet(Of String)(StringComparer.Ordinal)
     Private ReadOnly LanguageDisplayNames As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
     Private ReadOnly AvailableLanguageCache As New List(Of String)
     Private LanguageDictionary As ResourceDictionary = Nothing
@@ -73,20 +73,101 @@ Public Module ModLanguage
 
     ''' <summary>
     ''' 初始化语言包。应在创建任何窗口或页面之前调用。
+    ''' 若配置文件中还没有语言设置（例如首次启动），会尝试跟随系统语言。
     ''' </summary>
     Public Sub Initialize()
         If _IsInitialized Then Return
-        Dim Language As String = DefaultLanguage
+        Dim SavedLanguage As String = ""
         Try
             '直接读取配置文件，避免在语言包加载前触发 Settings 的静态初始化
-            Language = NormalizeLanguage(ReadIni("Setup", "SystemLanguage"))
+            SavedLanguage = ReadIni("Setup", "SystemLanguage")
         Catch ex As Exception
-            '配置文件尚未就绪时忽略，直接使用默认语言
+            '配置文件尚未就绪时忽略，按首次启动处理
         End Try
-        If String.IsNullOrEmpty(Language) Then Language = DefaultLanguage
+
+        Dim Language As String
+        If String.IsNullOrWhiteSpace(SavedLanguage) Then
+            '首次启动：检查系统语言是否受支持，支持则自动切换
+            Language = DetectSystemLanguage()
+            Logger.Info($"未找到语言设置，已根据系统语言自动选择：{Language}")
+        Else
+            Language = NormalizeLanguage(SavedLanguage)
+        End If
         LoadLanguage(Language)
         _IsInitialized = True
     End Sub
+
+    ''' <summary>
+    ''' 检查系统语言是否受支持。若受支持，返回对应的语言代码；否则返回默认语言。
+    ''' 依次尝试当前界面语言、系统安装语言与系统区域设置，并按语言代码前缀回退（例如 en_us 找不到时使用任意 en_*）。
+    ''' </summary>
+    Public Function DetectSystemLanguage() As String
+        Try
+            RefreshAvailableLanguages()
+            For Each Candidate In EnumerateSystemLanguageCandidates()
+                Dim Match = FindSupportedLanguage(Candidate)
+                If Match IsNot Nothing Then Return Match
+            Next
+        Catch ex As Exception
+            Logger.Warn(ex, "检查系统语言失败")
+        End Try
+        Return DefaultLanguage
+    End Function
+
+    ''' <summary>
+    ''' 在可用语言中查找与指定语言代码匹配的语言。
+    ''' 优先精确匹配，其次匹配同语言的其他区域（例如 zh_tw → zh_cn）。
+    ''' 若没有匹配项，返回 Nothing。
+    ''' </summary>
+    Public Function FindSupportedLanguage(Language As String) As String
+        If String.IsNullOrWhiteSpace(Language) Then Return Nothing
+        Dim Code As String = NormalizeLanguage(Language)
+        If AvailableLanguageCache.Contains(Code) Then Return Code
+        Dim Neutral As String = Code.Split("_"c)(0)
+        Return AvailableLanguageCache.FirstOrDefault(
+            Function(Available) Available = Neutral OrElse Available.StartsWith(Neutral & "_", StringComparison.OrdinalIgnoreCase))
+    End Function
+
+    ''' <summary>
+    ''' 按优先级枚举可用于匹配系统语言的候选代码。
+    ''' </summary>
+    Private Iterator Function EnumerateSystemLanguageCandidates() As IEnumerable(Of String)
+        Dim Seen As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+        For Each Culture As CultureInfo In {CultureInfo.CurrentUICulture, CultureInfo.InstalledUICulture, CultureInfo.CurrentCulture}
+            If Culture Is Nothing Then Continue For
+            For Each Candidate In GetCultureLanguageCodes(Culture)
+                If Not String.IsNullOrEmpty(Candidate) AndAlso Seen.Add(Candidate) Then Yield Candidate
+                '同时尝试仅含语言部分的代码，以便匹配任意同语言的语言包
+                Dim Neutral As String = Candidate.Split("_"c)(0)
+                If Seen.Add(Neutral) Then Yield Neutral
+            Next
+        Next
+    End Function
+
+    ''' <summary>
+    ''' 将区域信息转换为语言代码，例如 zh-Hans-CN → zh_cn、en-US → en_us。
+    ''' </summary>
+    Private Function GetCultureLanguageCodes(Culture As CultureInfo) As IEnumerable(Of String)
+        Dim Result As New List(Of String)
+        If String.IsNullOrEmpty(Culture.Name) Then Return Result
+        Dim Parts As String() = Culture.Name.Split("-"c)
+        If Parts.Length = 1 Then
+            Result.Add(Parts(0).ToLowerInvariant())
+        Else
+            '语言部分取第一段，区域部分取最后一段，跳过 Hans、Hant 等书写系统子标签
+            Result.Add((Parts(0) & "_" & Parts(Parts.Length - 1)).ToLowerInvariant())
+        End If
+        If Culture.Parent IsNot Nothing AndAlso Not String.IsNullOrEmpty(Culture.Parent.Name) Then
+            Result.Add(Culture.Parent.Name.Split("-"c)(0).ToLowerInvariant())
+        End If
+        Return Result
+    End Function
+
+    ''' <summary>
+    ''' 语言切换完成后触发，参数为新的语言代码。
+    ''' 用于刷新直接赋值而非通过 DynamicResource 绑定的文本（例如下拉框选项）。
+    ''' </summary>
+    Public Event LanguageChanged As Action(Of String)
 
     ''' <summary>
     ''' 重新加载指定语言。切换语言后仍建议重启启动器，以刷新代码中直接赋值的文本。
@@ -96,24 +177,27 @@ Public Module ModLanguage
         RefreshAvailableLanguages()
         If Not AvailableLanguageCache.Contains(Language) Then Language = DefaultLanguage
 
-        LanguageData.Clear()
-        MissingKeys.Clear()
+        '先在临时字典中组装，再整体替换，避免后台线程调用 T() 时读到半成品
+        Dim NewData As New Dictionary(Of String, String)(StringComparer.Ordinal)
 
         '先加载基础语言，再叠加目标语言，实现缺键回退
-        LoadEmbeddedLanguage(DefaultLanguage)
-        LoadExternalLanguage(DefaultLanguage)
+        LoadEmbeddedLanguage(NewData, DefaultLanguage)
+        LoadExternalLanguage(NewData, DefaultLanguage)
         If Language <> DefaultLanguage Then
-            LoadEmbeddedLanguage(Language)
-            LoadExternalLanguage(Language)
+            LoadEmbeddedLanguage(NewData, Language)
+            LoadExternalLanguage(NewData, Language)
         End If
 
-        If LanguageData.Count = 0 Then
+        If NewData.Count = 0 Then
             Logger.Error($"基础语言包 {DefaultLanguage}.json 未能加载")
         End If
 
+        LanguageData = NewData
+        MissingKeys = New HashSet(Of String)(StringComparer.Ordinal)
         _CurrentLanguage = Language
         ApplyCulture(Language)
         ApplyResourceDictionary()
+        RaiseEvent LanguageChanged(Language)
     End Sub
 
     ''' <summary>
@@ -181,35 +265,35 @@ Public Module ModLanguage
         Return Language
     End Function
 
-    Private Sub LoadEmbeddedLanguage(Language As String)
+    Private Sub LoadEmbeddedLanguage(Target As Dictionary(Of String, String), Language As String)
         Dim Text As String = ReadEmbeddedLanguage(Language)
         If String.IsNullOrWhiteSpace(Text) Then
             Logger.Warn($"内嵌语言文件不存在：{Language}")
             Return
         End If
-        MergeLanguageJson(Text, Language)
+        MergeLanguageJson(Target, Text, Language)
     End Sub
 
-    Private Sub LoadExternalLanguage(Language As String)
+    Private Sub LoadExternalLanguage(Target As Dictionary(Of String, String), Language As String)
         Try
             Dim ExternalPath As String = Paths.Base & "FXL\Languages\" & Language & ".json"
             If Not FileUtils.Exists(ExternalPath) Then Return
             Dim ExternalText As String = FileUtils.TryReadAsString(ExternalPath, Encoding.UTF8)
-            If Not String.IsNullOrWhiteSpace(ExternalText) Then MergeLanguageJson(ExternalText, Language)
+            If Not String.IsNullOrWhiteSpace(ExternalText) Then MergeLanguageJson(Target, ExternalText, Language)
         Catch ex As Exception
             Logger.Warn(ex, $"读取外部语言文件失败：{Language}")
         End Try
     End Sub
 
     ''' <summary>
-    ''' 将 JSON 逐键合并到当前语言数据中。外部语言包只覆盖同名的键，不做整体替换。
+    ''' 将 JSON 逐键合并到目标语言数据中。外部语言包只覆盖同名的键，不做整体替换。
     ''' </summary>
-    Private Sub MergeLanguageJson(Text As String, Language As String)
+    Private Sub MergeLanguageJson(Target As Dictionary(Of String, String), Text As String, Language As String)
         Try
             Dim Root As JObject = JObject.Parse(Text)
             For Each Item As JProperty In Root.Properties()
                 If Item.Value Is Nothing Then Continue For
-                LanguageData(NormalizeKey(Item.Name)) = Item.Value.ToString()
+                Target(NormalizeKey(Item.Name)) = Item.Value.ToString()
             Next
         Catch ex As Exception
             Logger.Error(ex, $"语言文件解析失败：{Language}")
@@ -351,13 +435,20 @@ Public Module ModLanguage
         Try
             Dim App = Application.Current
             If App Is Nothing Then Return
+            '资源字典属于 UI 线程，若在后台线程调用则切换过去更新
+            If Not App.Dispatcher.CheckAccess() Then
+                App.Dispatcher.Invoke(Sub() ApplyResourceDictionary())
+                Return
+            End If
             Dim NewDictionary As New ResourceDictionary()
-            For Each Item In LanguageData
+            Dim Data As Dictionary(Of String, String) = LanguageData
+            For Each Item In Data
                 NewDictionary(Item.Key) = Item.Value
             Next
+            '先加入新字典再移除旧字典，避免语言切换时短暂缺失文本
+            App.Resources.MergedDictionaries.Add(NewDictionary)
             If LanguageDictionary IsNot Nothing Then App.Resources.MergedDictionaries.Remove(LanguageDictionary)
             LanguageDictionary = NewDictionary
-            App.Resources.MergedDictionaries.Add(LanguageDictionary)
         Catch ex As Exception
             Logger.Error(ex, "应用语言资源字典失败")
         End Try

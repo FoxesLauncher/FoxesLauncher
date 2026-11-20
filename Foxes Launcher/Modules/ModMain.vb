@@ -331,16 +331,15 @@ EndHint:
     End Function
     ''' <summary>
     ''' 显示区域与语言选择框。点击确定后返回选择结果。
+    ''' 标题与按钮默认留空，由弹窗按当前语言实时填充，以便在弹窗内切换语言时立即更新。
     ''' </summary>
-    ''' <param name="Title">弹窗的标题。</param>
+    ''' <param name="Title">弹窗的标题，默认为“区域与语言”。</param>
     ''' <param name="Button1">显示的第一个按钮，默认为 “确定”。</param>
     Public Function MyMsgBoxRegionLanguage(Optional Title As String = Nothing, Optional Button1 As String = Nothing) As RegionLanguageSelection
-        If Title Is Nothing Then Title = T("区域与语言")
-        If Button1 Is Nothing Then Button1 = T("确定")
         '主窗体尚未加载时直接返回，由调用方使用默认值
         If FrmMain Is Nothing OrElse FrmMain.PanMsg Is Nothing Then Return Nothing
         '将弹窗列入队列
-        Dim Converter As New MyMsgBoxConverter With {.Type = MyMsgBoxType.RegionLanguage, .Title = Title, .Button1 = Button1}
+        Dim Converter As New MyMsgBoxConverter With {.Type = MyMsgBoxType.RegionLanguage, .Title = If(Title, ""), .Button1 = If(Button1, "")}
         WaitingMyMsgBox.Enqueue(Converter)
         '虽然我也不知道这是啥但是能用就成了 :)
         Try

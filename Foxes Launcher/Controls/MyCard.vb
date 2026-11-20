@@ -61,6 +61,61 @@ Public Class MyCard
     End Property
     Public Shared ReadOnly TitleProperty As DependencyProperty = DependencyProperty.Register("Title", GetType(String), GetType(MyCard), New PropertyMetadata(""))
 
+    Private _MainIcon As Shapes.Path
+    ''' <summary>
+    ''' 标题左侧的矢量图标，路径语法与 MyIconButton.Logo 相同。留空时不显示图标。
+    ''' </summary>
+    Public Property Icon As String
+        Get
+            Return GetValue(IconProperty)
+        End Get
+        Set(value As String)
+            SetValue(IconProperty, value)
+        End Set
+    End Property
+    Public Shared ReadOnly IconProperty As DependencyProperty = DependencyProperty.Register("Icon", GetType(String), GetType(MyCard), New PropertyMetadata("", AddressOf OnIconChanged))
+    Private Shared Sub OnIconChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        DirectCast(d, MyCard).UpdateIcon()
+    End Sub
+    ''' <summary>
+    ''' 按 Icon 属性创建、更新或移除标题图标，并为标题文字留出位置。
+    ''' </summary>
+    Private Sub UpdateIcon()
+        If _MainTextBlock Is Nothing Then Return '尚未加载，会在 Init 中再调用
+        Dim Value As String = Icon
+        If String.IsNullOrWhiteSpace(Value) Then
+            If _MainIcon IsNot Nothing Then
+                MainGrid.Children.Remove(_MainIcon)
+                _MainIcon = Nothing
+            End If
+            MainTextBlock.Margin = New Thickness(15, 12, 0, 0)
+            Return
+        End If
+        If _MainIcon Is Nothing Then
+            _MainIcon = New Shapes.Path With {
+                .HorizontalAlignment = HorizontalAlignment.Left,
+                .VerticalAlignment = VerticalAlignment.Top,
+                .Margin = New Thickness(15, 11, 0, 0),
+                .Width = 15,
+                .Height = 15,
+                .Stretch = Stretch.Uniform,
+                .IsHitTestVisible = False}
+            _MainIcon.SetResourceReference(Shapes.Path.FillProperty, "ColorBrush1")
+            MainGrid.Children.Insert(0, _MainIcon)
+        End If
+        Try
+            _MainIcon.Data = (New GeometryConverter).ConvertFromString(Value)
+        Catch ex As Exception
+            Logger.Warn(ex, "设置卡片标题图标失败")
+            MainGrid.Children.Remove(_MainIcon)
+            _MainIcon = Nothing
+            MainTextBlock.Margin = New Thickness(15, 12, 0, 0)
+            Return
+        End Try
+        '图标宽 15，与标题文字间隔 7
+        MainTextBlock.Margin = New Thickness(37, 12, 0, 0)
+    End Sub
+
     'UI 建立
     Public Sub New()
         MainChrome = New MyDropShadow With {
@@ -84,6 +139,7 @@ Public Class MyCard
             MainTextBlock.SetBinding(TextBlock.TextProperty, New Binding("Title") With {.Source = Me, .Mode = BindingMode.OneWay})
             MainGrid.Children.Add(MainTextBlock)
         End If
+        UpdateIcon()
         If CanSwap OrElse SwapControl IsNot Nothing Then
             If SwapControl Is Nothing AndAlso Children.Count > 3 Then SwapControl = Children(3)
             MainSwap = New Shapes.Path With {.HorizontalAlignment = HorizontalAlignment.Right, .Stretch = Stretch.Uniform, .Height = 6, .Width = 10, .VerticalAlignment = VerticalAlignment.Top, .Margin = New Thickness(0, 17, 16, 0), .Data = New GeometryConverter().ConvertFromString("M2,4 l-2,2 10,10 10,-10 -2,-2 -8,8 -8,-8 z"), .RenderTransform = New RotateTransform(180), .RenderTransformOrigin = New Point(0.5, 0.5)}
@@ -143,6 +199,7 @@ Public Class MyCard
         If Not HasMouseAnimation Then Return
         Dim AniList As New List(Of AniData)
         If Not IsNothing(MainTextBlock) Then AniList.Add(AaColor(MainTextBlock, TextBlock.ForegroundProperty, "ColorBrush2", 90))
+        If Not IsNothing(_MainIcon) Then AniList.Add(AaColor(_MainIcon, Shapes.Path.FillProperty, "ColorBrush2", 90))
         If Not IsNothing(MainSwap) Then AniList.Add(AaColor(MainSwap, Shapes.Path.FillProperty, "ColorBrush2", 90))
         AniList.AddRange({
             AaColor(MainChrome, MyDropShadow.ColorProperty, "ColorObject4", 90),
@@ -154,6 +211,7 @@ Public Class MyCard
         If Not HasMouseAnimation Then Return
         Dim AniList As New List(Of AniData)
         If Not IsNothing(MainTextBlock) Then AniList.Add(AaColor(MainTextBlock, TextBlock.ForegroundProperty, "ColorBrush1", 90))
+        If Not IsNothing(_MainIcon) Then AniList.Add(AaColor(_MainIcon, Shapes.Path.FillProperty, "ColorBrush1", 90))
         If Not IsNothing(MainSwap) Then AniList.Add(AaColor(MainSwap, Shapes.Path.FillProperty, "ColorBrush1", 90))
         AniList.AddRange({
             AaColor(MainChrome, MyDropShadow.ColorProperty, "ColorObjectShadow", 90),

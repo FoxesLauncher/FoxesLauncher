@@ -18,7 +18,7 @@ Public Class Settings
         New Setting("HintExportConfig", False, Source:=Sources.Registry),
         New Setting("SystemEulaVersion", 0, Source:=Sources.Registry),
         New Setting("SystemRegion", ModRegion.RegionAsiaMainlandChina, OnChanged:=Sub() ModRegion.NotifyRegionLanguageChanged()),
-        New Setting("SystemLanguage", ModRegion.LanguageSimplifiedChineseMainland, OnChanged:=Sub() ModRegion.NotifyRegionLanguageChanged()),
+        New Setting("SystemLanguage", ModRegion.LanguageSimplifiedChineseMainland, OnChanged:=Sub(Value) ModRegion.OnLanguageSettingChanged(CStr(Value))),
         New Setting("SystemCount", 0, Source:=Sources.Registry, Encrypted:=True),
         New Setting("SystemLaunchCount", 0, Source:=Sources.Registry, Encrypted:=True),
         New Setting("SystemLastVersionReg", 0, Source:=Sources.Registry, Encrypted:=True),

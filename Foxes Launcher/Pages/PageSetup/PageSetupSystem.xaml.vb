@@ -16,14 +16,57 @@ Public Class PageSetupSystem
         Reload()
         SliderLoad()
         AniControlEnabled -= 1
+        '切换语言后就地更新区域名称（区域名称是翻译文本，且下拉框选项不会自动刷新）
+        AddHandler ModLanguage.LanguageChanged, AddressOf OnLanguageChanged
 
+    End Sub
+    ''' <summary>
+    ''' 界面语言切换后，更新下拉框中随语言变化的区域名称，不改变当前选择。
+    ''' </summary>
+    Private Sub OnLanguageChanged(Language As String)
+        Try
+            Dim SelectedCode As String = GetSelectedRegionCode()
+            '重建期间不触发设置保存，避免与正在进行的语言切换相互干扰
+            AniControlEnabled += 1
+            Try
+                RebuildRegionItems(SelectedCode)
+            Finally
+                AniControlEnabled -= 1
+            End Try
+        Catch ex As Exception
+            Logger.Warn(ex, "刷新区域与语言下拉框文本失败")
+        End Try
+    End Sub
+    ''' <summary>
+    ''' 获取当前选择的区域代码，若没有选择则返回空字符串。
+    ''' </summary>
+    Private Function GetSelectedRegionCode() As String
+        Dim Item = TryCast(ComboRegion.SelectedItem, MyComboBoxItem)
+        If Item IsNot Nothing AndAlso Item.Tag IsNot Nothing Then Return Item.Tag.ToString()
+        Return ""
+    End Function
+    ''' <summary>
+    ''' 重建区域下拉框选项，并尽量保持原来的选择。区域名称是翻译文本，切换语言后需要重建。
+    ''' </summary>
+    Private Sub RebuildRegionItems(Optional SelectedCode As String = Nothing)
+        If String.IsNullOrEmpty(SelectedCode) Then SelectedCode = GetSelectedRegionCode()
+        If String.IsNullOrEmpty(SelectedCode) Then SelectedCode = CurrentRegion
+        ComboRegion.Items.Clear()
+        Dim Entries = RegionEntries
+        For Each Entry In Entries
+            Dim Item As New MyComboBoxItem With {.Content = Entry.Name, .Tag = Entry.Code}
+            SettingService.SetValue(Item, Entry.Code)
+            ComboRegion.Items.Add(Item)
+        Next
+        ComboRegion.SelectedIndex = Math.Max(0, Entries.FindIndex(Function(e) e.Code = SelectedCode))
     End Sub
     ''' <summary>
     ''' 初始化区域与语言下拉框的选项。
     ''' </summary>
     Private Sub InitRegionLanguageCombos()
         If ComboRegion.Items.Count = 0 Then
-            For Each Entry In RegionEntries
+            Dim Entries = RegionEntries
+            For Each Entry In Entries
                 Dim Item As New MyComboBoxItem With {.Content = Entry.Name, .Tag = Entry.Code}
                 SettingService.SetValue(Item, Entry.Code)
                 ComboRegion.Items.Add(Item)

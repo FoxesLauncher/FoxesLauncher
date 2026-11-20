@@ -144,6 +144,43 @@ Public Module ModRegion
     ''' </summary>
     Public Sub NotifyRegionLanguageChanged()
         If IsApplyingInitialRegionLanguage Then Return
+        ShowRestartPrompt()
+    End Sub
+
+    ''' <summary>
+    ''' 语言设置变更时调用。首次启动写入设置时跳过，避免重复加载语言。
+    ''' </summary>
+    Public Sub OnLanguageSettingChanged(Language As String)
+        If IsApplyingInitialRegionLanguage Then Return
+        ApplyLanguageSetting(Language)
+    End Sub
+
+    ''' <summary>
+    ''' 立即应用新的语言设置，使界面文本（包括随后的重启提醒）使用新语言。
+    ''' 若在后台线程调用，会切换到 UI 线程后再更新语言资源。
+    ''' </summary>
+    Public Sub ApplyLanguageSetting(Language As String)
+        Try
+            If Application.Current IsNot Nothing AndAlso Not Application.Current.Dispatcher.CheckAccess() Then
+                RunInUiWait(Sub() ModLanguage.LoadLanguage(Language))
+            Else
+                ModLanguage.LoadLanguage(Language)
+            End If
+        Catch ex As Exception
+            Logger.Error(ex, "应用界面语言失败", LogBehavior.Toast)
+        End Try
+        NotifyRegionLanguageChanged()
+    End Sub
+
+    ''' <summary>
+    ''' 提示需要重启启动器才能完全应用区域与语言设置。
+    ''' 提示文本使用当前已经应用的语言；若在后台线程调用，会切换到 UI 线程显示。
+    ''' </summary>
+    Private Sub ShowRestartPrompt()
+        If Application.Current IsNot Nothing AndAlso Not Application.Current.Dispatcher.CheckAccess() Then
+            RunInUiWait(AddressOf ShowRestartPrompt)
+            Return
+        End If
         If MyMsgBox(T("区域或语言设置已更改，请重启启动器。"), T("提示"), T("稍后"), T("重启启动器")) = 2 Then
             Try
                 StartProcess(New ProcessStartInfo(PathExe, "--wait"))
@@ -163,9 +200,11 @@ Public Module ModRegion
     ''' <summary>
     ''' 在首次启动时询问区域与语言。
     ''' 仅在 Setup.ini 中没有有效的区域与语言设置时显示。
+    ''' 若选择的语言与启动时使用的语言不同，会立即应用并提示重启启动器。
     ''' </summary>
     Public Sub PromptRegionLanguageIfNeeded()
         If HasRegionLanguageSetting() Then Return
+        Dim StartupLanguage As String = ModLanguage.CurrentLanguage
         Dim Result As RegionLanguageSelection = MyMsgBoxRegionLanguage()
         If Result Is Nothing Then
             Result = New RegionLanguageSelection With {.Region = CurrentRegion, .Language = CurrentLanguage}
@@ -181,6 +220,15 @@ Public Module ModRegion
             IsApplyingInitialRegionLanguage = False
         End Try
         Logger.Info($"已保存区域与语言设置：{Result.Region} / {Result.Language}")
+        If Result.Language <> StartupLanguage Then
+            '弹窗中可能已经预览过新语言，这里再确保一次，让重启提醒使用新语言
+            Try
+                RunInUiWait(Sub() ModLanguage.LoadLanguage(Result.Language))
+            Catch ex As Exception
+                Logger.Error(ex, "应用首次启动选择的语言失败", LogBehavior.Toast)
+            End Try
+            ShowRestartPrompt()
+        End If
     End Sub
 
 End Module
