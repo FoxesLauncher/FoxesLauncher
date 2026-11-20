@@ -6,27 +6,7 @@
     PanScroll="PanBack" RenderOptions.BitmapScalingMode="LowQuality">
     <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" x:Name="PanBack">
         <StackPanel x:Name="PanMain" Margin="25,10" Grid.IsSharedSizeScope="True">
-            <local:MyCard Margin="0,15" Title="{DynamicResource 关于 狐狐启动器}">
-                <Grid Margin="21,40,21,16">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="45" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="40" />
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="150" />
-                    </Grid.ColumnDefinitions>
-                    <local:MyListItem IsHitTestVisible="False" Title="{DynamicResource 皓辰不是猫}" Margin="-5,0,15,0" Info="{DynamicResource Foxes Launcher 的维护者}" Grid.Row="0" Grid.Column="1" />
-                    <Image Source="/Foxes Launcher;component/Images/Heads/Himic.png" Grid.Row="0" Margin="3">
-                        <Image.Clip>
-                            <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
-                        </Image.Clip>
-                    </Image>
-                    <local:MyButton Text="{DynamicResource GitHub 主页}" Grid.Column="2" Grid.Row="0" Height="35"
-                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/OutHimic" />
-                </Grid>
-            </local:MyCard>
-            <local:MyCard Margin="0,15" Title="{DynamicResource 关于 PCL2}">
+            <local:MyCard Margin="0,15" Title="{DynamicResource 关于}">
                 <Grid Margin="21,40,21,16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="45" />
@@ -39,25 +19,56 @@
                         <ColumnDefinition Width="150" />
                     </Grid.ColumnDefinitions>
                     <local:MyListItem IsHitTestVisible="False" Title="{DynamicResource 龙腾猫跃}" Margin="-5,0,15,0" Info="{DynamicResource Plain Craft Launcher 2 的开发者！}" Grid.Row="0" Grid.Column="1" />
-                    <local:MyListItem IsHitTestVisible="False" Title="HerobrineXia" Margin="-5,0,15,0" Info="{DynamicResource Plain Craft Launcher 2 的协力开发者！}" Grid.Row="1" Grid.Column="1" />
-                    <local:MyListItem IsHitTestVisible="False" Title="Plain Craft Launcher 2" Margin="-5,0,15,0" Info="{DynamicResource 当前版本：2.99.0.1}" Grid.Row="2" Grid.Column="1" x:Name="ItemAboutFxl" />
+                    <local:MyListItem IsHitTestVisible="False" Title="{DynamicResource 皓辰不是猫}" Margin="-5,0,15,0" Info="{DynamicResource Foxes Launcher 的维护者}" Grid.Row="1" Grid.Column="1" />
+                    <local:MyListItem IsHitTestVisible="False" Title="Foxes Launcher" Margin="-5,0,15,0" Info="{DynamicResource 当前版本：%VERSION%}" Grid.Row="2" Grid.Column="1" x:Name="ItemAboutFxl" />
                     <Image Source="/Foxes Launcher;component/Images/Heads/LTCat.jpg" Grid.Row="0" Margin="3">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
                     </Image>
-                    <Image Source="/Foxes Launcher;component/Images/Heads/HerobrineXia.png" Grid.Row="1" Margin="3">
+                    <Image Source="/Foxes Launcher;component/Images/Heads/Himic.png" Grid.Row="1" Margin="3">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
                     </Image>
-                    <Image Source="/Foxes Launcher;component/Images/Heads/Logo.png" Grid.Row="2" Margin="3">
+                    <Image Source="/Foxes Launcher;component/Images/Heads/Foxes.png" Grid.Row="2" Margin="3">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
                     </Image>
                     <local:MyButton Text="{DynamicResource 赞助 PCL !}" Grid.Column="2" Grid.Row="0" Height="35" ColorType="Highlight"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://meloong.com/afd/a/LTCat" />
+                    <local:MyButton Text="{DynamicResource GitHub 主页}" Grid.Column="2" Grid.Row="1" Height="35"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/OutHimic" />
+                    <local:MyButton Text="{DynamicResource 开源代码}" Grid.Column="2" Grid.Row="2" Height="35"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/FoxesLauncher/FoxesLauncher" />
+                </Grid>
+            </local:MyCard>
+            <local:MyCard Margin="0,15" Title="{DynamicResource 关于 PCL2}">
+                <Grid Margin="21,40,21,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="45" />
+                        <RowDefinition Height="45" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="150" />
+                    </Grid.ColumnDefinitions>
+                    <local:MyListItem IsHitTestVisible="False" Title="HerobrineXia" Margin="-5,0,15,0" Info="{DynamicResource Plain Craft Launcher 2 的协力开发者！}" Grid.Row="0" Grid.Column="1" />
+                    <local:MyListItem IsHitTestVisible="False" Title="Plain Craft Launcher 2" Margin="-5,0,15,0" Grid.Row="1" Grid.Column="1" x:Name="ItemAboutPcl" />
+                    <Image Source="/Foxes Launcher;component/Images/Heads/HerobrineXia.png" Grid.Row="0" Margin="3">
+                        <Image.Clip>
+                            <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
+                        </Image.Clip>
+                    </Image>
+                    <Image Source="/Foxes Launcher;component/Images/Heads/Logo.png" Grid.Row="1" Margin="3">
+                        <Image.Clip>
+                            <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
+                        </Image.Clip>
+                    </Image>
+                    <local:MyButton Text="{DynamicResource 上游源代码}" Grid.Column="2" Grid.Row="1" Height="35"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/Meloong-Git/PCL" />
                 </Grid>
             </local:MyCard>
             <local:MyCard Margin="0,0,0,15" Title="{DynamicResource 特别鸣谢}">
@@ -149,18 +160,21 @@
             <local:MyCard Margin="0,0,0,15" Title="{DynamicResource 法律信息}" IsSwapped="True" CanSwap="True">
                 <StackPanel Margin="25,39,23,20">
                     <TextBlock Text="{DynamicResource 匿名数据收集}" TextWrapping="Wrap" Margin="0,6,0,4" FontWeight="Bold" />
-                    <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{local:I18n '当下载失败、PCL 出错、游戏崩溃等事件时，PCL 会匿名上报信息，以通知龙猫 “哦吼，出错了”，让龙猫能更好地修 Bug……（PCL 不会上传或收集任何个人信息，包括上报的东西里面也没有！）&#10;你可以在 设置 → 其他 → 启动器 中关闭上报，不过龙猫就不知道你遇到了什么 Bug 了……&#10;详情：https://github.com/Meloong-Git/PCL/discussions/7036'}" TextWrapping="Wrap" />
-                    <TextBlock Text="{DynamicResource 隐私声明与个人信息保护政策}" TextWrapping="Wrap" Margin="0,10,0,4" FontWeight="Bold" />
-                    <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{local:I18n 'PCL 没有收集个人信息，所以这里其实啥都不用写……&#10;留个这个其实只是为了让你知道 PCL 没有收集个人信息，诶嘿。'}" TextWrapping="Wrap" />
+                    <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{local:I18n '当下载失败、FXL 出错、游戏崩溃等事件发生时，FXL 会上报事件类型、启动器与 Minecraft 版本、登录方式，以及经过打码处理的异常信息、下载地址与文件名，用于统计使用情况与排查问题。&#10;上报内容会对 Windows 用户名与登录访问令牌打码，不包含密码、令牌或可直接识别个人身份的信息。&#10;你可以在 设置 → 其他 → 启动器 中随时关闭“匿名数据收集”，关闭后 FXL 不会再发送任何遥测数据。&#10;此外，FXL 的 HTTP 请求 User-Agent 中包含启动器版本号，用于统计各版本的使用情况。'}" TextWrapping="Wrap" />
+                    <TextBlock Text="{DynamicResource 隐私说明}" TextWrapping="Wrap" Margin="0,10,0,4" FontWeight="Bold" />
+                    <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{local:I18n 'FXL 不会收集姓名、邮箱、账号密码等个人信息，也不会读取与启动 Minecraft 无关的个人文件。&#10;遥测数据仅用于统计与故障排查，可随时在设置中关闭。&#10;联机功能需要连接 EasyTier 网络与 FXL 联机服务，相关数据处理适用各自的服务条款与隐私政策；使用 Microsoft 账户登录时，账户信息由 Microsoft 处理。'}" TextWrapping="Wrap" />
                     <TextBlock Text="{DynamicResource 其他信息}" TextWrapping="Wrap" Margin="0,10,0,4" FontWeight="Bold" />
-                    <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{local:I18n 'FoxesLauncher：Copyright © 2024-2026 EndlessMC Organization（新增部分以 MIT 许可证发布）&#10;上游 PCL2：Copyright © 成都瓜皮龙科技有限公司&#10;计算机软件著作权登记号：2020SR0875133&#10;违法违规行为举报投诉邮箱：admin@meloong.com&#10;非 MINECRAFT 官方产品。未经 MOJANG 或 MICROSOFT 批准，也不与 MOJANG 或 MICROSOFT 关联。'}" TextWrapping="Wrap" />
-                    <StackPanel Orientation="Horizontal" Height="35" HorizontalAlignment="Left" Margin="0,12,0,0">
-                        <local:MyButton Text="{DynamicResource 用户协议与免责声明}" Width="170" Padding="13,0" Margin="0,0,20,0" ColorType="Highlight"
+                    <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{local:I18n 'Foxes Launcher：Copyright © 2024-2026 EndlessMC Organization。本分支新增代码以 MIT 许可证发布，FoxesCore 以 Apache License 2.0 发布。&#10;上游 Plain Craft Launcher 2：Copyright © 龙腾猫跃（LTCat）2016. All Rights Reserved.；Copyright © 成都瓜皮龙科技有限公司。&#10;计算机软件著作权登记号：2020SR0875133&#10;违法违规行为举报投诉邮箱：admin@meloong.com&#10;Foxes Launcher 是第三方基于 Plain Craft Launcher 2 独立进行的二次创作，与 PCL 官方、龙腾猫跃及成都瓜皮龙科技有限公司均无隶属关系。Plain Craft Launcher、PCL 的名称与图标归其权利人所有，本项目仅在说明来源时使用。&#10;使用、修改或分发本软件，必须同时遵守《PCL 分发有限许可》与《PCL 存储库合理使用指南》。&#10;非 MINECRAFT 官方产品。未经 MOJANG 或 MICROSOFT 批准，也不与 MOJANG 或 MICROSOFT 关联。'}" TextWrapping="Wrap" />
+                    <WrapPanel Margin="0,12,0,0" HorizontalAlignment="Left">
+                        <local:MyButton Text="{DynamicResource 用户协议与免责声明}" MinWidth="170" Padding="13,0" Margin="0,0,20,8" ColorType="Highlight"
                                         local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://shimo.im/docs/rGrd8pY8xWkt6ryW#anchor-RnU9" />
-                        <local:MyButton Text="{DynamicResource PCL 分发有限许可}" Width="170" Padding="13,0" Margin="0,0,20,0"
+                        <local:MyButton Text="{DynamicResource PCL 分发有限许可}" MinWidth="170" Padding="13,0" Margin="0,0,20,8"
                                         local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://shimo.im/docs/rGrd8pY8xWkt6ryW#anchor-X0bo" />
-                        <local:MyButton Text="{DynamicResource 开源代码}" Width="140" Padding="13,0" local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/FoxesLauncher/FoxesLauncher" />
-                    </StackPanel>
+                        <local:MyButton Text="{DynamicResource MIT 许可证}" MinWidth="140" Padding="13,0" Margin="0,0,20,8"
+                                        local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/FoxesLauncher/FoxesLauncher/blob/main/LICENSE" />
+                        <local:MyButton Text="{DynamicResource 开源代码}" MinWidth="140" Padding="13,0" Margin="0,0,0,8"
+                                        local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/FoxesLauncher/FoxesLauncher" />
+                    </WrapPanel>
                 </StackPanel>
             </local:MyCard>
             <local:MyCard Margin="0,0,0,15" Title="{DynamicResource 许可与版权声明}" IsSwapped="True" CanSwap="True">
@@ -194,6 +208,12 @@
                         <RowDefinition Height="60" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Java Launch Wrapper" TextWrapping="Wrap" FontWeight="Bold" />
@@ -201,14 +221,14 @@
                     <local:MyButton Grid.Row="1" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/00ll00/java_launch_wrapper" />
                     <local:MyButton Grid.Row="1" Grid.Column="3" MinWidth="140" Text="{DynamicResource 查看许可文档}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
-                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/00ll00/java_launch_wrapper?tab=MIT-1-ov-file#readme" />
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/00ll00/java_launch_wrapper/blob/master/LICENCE" />
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="LWJGL Unsafe Agent" TextWrapping="Wrap" FontWeight="Bold" />
                     <TextBlock Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2026 Glavo&#xa;Licensed under the Apache License, Version 2.0." TextWrapping="Wrap" />
                     <local:MyButton Grid.Row="3" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/HMCL-dev/lwjgl-unsafe-agent" />
                     <local:MyButton Grid.Row="3" Grid.Column="3" MinWidth="140" Text="{DynamicResource 查看许可文档}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
-                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://www.apache.org/licenses/LICENSE-2.0" />
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/HMCL-dev/lwjgl-unsafe-agent/blob/main/LICENSE" />
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Newtonsoft.Json" TextWrapping="Wrap" FontWeight="Bold" />
                     <TextBlock Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2007 James Newton-King&#xa;Licensed under the MIT License." TextWrapping="Wrap" />
@@ -218,14 +238,14 @@
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://opensource.org/licenses/MIT" />
 
                     <TextBlock Grid.Row="6" Grid.Column="0" Text="NAudio" TextWrapping="Wrap" FontWeight="Bold" />
-                    <TextBlock Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2015 Mark Heath (mark.heath@gmail.com)&#xa;Licensed under the Microsoft Public License (Ms-PL)." TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2001-2014 Mark Heath&#xa;Licensed under the Microsoft Public License (Ms-PL)." TextWrapping="Wrap" />
                     <local:MyButton Grid.Row="7" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/naudio/NAudio" />
                     <local:MyButton Grid.Row="7" Grid.Column="3" MinWidth="140" Text="{DynamicResource 查看许可文档}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/naudio/NAudio/blob/f98664ba3d5966a736dd5cf45329e542be5fece8/license.txt" />
 
                     <TextBlock Grid.Row="8" Grid.Column="0" Text="Ookii.Dialogs" TextWrapping="Wrap" FontWeight="Bold" />
-                    <TextBlock Grid.Row="8" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2009 Sven Groot (Ookii.org)&#xa;Licensed under the BSD 3-Clause License." TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="8" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2009-2021 Ookii Dialogs Contributors&#xa;Licensed under the BSD 3-Clause License." TextWrapping="Wrap" />
                     <local:MyButton Grid.Row="9" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://www.ookii.org/Software/Dialogs/" />
                     <local:MyButton Grid.Row="9" Grid.Column="3" MinWidth="140" Text="{DynamicResource 查看许可文档}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
@@ -250,13 +270,6 @@
                     <local:MyButton Grid.Row="15" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://www.iconfont.cn/" />
 
-                    <!--<TextBlock Grid.Row="16" Grid.Column="0" Text="EasyTier" TextWrapping="Wrap" FontWeight="Bold" />
-                    <TextBlock Grid.Row="16" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2024-present Easytier Programme within The Commons Conservancy&#xa;Licensed under the GNU Lesser General Public License." TextWrapping="Wrap" />
-                    <local:MyButton Grid.Row="17" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
-                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://easytier.cn/" />
-                    <local:MyButton Grid.Row="17" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
-                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/EasyTier/EasyTier/blob/main/LICENSE" />-->
-
                     <TextBlock Grid.Row="16" Grid.Column="0" Text="ThrottleDebounce" TextWrapping="Wrap" FontWeight="Bold" />
                     <TextBlock Grid.Row="16" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2026 Ben Hutchison&#xa;Licensed under the Apache License, Version 2.0." TextWrapping="Wrap" />
                     <local:MyButton Grid.Row="17" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
@@ -265,7 +278,7 @@
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://licenses.nuget.org/Apache-2.0" />
 
                     <TextBlock Grid.Row="18" Grid.Column="0" Text="CacheCow" TextWrapping="Wrap" FontWeight="Bold" />
-                    <TextBlock Grid.Row="18" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © Ali Kheyrollahi&#xa;Licensed under the MIT License." TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="18" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2013 Ali Kheyrollahi&#xa;Licensed under the MIT License." TextWrapping="Wrap" />
                     <local:MyButton Grid.Row="19" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/aliostad/CacheCow" />
                     <local:MyButton Grid.Row="19" Grid.Column="3" MinWidth="140" Text="{DynamicResource 查看许可文档}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
@@ -277,6 +290,27 @@
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/HMCL-dev/HMCL/tree/main/minecraft/libraries/HMCLTransformerDiscoveryService" />
                     <local:MyButton Grid.Row="21" Grid.Column="3" MinWidth="140" Text="{DynamicResource 查看许可文档}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/HMCL-dev/HMCL/blob/main/LICENSE" />
+
+                    <TextBlock Grid.Row="22" Grid.Column="0" Text="EasyTier" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="22" Grid.Column="2" Grid.ColumnSpan="2" Text="{local:I18n 'Copyright © 2024-present EasyTier Programme within The Commons Conservancy&#10;Licensed under the GNU Lesser General Public License, Version 3.0.&#10;本组件以独立可执行文件形式提供，可依 LGPL 替换或重新链接；对应源代码见来源网站。'}" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="23" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/EasyTier/EasyTier" />
+                    <local:MyButton Grid.Row="23" Grid.Column="3" MinWidth="140" Text="{DynamicResource 查看许可文档}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/EasyTier/EasyTier/blob/main/LICENSE" />
+
+                    <TextBlock Grid.Row="24" Grid.Column="0" Text="Microsoft ASP.NET Web API Client" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="24" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © Microsoft Corporation. All rights reserved.&#xa;Licensed under the Microsoft .NET Library License." TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="25" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://www.nuget.org/packages/Microsoft.AspNet.WebApi.Client" />
+                    <local:MyButton Grid.Row="25" Grid.Column="3" MinWidth="140" Text="{DynamicResource 查看许可文档}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://www.nuget.org/packages/Microsoft.AspNet.WebApi.Client/5.2.7/license" />
+
+                    <TextBlock Grid.Row="26" Grid.Column="0" Text="libwebp" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="26" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2010 Google Inc. All rights reserved.&#xa;Licensed under the BSD 3-Clause License." TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="27" Grid.Column="2" MinWidth="140" Text="{DynamicResource 查看来源网站}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://chromium.googlesource.com/webm/libwebp" />
+                    <local:MyButton Grid.Row="27" Grid.Column="3" MinWidth="140" Text="{DynamicResource 查看许可文档}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://chromium.googlesource.com/webm/libwebp/+/refs/heads/main/COPYING" />
                 </Grid>
             </local:MyCard>
         </StackPanel>

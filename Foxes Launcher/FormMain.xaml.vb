@@ -418,7 +418,7 @@ Public Class FormMain
             If Settings.Get(Of Integer)("SystemEulaVersion") < EulaVersion Then
                 Select Case MyMsgBox(
                     If(Settings.Get(Of Integer)("SystemEulaVersion") = 0,
-                        T("在使用 FXL 前，请先阅读用户协议与免责声明。"),
+                        T("再继续使用FxL前，您需要继续阅读并同意 PCL 用户许可协议和 Minecraft EULA。"),
                         T("FXL 的用户协议与免责声明已更新。{0}请阅读更新后的用户协议与免责声明。", vbCrLf)),
                         T("协议授权"), T("同意"), T("拒绝"), T("查看用户协议与免责声明"),
                         Button3Action:=Sub() OpenWebsite("https://shimo.im/docs/rGrd8pY8xWkt6ryW"))

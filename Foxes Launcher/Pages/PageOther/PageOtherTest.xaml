@@ -33,7 +33,7 @@
                         <RowDefinition Height="Auto" MinHeight="28" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBlock Margin="0,0,0,11" Text="{DynamicResource 使用 FXL 的高速多线程下载引擎下载任意文件。请注意，部分网站（例如百度网盘）可能会报错 (403) 已禁止，无法正常下载。}"
+                    <TextBlock Margin="0,0,0,11" Text="{DynamicResource 使用 PCL 的高速多线程下载引擎下载任意文件。请注意，部分网站（例如百度网盘）可能会报错 (403) 已禁止，无法正常下载。}"
                                TextWrapping="Wrap" Grid.ColumnSpan="3" />
                     <TextBlock Grid.Row="1" VerticalAlignment="Top" Margin="0,6,25,0" HorizontalAlignment="Left" Text="{DynamicResource 下载地址}" />
                     <local:MyTextBox x:Name="TextDownloadUrl" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1">

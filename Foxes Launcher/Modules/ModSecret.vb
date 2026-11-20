@@ -134,6 +134,11 @@ Friend Module ModSecret
             SetResource("ColorBrushGray6", If(IsDark, New MyColor(48, 51, 58), New MyColor(235, 235, 235)))
             SetResource("ColorBrushGray7", If(IsDark, New MyColor(40, 43, 50), New MyColor(240, 240, 240)))
             SetResource("ColorBrushGray8", If(IsDark, New MyColor(35, 37, 43), New MyColor(245, 245, 245)))
+            '同步现代化 Tooltip 的配色
+            FoxesCore.Wpf.ModernTooltipService.ApplyTheme(
+                TryCast(Application.Current.Resources("ColorBrushDialog"), Brush),
+                TryCast(Application.Current.Resources("ColorBrushGray5"), Brush),
+                TryCast(Application.Current.Resources("ColorBrush1"), Brush))
             Application.Current.Resources("ColorObject1") = CType(Color1, Color)
             Application.Current.Resources("ColorObject2") = CType(Color2, Color)
             Application.Current.Resources("ColorObject3") = CType(Color3, Color)

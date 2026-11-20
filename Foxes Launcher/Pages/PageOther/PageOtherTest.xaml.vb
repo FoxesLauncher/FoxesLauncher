@@ -14,7 +14,8 @@ Public Class PageOtherTest
         TextDownloadFolder.Text = Settings.Get(Of String)("CacheDownloadFolder")
         TextDownloadFolder.Validate()
         If Not TextDownloadFolder.IsValidated OrElse TextDownloadFolder.Text = "" Then
-            TextDownloadFolder.Text = Paths.Base & "FXL\MyDownload\"
+            ' 默认保存到用户的下载文件夹（下载文件夹没有 SpecialFolder 枚举）
+            TextDownloadFolder.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) & "\Downloads\"
         End If
         TextDownloadFolder.Validate()
         RefreshDownloadNameRule()

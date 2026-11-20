@@ -2,7 +2,8 @@ param(
     [ValidateSet('Debug', 'Release', 'Snapshot')]
     [string]$Configuration = 'Release',
     [string]$Platform = 'Any CPU',
-    [switch]$NoRestore
+    [switch]$NoRestore,
+    [switch]$Rebuild
 )
 
 $ErrorActionPreference = 'Stop'
@@ -26,6 +27,7 @@ function Find-MSBuild {
 Write-Host "==> Root:          $root"
 Write-Host "==> Configuration: $Configuration"
 Write-Host "==> Platform:      $Platform"
+if ($Rebuild) { Write-Host '==> Rebuild:       True (clean + full build)' }
 
 # Initialize the FoxesCore submodule when the checkout is empty.
 $coreProject = Join-Path $root 'FoxesCore\Shared\FoxesCore.csproj'
@@ -46,6 +48,7 @@ $msbuildArgs = @(
     '/nologo'
     '/v:m'
 )
+if ($Rebuild) { $msbuildArgs += '/t:Rebuild' }
 if ($NoRestore) { $msbuildArgs += '/p:RestorePackages=false' } else { $msbuildArgs = @('/restore') + $msbuildArgs }
 
 Write-Host '==> Building...'

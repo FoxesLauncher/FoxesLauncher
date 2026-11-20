@@ -11,6 +11,7 @@ Public Class PageOtherAbout
         IsLoaded = True
 
         ItemAboutFxl.Info = ItemAboutFxl.Info.Replace("%VERSION%", VersionDisplay).Replace("%VERSIONCODE%", VersionCode).Replace("%BRANCH%", CInt(BuildType))
+        ItemAboutPcl.Info = T("上游版本：") & "2.99.0.1"
 
     End Sub
 
