@@ -413,3 +413,6 @@ desktop.ini
 !.env.example
 .env.local
 Foxes Launcher/Modules/GeneratedSecrets.vb
+
+# i18n 翻译脚本的本地断点缓存
+build/.i18n-cache/

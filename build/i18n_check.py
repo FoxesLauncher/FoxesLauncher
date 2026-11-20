@@ -8,6 +8,9 @@ Checks performed:
   4. Keys do not contain the old ``.{8 hex}`` source-hash suffix.
   5. No empty values in the base language pack.
   6. No hard-coded Chinese in XAML display properties (allow-list below).
+  7. Every extra language pack only contains known keys, has no empty
+     values, keeps the source placeholders and newlines, and reaches the
+     required coverage; every pack is registered in manifest.json.
 
 Exit code 1 on any problem, so it can be used in CI.
 """
@@ -296,6 +299,69 @@ def find_potential_fragments(root: Path) -> list[str]:
     return rows
 
 
+def load_language_packs(root: Path, base: dict[str, str], max_missing: int = 0) -> tuple[list[str], list[str]]:
+    """Validate every non-base language pack against the base pack."""
+    lang_dir = root / "Resources" / "Languages"
+    reports: list[str] = []
+    problems: list[str] = []
+    packs: dict[str, dict] = {}
+    for path in sorted(lang_dir.glob("*.json")):
+        if path.name in {"zh_cn.json", "manifest.json"}:
+            continue
+        try:
+            data = json.loads(read_text(path))
+        except Exception as ex:  # noqa: BLE001
+            problems.append(f"unreadable language pack {path.name}: {ex}")
+            continue
+        if not isinstance(data, dict):
+            problems.append(f"language pack {path.name} is not a JSON object")
+            continue
+        packs[path.stem.lower()] = data
+        missing = [key for key in base if key not in data]
+        unknown = [key for key in data if key not in base]
+        coverage = (len(base) - len(missing)) / len(base) if base else 1.0
+        reports.append(f"{path.stem}: {len(base) - len(missing)}/{len(base)} keys ({coverage:.1%})")
+        if len(missing) > max_missing:
+            problems.append(
+                f"{path.name} is missing {len(missing)} key(s) (limit {max_missing}); "
+                f"first: {missing[0]!r}"
+            )
+        for key in unknown[:20]:
+            problems.append(f"unknown key in {path.name}: {key!r}")
+        if len(unknown) > 20:
+            problems.append(f"... and {len(unknown) - 20} more unknown key(s) in {path.name}")
+        for key, value in data.items():
+            if not isinstance(value, str) or not value.strip():
+                problems.append(f"empty value in {path.name}: {key!r}")
+                continue
+            if key not in base:
+                continue
+            expected = sorted(re.findall(r"\{(\d+)(?:[,:][^{}]*)?\}", base[key]))
+            actual = sorted(re.findall(r"\{(\d+)(?:[,:][^{}]*)?\}", value))
+            if expected != actual:
+                problems.append(
+                    f"placeholder mismatch in {path.name}: {key!r} has {actual}, expected {expected}"
+                )
+            if base[key].count("\n") != value.count("\n"):
+                problems.append(f"newline mismatch in {path.name}: {key!r}")
+
+    manifest_path = lang_dir / "manifest.json"
+    try:
+        manifest = json.loads(read_text(manifest_path))
+        registered = {str(item.get("code", "")).lower() for item in manifest.get("languages", [])}
+    except Exception as ex:  # noqa: BLE001
+        problems.append(f"unreadable manifest.json: {ex}")
+        registered = set()
+    for code in packs:
+        if code not in registered:
+            problems.append(f"language pack {code} is not registered in manifest.json")
+    for code in sorted(registered):
+        if code and code != "zh_cn" and code not in packs:
+            problems.append(f"manifest.json registers {code!r} but {code}.json is missing")
+
+    return reports, problems
+
+
 def validate(root: Path) -> tuple[list[str], dict[str, list[tuple[int, str]]], dict[str, str]]:
     lang_path = root / "Resources" / "Languages" / "zh_cn.json"
     raw_language = json.loads(read_text(lang_path))
@@ -346,6 +412,12 @@ def self_test() -> int:
         lang_dir = root / "Resources" / "Languages"
         lang_dir.mkdir(parents=True)
         (lang_dir / "zh_cn.json").write_text('{"确定": "确定", " 半句": " 半句"}', encoding="utf-8")
+        (lang_dir / "zh_tw.json").write_text('{"确定": "確定 {0}", "多余": "多餘"}', encoding="utf-8")
+        (lang_dir / "manifest.json").write_text(
+            '{"default": "zh_cn", "languages": [{"code": "zh_tw", "name": "繁體中文（中國臺灣）"}, '
+            '{"code": "en_us", "name": "English (US)"}]}',
+            encoding="utf-8",
+        )
         (root / "Bad.xaml").write_text(
             '<TextBlock xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" '
             'xmlns:local="clr-namespace:FXL" '
@@ -357,7 +429,7 @@ def self_test() -> int:
             'Module M\nSub X()\nHint(T("不存在的VB键"))\nEnd Sub\nEnd Module\n',
             encoding="utf-8",
         )
-        problems, used, _ = validate(root)
+        problems, used, language = validate(root)
         missing = {key for key in used if any(key in p and p.startswith("missing key:") for p in problems)}
         expected = {"不存在的XAML键", "不存在的I18n键", "不存在的VB键"}
         if not expected.issubset(missing):
@@ -368,7 +440,25 @@ def self_test() -> int:
         if not any(p.startswith("edge-whitespace key:") for p in problems):
             print("self-test failed: edge-whitespace fragment was not detected")
             return 1
-        print("self-test OK: XAML, I18n, VB missing keys and edge-whitespace fragments are detected")
+        reports, pack_problems = load_language_packs(root, language)
+        if not any("placeholder mismatch" in p for p in pack_problems):
+            print("self-test failed: pack placeholder mismatch was not detected")
+            print("reports:", reports)
+            print("pack problems:", pack_problems)
+            return 1
+        if not any("unknown key" in p for p in pack_problems):
+            print("self-test failed: pack unknown key was not detected")
+            return 1
+        if not any("missing 1 key" in p for p in pack_problems):
+            print("self-test failed: pack missing key was not detected")
+            return 1
+        if not any("en_us.json is missing" in p for p in pack_problems):
+            print("self-test failed: manifest entry without pack was not detected")
+            return 1
+        print(
+            "self-test OK: XAML, I18n, VB missing keys, edge-whitespace fragments "
+            "and language pack coverage/placeholders are detected"
+        )
         return 0
 
 
@@ -378,6 +468,7 @@ def main() -> int:
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--report-fragments", action="store_true")
     parser.add_argument("--max-fragments", type=int, default=None)
+    parser.add_argument("--max-missing", type=int, default=0, help="allowed missing keys per language pack")
     args = parser.parse_args()
 
     if args.self_test:
@@ -395,6 +486,13 @@ def main() -> int:
         return 0
 
     problems, used, language = validate(root)
+    reports, pack_problems = load_language_packs(root, language, args.max_missing)
+    problems.extend(pack_problems)
+
+    if reports:
+        print("Language packs:")
+        for report in reports:
+            print("  " + report)
 
     if problems:
         print(f"{len(problems)} problem(s):")

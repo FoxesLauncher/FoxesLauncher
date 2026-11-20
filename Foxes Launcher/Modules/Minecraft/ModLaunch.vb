@@ -1807,8 +1807,8 @@ NextInstance:
             '1.13+    ：zh_cn 时正常，zh_CN 时自动切换为英文
             Dim CurrentLang As String = ReadIni(SetupFileAddress, "lang", "none")
             Dim RequiredLang As String = If(CurrentLang = "none" OrElse Not DirectoryUtils.Exists(McInstanceSelected.PathIndie & "saves"), '#3844，整合包可能已经自带了 options.txt
-                If(Settings.Get(Of Boolean)("ToolHelpChinese"), ModLanguage.CurrentLanguage, "en_us"), CurrentLang.Lower)
-            If Not McInstanceSelected.Version.Valid OrElse McInstanceSelected.Version.Vanilla.Major <= 10 Then
+                If(Settings.Get(Of Boolean)("ToolHelpChinese"), GetMinecraftLanguageCode(), "en_us"), CurrentLang.Lower)
+            If NeedsUppercaseMinecraftLanguage() Then
                 '将最后两位改为大写，前面的部分保留
                 RequiredLang = RequiredLang.Substring(0, RequiredLang.Length - 2) & RequiredLang.Substring(RequiredLang.Length - 2).Upper
             End If
@@ -2174,5 +2174,57 @@ IgnoreCustomSkin:
     End Sub
 
 #End Region
+
+''' <summary>
+''' 获取 Minecraft 应使用的语言代码。
+''' 1.17（21w16a）起支持香港繁体，更早的版本回退到台湾繁体。
+''' </summary>
+Private Function GetMinecraftLanguageCode() As String
+    If ModLanguage.CurrentLanguage <> "zh_hk" Then Return ModLanguage.CurrentLanguage
+    Return If(IsMinecraftZhHkSupported(), "zh_hk", "zh_tw")
+End Function
+
+''' <summary>
+''' 判断当前实例的 Minecraft 是否支持香港繁体。
+''' 21w16a（1.17 快照）及之后的版本支持，更早的版本只能使用台湾繁体。
+''' </summary>
+Private Function IsMinecraftZhHkSupported() As Boolean
+    Dim Version = McInstanceSelected.Version
+    If Version Is Nothing Then Return False
+    If Version.Valid Then Return Version.Vanilla.Major >= 17
+    ' 快照的原版版本号无法可靠解析，按版本名判断是否在 21w16a 之后
+    Dim SnapshotYear As Integer, SnapshotWeek As Integer
+    If Version.IsSnapshot AndAlso TryParseMinecraftSnapshot(Version.VanillaName, SnapshotYear, SnapshotWeek) Then
+        Return SnapshotYear > 21 OrElse (SnapshotYear = 21 AndAlso SnapshotWeek >= 16)
+    End If
+    Return False
+End Function
+
+''' <summary>
+''' 判断 Minecraft 语言代码的最后两位是否需要大写。
+''' 1.10 及更早的正式版，以及 1.13（17w43a）之前的快照需要大写。
+''' </summary>
+Private Function NeedsUppercaseMinecraftLanguage() As Boolean
+    Dim Version = McInstanceSelected.Version
+    If Version Is Nothing Then Return True
+    If Version.Valid Then Return Version.Vanilla.Major <= 10
+    Dim SnapshotYear As Integer, SnapshotWeek As Integer
+    If Version.IsSnapshot AndAlso TryParseMinecraftSnapshot(Version.VanillaName, SnapshotYear, SnapshotWeek) Then
+        Return SnapshotYear < 17 OrElse (SnapshotYear = 17 AndAlso SnapshotWeek < 43)
+    End If
+    ' 无法判断时保持旧行为
+    Return True
+End Function
+
+''' <summary>
+''' 尝试从快照版本名中解析年份与周数，例如 21w16a。
+''' </summary>
+Private Function TryParseMinecraftSnapshot(Name As String, ByRef SnapshotYear As Integer, ByRef SnapshotWeek As Integer) As Boolean
+    SnapshotYear = 0
+    SnapshotWeek = 0
+    If String.IsNullOrEmpty(Name) OrElse Name.Length < 5 OrElse Name.Chars(2) <> "w"c Then Return False
+    Return Integer.TryParse(Name.Substring(0, 2), SnapshotYear) AndAlso
+           Integer.TryParse(Name.Substring(3, 2), SnapshotWeek)
+End Function
 
 End Module

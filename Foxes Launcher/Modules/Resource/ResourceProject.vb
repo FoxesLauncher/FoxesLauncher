@@ -570,9 +570,7 @@ Public Class ResourceProject
             End If
             NewItem.LabSource.Text = Platform.ToString
             NewItem.LabTime.Text = StringUtils.FormatTimeSpan(LastUpdate - Date.Now, True)
-            NewItem.LabDownload.Text =
-                If(DownloadCount > 100000000, T("{0} 亿", Math.Round(DownloadCount / 100000000, 2)),
-                If(DownloadCount > 100000, T("{0} 万", Math.Floor(DownloadCount / 10000)), DownloadCount))
+            NewItem.LabDownload.Text = FormatDownloadCount(DownloadCount)
             Return NewItem
         End Function) With {.Height = 64}
     End Function

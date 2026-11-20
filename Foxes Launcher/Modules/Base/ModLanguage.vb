@@ -414,6 +414,22 @@ Public Module ModLanguage
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 按当前界面语言格式化下载次数。
+    ''' 英语使用 K/M 缩写，中文使用万/亿。
+    ''' </summary>
+    Public Function FormatDownloadCount(Count As Long) As String
+        If Count <= 0 Then Return Count.ToString(CultureInfo.InvariantCulture)
+        If CurrentLanguage = "en_us" Then
+            If Count >= 1000000L Then Return (Count / 1000000.0).ToString("0.#", CultureInfo.InvariantCulture) & "M"
+            If Count >= 1000L Then Return (Count / 1000.0).ToString("0.#", CultureInfo.InvariantCulture) & "K"
+            Return Count.ToString(CultureInfo.InvariantCulture)
+        End If
+        If Count > 100000000L Then Return T("{0} 亿", Math.Round(Count / 100000000.0, 2))
+        If Count > 100000L Then Return T("{0} 万", Math.Floor(Count / 10000.0))
+        Return Count.ToString(CultureInfo.InvariantCulture)
+    End Function
+
     Private Sub ApplyCulture(Language As String)
         Try
             Dim Culture As New CultureInfo(ToCultureName(Language))

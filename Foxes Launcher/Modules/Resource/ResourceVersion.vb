@@ -384,7 +384,7 @@ Public Class ResourceVersion
                     If .Title <> PathUtils.GetFileNameWithoutExtension(FileName) Then Yield PathUtils.GetFileNameWithoutExtension(FileName)
                     If Dependencies.Any Then Yield T("{0} 项前置", Dependencies.Count)
                     If GameVersions.All(Function(v) Not v.Contains(".") OrElse {"w", "snapshot", "rc", "pre", "experimental", "-"}.Any(Function(s) v.ContainsIgnoreCase(s))) Then Yield T("游戏版本 {0}", GameVersions.Join("、"c))
-                    If DownloadCount > 0 Then Yield T("下载 {0}次", If(DownloadCount > 100000, T("{0} 万", Math.Round(DownloadCount / 10000)), DownloadCount.ToString() + " ")) 'CurseForge 的下载次数经常错误地返回 0
+                    If DownloadCount > 0 Then Yield T("下载 {0}次", FormatDownloadCount(DownloadCount) & If(DownloadCount > 100000, "", " ")) 'CurseForge 的下载次数经常错误地返回 0
                     Yield T("更新于 {0}", StringUtils.FormatTimeSpan(ReleaseDate - Date.Now, False))
                     If ReleaseType <> ReleaseTypes.Release Then Yield ReleaseTypeDisplay
                 End Function().Join("，"c)

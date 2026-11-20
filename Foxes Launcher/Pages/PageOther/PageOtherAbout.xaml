@@ -18,8 +18,8 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="150" />
                     </Grid.ColumnDefinitions>
-                    <local:MyListItem IsHitTestVisible="False" Title="{DynamicResource 龙腾猫跃}" Margin="-5,0,15,0" Info="{DynamicResource Plain Craft Launcher 2 的开发者！}" Grid.Row="0" Grid.Column="1" />
-                    <local:MyListItem IsHitTestVisible="False" Title="{DynamicResource 皓辰不是猫}" Margin="-5,0,15,0" Info="{DynamicResource Foxes Launcher 的维护者}" Grid.Row="1" Grid.Column="1" />
+                    <local:MyListItem IsHitTestVisible="False" x:Name="ItemAuthorLTCat" Margin="-5,0,15,0" Info="{DynamicResource Plain Craft Launcher 2 的开发者！}" Grid.Row="0" Grid.Column="1" />
+                    <local:MyListItem IsHitTestVisible="False" x:Name="ItemAuthorHimic" Margin="-5,0,15,0" Info="{DynamicResource Foxes Launcher 的维护者}" Grid.Row="1" Grid.Column="1" />
                     <local:MyListItem IsHitTestVisible="False" Title="Foxes Launcher" Margin="-5,0,15,0" Info="{DynamicResource 当前版本：%VERSION%}" Grid.Row="2" Grid.Column="1" x:Name="ItemAboutFxl" />
                     <Image Source="/Foxes Launcher;component/Images/Heads/LTCat.jpg" Grid.Row="0" Margin="3">
                         <Image.Clip>
