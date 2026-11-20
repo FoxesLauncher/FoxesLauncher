@@ -11,6 +11,8 @@ Checks performed:
   7. Every extra language pack only contains known keys, has no empty
      values, keeps the source placeholders and newlines, and reaches the
      required coverage; every pack is registered in manifest.json.
+  8. With ``--unused``, every key defined in zh_cn.json is referenced by
+     the source (orphan keys are reported).
 
 Exit code 1 on any problem, so it can be used in CI.
 """
@@ -43,7 +45,6 @@ DISPLAY_ATTRS = {
 SKIP_FILES = {
     "Resources/Custom.xaml",
     "Resources/Languages/zh_cn.json",
-    "Modules/Base/ModLanguage.vb",
 }
 
 
@@ -403,6 +404,11 @@ def validate(root: Path) -> tuple[list[str], dict[str, list[tuple[int, str]]], d
     return problems, used, language
 
 
+def find_unused(used: dict[str, list[tuple[int, str]]], language: dict[str, str]) -> list[str]:
+    """Return keys defined in the base pack but never referenced by the source."""
+    return sorted(key for key in language if key not in used)
+
+
 def self_test() -> int:
     """A deliberately broken fixture must fail, or the checker is empty."""
     import tempfile
@@ -440,6 +446,11 @@ def self_test() -> int:
         if not any(p.startswith("edge-whitespace key:") for p in problems):
             print("self-test failed: edge-whitespace fragment was not detected")
             return 1
+        unused = find_unused(used, language)
+        if "确定" not in unused:
+            print("self-test failed: unused key was not detected")
+            print("unused:", unused)
+            return 1
         reports, pack_problems = load_language_packs(root, language)
         if not any("placeholder mismatch" in p for p in pack_problems):
             print("self-test failed: pack placeholder mismatch was not detected")
@@ -456,8 +467,8 @@ def self_test() -> int:
             print("self-test failed: manifest entry without pack was not detected")
             return 1
         print(
-            "self-test OK: XAML, I18n, VB missing keys, edge-whitespace fragments "
-            "and language pack coverage/placeholders are detected"
+            "self-test OK: XAML, I18n, VB missing keys, edge-whitespace fragments, "
+            "unused keys and language pack coverage/placeholders are detected"
         )
         return 0
 
@@ -469,6 +480,8 @@ def main() -> int:
     parser.add_argument("--report-fragments", action="store_true")
     parser.add_argument("--max-fragments", type=int, default=None)
     parser.add_argument("--max-missing", type=int, default=0, help="allowed missing keys per language pack")
+    parser.add_argument("--unused", action="store_true", help="report keys defined but not used by the source")
+    parser.add_argument("--max-unused", type=int, default=0, help="allowed unused keys")
     args = parser.parse_args()
 
     if args.self_test:
@@ -483,6 +496,19 @@ def main() -> int:
         if args.max_fragments is not None and len(rows) > args.max_fragments:
             print(f"fragment baseline exceeded: {len(rows)} > {args.max_fragments}")
             return 1
+        return 0
+
+    if args.unused:
+        _, used, language = validate(root)
+        unused = find_unused(used, language)
+        if unused:
+            print(f"{len(unused)} unused key(s):")
+            for key in unused:
+                print("  " + repr(key))
+        if len(unused) > args.max_unused:
+            print(f"unused baseline exceeded: {len(unused)} > {args.max_unused}")
+            return 1
+        print(f"OK: {len(unused)} unused key(s) (limit {args.max_unused})")
         return 0
 
     problems, used, language = validate(root)
