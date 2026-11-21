@@ -10,8 +10,6 @@
                 <Grid Margin="21,40,21,16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="45" />
-                        <RowDefinition Height="45" />
-                        <RowDefinition Height="45" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40" />
@@ -19,32 +17,16 @@
                         <ColumnDefinition Width="150" />
                     </Grid.ColumnDefinitions>
                     <local:MyListItem IsHitTestVisible="False" x:Name="ItemAuthorLTCat" Margin="-5,0,15,0" Info="{DynamicResource Plain Craft Launcher 2 的开发者！}" Grid.Row="0" Grid.Column="1" />
-                    <local:MyListItem IsHitTestVisible="False" x:Name="ItemAuthorHimic" Margin="-5,0,15,0" Info="{DynamicResource Foxes Launcher 的维护者}" Grid.Row="1" Grid.Column="1" />
-                    <local:MyListItem IsHitTestVisible="False" Title="Foxes Launcher" Margin="-5,0,15,0" Info="{DynamicResource 当前版本：%VERSION%}" Grid.Row="2" Grid.Column="1" x:Name="ItemAboutFxl" />
                     <Image Source="/Foxes Launcher;component/Images/Heads/LTCat.jpg" Grid.Row="0" Margin="3">
-                        <Image.Clip>
-                            <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
-                        </Image.Clip>
-                    </Image>
-                    <Image Source="/Foxes Launcher;component/Images/Heads/Himic.png" Grid.Row="1" Margin="3">
-                        <Image.Clip>
-                            <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
-                        </Image.Clip>
-                    </Image>
-                    <Image Source="/Foxes Launcher;component/Images/Heads/Foxes.png" Grid.Row="2" Margin="3">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
                     </Image>
                     <local:MyButton Text="{DynamicResource 赞助 PCL !}" Grid.Column="2" Grid.Row="0" Height="35" ColorType="Highlight"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://meloong.com/afd/a/LTCat" />
-                    <local:MyButton Text="{DynamicResource GitHub 主页}" Grid.Column="2" Grid.Row="1" Height="35"
-                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/OutHimic" />
-                    <local:MyButton Text="{DynamicResource 开源代码}" Grid.Column="2" Grid.Row="2" Height="35"
-                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/FoxesLauncher/FoxesLauncher" />
                 </Grid>
             </local:MyCard>
-            <local:MyCard Margin="0,15" Title="{DynamicResource 关于 PCL2}">
+            <local:MyCard Margin="0,15" Title="{DynamicResource 关于 Foxes Launcher}">
                 <Grid Margin="21,40,21,16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="45" />
@@ -55,19 +37,57 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="150" />
                     </Grid.ColumnDefinitions>
-                    <local:MyListItem IsHitTestVisible="False" Title="HerobrineXia" Margin="-5,0,15,0" Info="{DynamicResource Plain Craft Launcher 2 的协力开发者！}" Grid.Row="0" Grid.Column="1" />
-                    <local:MyListItem IsHitTestVisible="False" Title="Plain Craft Launcher 2" Margin="-5,0,15,0" Grid.Row="1" Grid.Column="1" x:Name="ItemAboutPcl" />
-                    <Image Source="/Foxes Launcher;component/Images/Heads/HerobrineXia.png" Grid.Row="0" Margin="3">
+                    <local:MyListItem IsHitTestVisible="False" x:Name="ItemAuthorHimic" Margin="-5,0,15,0" Info="{DynamicResource Foxes Launcher 的维护者}" Grid.Row="0" Grid.Column="1" />
+                    <local:MyListItem IsHitTestVisible="False" Title="Foxes Launcher" Margin="-5,0,15,0" Info="{DynamicResource 当前版本：%VERSION%}" Grid.Row="1" Grid.Column="1" x:Name="ItemAboutFxl" />
+                    <Image Source="/Foxes Launcher;component/Images/Heads/Himic.png" Grid.Row="0" Margin="3">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
                     </Image>
-                    <Image Source="/Foxes Launcher;component/Images/Heads/Logo.png" Grid.Row="1" Margin="3">
+                    <Image Source="/Foxes Launcher;component/Images/Heads/Foxes.png" Grid.Row="1" Margin="3">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
                     </Image>
-                    <local:MyButton Text="{DynamicResource 上游源代码}" Grid.Column="2" Grid.Row="1" Height="35"
+                    <local:MyButton Text="{DynamicResource GitHub 主页}" Grid.Column="2" Grid.Row="0" Height="35"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/OutHimic" />
+                    <local:MyButton Text="{DynamicResource 开源代码}" Grid.Column="2" Grid.Row="1" Height="35"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/FoxesLauncher/FoxesLauncher" />
+                </Grid>
+            </local:MyCard>
+            <local:MyCard Margin="0,15" Title="{DynamicResource 关于 PCL2}">
+                <Grid Margin="21,40,21,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="45" />
+                        <RowDefinition Height="45" />
+                        <RowDefinition Height="45" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="150" />
+                    </Grid.ColumnDefinitions>
+                    <local:MyListItem IsHitTestVisible="False" x:Name="ItemAuthorLTCatPcl" Margin="-5,0,15,0" Info="{DynamicResource Plain Craft Launcher 2 的开发者！}" Grid.Row="0" Grid.Column="1" />
+                    <local:MyListItem IsHitTestVisible="False" Title="HerobrineXia" Margin="-5,0,15,0" Info="{DynamicResource Plain Craft Launcher 2 的协力开发者！}" Grid.Row="1" Grid.Column="1" />
+                    <local:MyListItem IsHitTestVisible="False" Title="Plain Craft Launcher 2" Margin="-5,0,15,0" Grid.Row="2" Grid.Column="1" x:Name="ItemAboutPcl" />
+                    <Image Source="/Foxes Launcher;component/Images/Heads/LTCat.jpg" Grid.Row="0" Margin="3">
+                        <Image.Clip>
+                            <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
+                        </Image.Clip>
+                    </Image>
+                    <Image Source="/Foxes Launcher;component/Images/Heads/HerobrineXia.png" Grid.Row="1" Margin="3">
+                        <Image.Clip>
+                            <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
+                        </Image.Clip>
+                    </Image>
+                    <Image Source="/Foxes Launcher;component/Images/Heads/Logo.png" Grid.Row="2" Margin="3">
+                        <Image.Clip>
+                            <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
+                        </Image.Clip>
+                    </Image>
+                    <local:MyButton Text="{DynamicResource 赞助 PCL !}" Grid.Column="2" Grid.Row="0" Height="35" ColorType="Highlight"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://meloong.com/afd/a/LTCat" />
+                    <local:MyButton Text="{DynamicResource 上游源代码}" Grid.Column="2" Grid.Row="2" Height="35"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/Meloong-Git/PCL" />
                 </Grid>
             </local:MyCard>
