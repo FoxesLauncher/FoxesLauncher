@@ -215,6 +215,9 @@
 
     <Compile Include="Controls\MyVirtualizingElement.vb" />
     <Compile Include="Modules\Base\FxlLogger.vb" />
+    <Compile Include="Modules\Base\ModLanguage.vb" />
+    <Compile Include="Modules\Base\I18nExtension.vb" />
+    <Compile Include="Modules\Base\FxlExceptions.vb" />
     <Compile Include="Modules\Resource\LocalResourceFile.vb" />
     <Compile Include="Modules\Resource\ResourceProject.vb" />
     <Compile Include="Modules\Resource\ResourceVersion.vb" />
@@ -247,6 +250,9 @@
     </Compile>
     <Compile Include="Controls\MyMsg\MyMsgSelect.xaml.vb">
       <DependentUpon>MyMsgSelect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MyMsg\MyMsgRegionLanguage.xaml.vb">
+      <DependentUpon>MyMsgRegionLanguage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\MyScrollBar.vb" />
     <Compile Include="Controls\MyScrollViewer.vb" />
@@ -436,6 +442,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\MyMsg\MyMsgSelect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MyMsg\MyMsgRegionLanguage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -715,6 +725,7 @@
     <Compile Include="Modules\Base\MyBitmap.vb" />
     <Compile Include="Modules\Base\SplashWindow.vb" />
     <Compile Include="Modules\ModMain.vb" />
+    <Compile Include="Modules\ModRegion.vb" />
     <Compile Include="Modules\Base\ModBase.vb" />
     <Compile Include="My Project\AssemblyInfo.vb">
       <SubType>Code</SubType>
@@ -756,6 +767,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\icon.ico" />
+    <EmbeddedResource Include="Resources\Languages\*.json">
+      <LogicalName>FXL.Resources.Languages.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Font.ttf" />

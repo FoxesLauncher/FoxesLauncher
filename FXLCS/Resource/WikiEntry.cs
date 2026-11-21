@@ -32,9 +32,13 @@ public class WikiEntry {
         var dataLines = FileUtils.ReadAsLines(@"Resource\WikiEntries.txt", type: typeof(WikiEntry)).ToList();
 
         // 读取最后一行的浏览量
+        var popularityLine = dataLines[^1];
+        if (popularityLine.Length % 3 != 0) { // 数据损坏时不要因为 Substring 越界而让整个 Mod 列表无法打开
+            Logger.Warn($"内置 MC 百科数据的浏览量行长度（{popularityLine.Length}）不是 3 的倍数，可能已损坏，将忽略末尾 {popularityLine.Length % 3} 个字符");
+        }
         Queue<int> popularities = [];
-        for (int i = 0; i < dataLines[^1].Length; i += 3) { // 将每 3 个字符切割成一个元素
-            popularities.Enqueue(int.Parse(dataLines[^1].Substring(i, 3).ConvertRadix(86, 10)));
+        for (int i = 0; i + 3 <= popularityLine.Length; i += 3) { // 将每 3 个字符切割成一个元素
+            popularities.Enqueue(int.Parse(popularityLine.Substring(i, 3).ConvertRadix(86, 10)));
         }
         dataLines.RemoveAt(dataLines.Count - 1);
 
@@ -45,7 +49,7 @@ public class WikiEntry {
             lineNumber++;
             if (lineData == "") continue;
 
-            var popularity = popularities.Dequeue();
+            var popularity = popularities.Count > 0 ? popularities.Dequeue() : 0;
             foreach (var entryData in lineData.Split('¨')) {
                 var entry = new WikiEntry();
                 var parts = entryData.Split('|');

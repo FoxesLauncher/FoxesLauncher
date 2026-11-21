@@ -7,7 +7,7 @@ Public Class PageLoginMs
         Dim IndexBefore = ComboAccounts.SelectedIndex
         '刷新下拉框列表
         ComboAccounts.Items.Clear()
-        ComboAccounts.Items.Add(New MyComboBoxItem With {.Content = "添加新账号"})
+        ComboAccounts.Items.Add(New MyComboBoxItem With {.Content = T("添加新账号")})
         Try
             Dim MsJson As JObject = Settings.Get(Of String)("LoginMsJson").DeserializeJson()
             For Each Account In MsJson
@@ -55,7 +55,7 @@ Public Class PageLoginMs
     ''' </summary>
     Public Shared Function IsVaild(LoginData As McLoginMs) As String
         If LoginData.OAuthRefreshToken = "" Then
-            Return "请在登录账号后再启动游戏！"
+            Return T("请在登录账号后再启动游戏！")
         Else
             Return ""
         End If
@@ -81,14 +81,14 @@ Public Class PageLoginMs
                 ElseIf McLoginMsLoader.State = LoadState.Canceled Then
                     Throw New OperationCanceledException
                 ElseIf McLoginMsLoader.Error Is Nothing Then
-                    Throw New Exception("未知错误！")
+                    Throw New Exception(T("未知错误！"))
                 Else
                     Throw New Exception(McLoginMsLoader.Error.Message, McLoginMsLoader.Error)
                 End If
             Catch ex As Exception
                 If ex.IsCanceled Then
-                ElseIf ex.Message.StartsWithF("$") Then
-                    Hint(ex.Message.TrimStart("$"), HintType.Red)
+                ElseIf IsBriefException(ex) Then
+                    Hint(ex.Message, HintType.Red)
                 ElseIf TypeOf ex Is Security.Authentication.AuthenticationException AndAlso ex.Message.Contains("SSL/TLS") Then
                     Logger.Error(ex, $"正版登录验证失败，请考虑在 [设置 → 其他] 中关闭 [在正版登录时验证 SSL 证书]，然后再试。{vbCrLf}{vbCrLf}原始错误信息：", LogBehavior.Alert)
                 Else
@@ -99,7 +99,7 @@ Public Class PageLoginMs
                 Sub()
                     ComboAccounts.IsEnabled = True
                     BtnLogin.IsEnabled = True
-                    BtnLogin.Text = "登录"
+                    BtnLogin.Text = T("登录")
                 End Sub)
             End Try
         End Sub, "Ms Login")

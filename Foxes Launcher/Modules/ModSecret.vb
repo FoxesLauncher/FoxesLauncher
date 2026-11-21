@@ -85,7 +85,7 @@ Friend Module ModSecret
                 Color5 = New MyColor(74, 104, 150)
                 Color6 = New MyColor(55, 63, 78)
                 Color7 = New MyColor(38, 42, 51)
-                Color8 = New MyColor(30, 33, 40)
+                Color8 = New MyColor(28, 255, 255, 255)
                 ColorBg0 = New MyColor(98, 140, 200)
                 ColorBg1 = New MyColor(230, 44, 48, 58)
                 ColorGray1 = New MyColor(232, 234, 238)
@@ -134,6 +134,11 @@ Friend Module ModSecret
             SetResource("ColorBrushGray6", If(IsDark, New MyColor(48, 51, 58), New MyColor(235, 235, 235)))
             SetResource("ColorBrushGray7", If(IsDark, New MyColor(40, 43, 50), New MyColor(240, 240, 240)))
             SetResource("ColorBrushGray8", If(IsDark, New MyColor(35, 37, 43), New MyColor(245, 245, 245)))
+            '同步现代化 Tooltip 的配色
+            FoxesCore.Wpf.ModernTooltipService.ApplyTheme(
+                TryCast(Application.Current.Resources("ColorBrushDialog"), Brush),
+                TryCast(Application.Current.Resources("ColorBrushGray5"), Brush),
+                TryCast(Application.Current.Resources("ColorBrush1"), Brush))
             Application.Current.Resources("ColorObject1") = CType(Color1, Color)
             Application.Current.Resources("ColorObject2") = CType(Color2, Color)
             Application.Current.Resources("ColorObject3") = CType(Color3, Color)
@@ -196,7 +201,7 @@ Friend Module ModSecret
 #Region "更新"
 
     Friend Sub UpdateCheckByButton()
-        Hint("该版本中不包含更新功能……")
+        Hint(T("该版本中不包含更新功能……"))
     End Sub
 
     Friend IsUpdateWaitingRestart As Boolean = False
@@ -223,7 +228,7 @@ Friend Module ModSecret
     ''' </summary>
     Public ServerConfig As JObject
 
-    Public ServerLoader As New LoaderTask(Of Integer, Integer)("FXL 配置更新", Sub() Logger.Info("该版本中不包含更新通知功能……"), Priority:=ThreadPriority.BelowNormal) With
+    Public ServerLoader As New LoaderTask(Of Integer, Integer)(T("FXL 配置更新"), Sub() Logger.Info("该版本中不包含更新通知功能……"), Priority:=ThreadPriority.BelowNormal) With
         {.ReloadTimeout = 1000 * 60 * 60} '超时 1 小时
 
 #End Region

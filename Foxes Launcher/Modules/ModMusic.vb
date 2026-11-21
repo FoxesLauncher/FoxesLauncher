@@ -82,20 +82,20 @@ Public Module ModMusic
                     If MusicState = MusicStates.Pause Then
                         FrmMain.BtnExtraMusic.Logo = Logo.IconPlay
                         FrmMain.BtnExtraMusic.LogoScale = 0.8
-                        ToolTipText = "已暂停：" & PathUtils.GetFileNameWithoutExtension(MusicCurrent)
+                        ToolTipText =T("已暂停：{0}", PathUtils.GetFileNameWithoutExtension(MusicCurrent))
                         If MusicAllList.Count > 1 Then
-                            ToolTipText += vbCrLf & "左键恢复播放，右键播放下一曲。"
+                            ToolTipText += vbCrLf & T("左键恢复播放，右键播放下一曲。")
                         Else
-                            ToolTipText += vbCrLf & "左键恢复播放，右键重新从头播放。"
+                            ToolTipText += vbCrLf & T("左键恢复播放，右键重新从头播放。")
                         End If
                     Else
                         FrmMain.BtnExtraMusic.Logo = Logo.IconMusic
                         FrmMain.BtnExtraMusic.LogoScale = 1
-                        ToolTipText = "正在播放：" & PathUtils.GetFileNameWithoutExtension(MusicCurrent)
+                        ToolTipText =T("正在播放：{0}", PathUtils.GetFileNameWithoutExtension(MusicCurrent))
                         If MusicAllList.Count > 1 Then
-                            ToolTipText += vbCrLf & "左键暂停，右键播放下一曲。"
+                            ToolTipText += vbCrLf & T("左键暂停，右键播放下一曲。")
                         Else
-                            ToolTipText += vbCrLf & "左键暂停，右键重新从头播放。"
+                            ToolTipText += vbCrLf & T("左键暂停，右键重新从头播放。")
                         End If
                     End If
                     FrmMain.BtnExtraMusic.ToolTip = ToolTipText
@@ -113,7 +113,7 @@ Public Module ModMusic
     ''' </summary>
     Public Sub MusicControlPause()
         If MusicNAudio Is Nothing Then
-            Hint("音乐播放尚未开始！", HintType.Red)
+            Hint(T("音乐播放尚未开始！"), HintType.Red)
         Else
             Select Case MusicState
                 Case MusicStates.Pause
@@ -133,14 +133,14 @@ Public Module ModMusic
     Public Sub MusicControlNext()
         If MusicAllList.IsSingle Then
             MusicStartPlay(MusicCurrent)
-            Hint("重新播放：" & PathUtils.GetLastPart(MusicCurrent), HintType.Green)
+            Hint(T("重新播放：{0}", PathUtils.GetLastPart(MusicCurrent)), HintType.Green)
         Else
             Dim Address As String = DequeueNextMusicAddress()
             If Address Is Nothing Then
-                Hint("没有可以播放的音乐！", HintType.Red)
+                Hint(T("没有可以播放的音乐！"), HintType.Red)
             Else
                 MusicStartPlay(Address)
-                Hint("正在播放：" & PathUtils.GetLastPart(Address), HintType.Green)
+                Hint(T("正在播放：{0}", PathUtils.GetLastPart(Address)), HintType.Green)
             End If
         End If
         MusicRefreshUI()
@@ -184,19 +184,19 @@ Public Module ModMusic
             MusicListInit(True)
             If Not MusicAllList.Any() Then
                 If MusicNAudio Is Nothing Then
-                    If ShowHint Then Hint("未检测到可用的背景音乐！", HintType.Red)
+                    If ShowHint Then Hint(T("未检测到可用的背景音乐！"), HintType.Red)
                 Else
                     MusicNAudio = Nothing
-                    If ShowHint Then Hint("背景音乐已清除！", HintType.Green)
+                    If ShowHint Then Hint(T("背景音乐已清除！"), HintType.Green)
                 End If
             Else
                 Dim Address As String = DequeueNextMusicAddress()
                 If Address Is Nothing Then
-                    If ShowHint Then Hint("没有可以播放的音乐！", HintType.Red)
+                    If ShowHint Then Hint(T("没有可以播放的音乐！"), HintType.Red)
                 Else
                     Try
                         MusicStartPlay(Address, IsFirstLoad)
-                        If ShowHint Then Hint("背景音乐已刷新：" & PathUtils.GetLastPart(Address), HintType.Green, False)
+                        If ShowHint Then Hint(T("背景音乐已刷新：{0}", PathUtils.GetLastPart(Address)), HintType.Green, False)
                     Catch
                     End Try
                 End If
@@ -313,16 +313,16 @@ Public Module ModMusic
         Catch ex As Exception
             Logger.Warn(ex, $"播放音乐出现内部错误（{MusicCurrent}）")
             If TypeOf ex Is NAudio.MmException AndAlso ex.Message.Contains("AlreadyAllocated") Then
-                Hint("你的音频设备正被其他程序占用。请在关闭占用的程序后重启 FXL，才能恢复音乐播放功能！", HintType.Red)
+                Hint(T("你的音频设备正被其他程序占用。请在关闭占用的程序后重启 FXL，才能恢复音乐播放功能！"), HintType.Red)
                 Thread.Sleep(1000000000)
             End If
             If TypeOf ex Is NAudio.MmException AndAlso (ex.Message.Contains("NoDriver") OrElse ex.Message.Contains("BadDeviceId")) Then
-                Hint("由于音频设备变更，音乐播放功能在重启 FXL 后才能恢复！", HintType.Red)
+                Hint(T("由于音频设备变更，音乐播放功能在重启 FXL 后才能恢复！"), HintType.Red)
                 Thread.Sleep(1000000000)
             End If
             If Not ({"wav", "mp3", "flac"}.Contains(PathUtils.GetExtension(MusicCurrent))) OrElse
                 ex.Message.Contains("0xC00D36C4") Then '#5096：不支持给定的 URL 的字节流类型。 (异常来自 HRESULT:0xC00D36C4)
-                Hint("播放音乐失败（" & PathUtils.GetLastPart(MusicCurrent) & "）：FXL 可能不支持此音乐格式，请将格式转换为 .wav、.mp3 或 .flac 后再试", HintType.Red)
+                Hint(T("播放音乐失败（{0}）：FXL 可能不支持此音乐格式，请将格式转换为 .wav、.mp3 或 .flac 后再试", PathUtils.GetLastPart(MusicCurrent)), HintType.Red)
             Else
                 Logger.Error(ex, $"播放音乐失败（{PathUtils.GetLastPart(MusicCurrent)}）", LogBehavior.Toast)
             End If

@@ -21,7 +21,7 @@ Public Class PageDownloadModify
 
     Public Overrides Sub LoaderInit() '父级 Handles Me.Initialized
         ControlInit()
-        InitLoader = New LoaderTask(Of McInstance, Object)("初始化版本修改", AddressOf LoadInstance)
+        InitLoader = New LoaderTask(Of McInstance, Object)(T("初始化版本修改"), AddressOf LoadInstance)
         PageLoaderInit(LoadMinecraft, PanLoad, PanAllBack, Nothing, InitLoader, AddressOf LoadInstanceFinished, Function() PageInstanceLeft.Instance)
     End Sub
     Public Overrides Sub Init() '父级 Handles Me.Loaded
@@ -56,7 +56,7 @@ Public Class PageDownloadModify
         Dim Manifest = Configs.McInstallManifest.Get(Task.Input.Config)
         If Manifest IsNot Nothing AndAlso Manifest.SchemaVersion > Versions.McInstallManifestVersion Then
             Logger.Warn($"安装清单由更新版本的 FXL 创建（清单版本：{Manifest.SchemaVersion}，当前版本：{Versions.McInstallManifestVersion}）")
-            Throw New Exception($"更新 FXL 后才能修改它！点击【设置 → 其他 → 检查更新】以更新。")
+            Throw New Exception(T("更新 FXL 后才能修改它！点击【设置 → 其他 → 检查更新】以更新。"))
         End If
         If Manifest IsNot Nothing Then
             Dim LatestManifest = Manifest.RefreshModComponents(Task.Input.PathIndie)
@@ -71,22 +71,22 @@ Public Class PageDownloadModify
         If Manifest IsNot Nothing Then
             '有清单：从清单读取
             Components = Manifest.Components
-            If Components Is Nothing Then Throw New Exception("安装清单缺少组件信息，无法还原已安装组件。")
+            If Components Is Nothing Then Throw New Exception(T("安装清单缺少组件信息，无法还原已安装组件。"))
             IsVanillaVersionReliable = True
         Else
             '无清单：通过版本 JSON 获取
             Dim VersionInfo = New McInstance(Task.Input.PathVersion).Version
-            If VersionInfo.VanillaName = "Unknown" Then Throw New Exception("无法确定 Minecraft 版本，无法修改")
+            If VersionInfo.VanillaName = "Unknown" Then Throw New Exception(T("无法确定 Minecraft 版本，无法修改"))
             Dim UnknownLoaders = VersionInfo.ModLoaderVersions.
-                Where(Function(Loader) String.IsNullOrWhiteSpace(Loader.Value) OrElse Loader.Value = "未知版本").
+                Where(Function(Loader) String.IsNullOrWhiteSpace(Loader.Value) OrElse Loader.Value = T("未知版本")).
                 Select(Function(Loader) Loader.Key.ToString()).ToList()
-            If UnknownLoaders.Any() Then Throw New Exception($"无法确定 {UnknownLoaders.Join("、")} 的版本，无法修改")
+            If UnknownLoaders.Any() Then Throw New Exception(T("无法确定 {0} 的版本，无法修改", UnknownLoaders.Join("、")))
             Components = New McComponents(VersionInfo.VanillaName, VersionInfo.ModLoaderVersions)
             OptiFineVersion = VersionInfo.OptiFine
             IsVanillaVersionReliable = VersionInfo.Reliable
         End If
         Dim MinecraftVersion = Components.MinecraftVersion
-        If String.IsNullOrWhiteSpace(MinecraftVersion) Then Throw New Exception("无法确定当前 Minecraft 版本，请检查版本文件")
+        If String.IsNullOrWhiteSpace(MinecraftVersion) Then Throw New Exception(T("无法确定当前 Minecraft 版本，请检查版本文件"))
         '等待子列表加载器完成获取
         Dim LoaderList As New Dictionary(Of String, LoaderBase) From {
             {"Minecraft", DlClientListLoader}, {"OptiFine", DlOptiFineListLoader}, {"LiteLoader", DlLiteLoaderListLoader},
@@ -104,10 +104,10 @@ Public Class PageDownloadModify
             For Each Pair In LoaderList
                 Dim Loader = Pair.Value
                 If Loader.State = LoadState.Failed Then
-                    If Loader Is ForgeLoader AndAlso Loader.Error.Message = "无" Then Continue For 'Forge 无版本时不报错
-                    Throw New Exception($"获取 {Pair.Key} 版本列表失败，请稍后再试，或使用 VPN 改善网络环境", Loader.Error)
+                    If Loader Is ForgeLoader AndAlso Loader.Error.Message = T("无") Then Continue For 'Forge 无版本时不报错
+                    Throw New Exception(T("获取 {0} 版本列表失败，请稍后再试，或使用 VPN 改善网络环境", Pair.Key), Loader.Error)
                 ElseIf Loader.State = LoadState.Canceled Then
-                    Throw New Exception($"获取 {Pair.Key} 版本列表被中断，请稍后再试，或使用 VPN 改善网络环境")
+                    Throw New Exception(T("获取 {0} 版本列表被中断，请稍后再试，或使用 VPN 改善网络环境", Pair.Key))
                 End If
             Next
             If LoaderList.Values.All(Function(Loader) Loader.State = LoadState.Finished OrElse Loader.State = LoadState.Failed) Then Exit Do
@@ -120,7 +120,7 @@ Public Class PageDownloadModify
         MinecraftVersions = CType(DlClientListLoader.Output.Value("versions").DeepClone(), JArray)
         VanillaData = MinecraftVersions.OfType(Of JObject).FirstOrDefault(
             Function(v) v("id").ToString.Replace("∞", "infinite") = MinecraftVersion.Replace("∞", "infinite"))
-        If VanillaData Is Nothing Then Throw New Exception($"Minecraft 列表中没有已安装的 {MinecraftVersion}")
+        If VanillaData Is Nothing Then Throw New Exception(T("Minecraft 列表中没有已安装的 {0}", MinecraftVersion))
         VanillaData("id") = MinecraftVersion
         'OptiFine
         If Manifest IsNot Nothing Then
@@ -130,24 +130,24 @@ Public Class PageDownloadModify
                 If DlOptiFineListBmclapiLoader.State <> LoadState.Finished Then DlOptiFineListBmclapiLoader.WaitForExit()
                 DlOptiFineListLoader.Output = DlOptiFineListBmclapiLoader.Output
             End If
-        ElseIf OptiFineVersion IsNot Nothing AndAlso OptiFineVersion <> "未知版本" Then
+        ElseIf OptiFineVersion IsNot Nothing AndAlso OptiFineVersion <> T("未知版本") Then
             SelectedOptiFine = DlOptiFineListLoader.Output.Value.FirstOrDefault(
                 Function(v) v.Inherit = MinecraftVersion AndAlso
                     v.InstanceName.AfterLast("-OptiFine_").Replace("HD_U_", "") = OptiFineVersion.Replace("HD_U_", ""))
-            If SelectedOptiFine Is Nothing Then Throw New Exception($"OptiFine 列表中没有已安装的 {OptiFineVersion}")
+            If SelectedOptiFine Is Nothing Then Throw New Exception(T("OptiFine 列表中没有已安装的 {0}", OptiFineVersion))
         End If
         'Forge
         If Components.ModLoaderVersions.ContainsKey(ModLoaders.Forge) Then
             SelectedForge = ForgeLoader?.Output?.FirstOrDefault(
                 Function(v) v.Inherit = MinecraftVersion AndAlso v.VersionName = Components.ModLoaderVersions(ModLoaders.Forge) AndAlso
                             v.Category <> "universal" AndAlso v.Category <> "client" AndAlso (SelectedOptiFine Is Nothing OrElse IsOptiFineSuitForForge(SelectedOptiFine, v)))
-            If SelectedForge Is Nothing Then Throw New Exception($"Forge 列表中没有已安装的 {Components.ModLoaderVersions(ModLoaders.Forge)}")
+            If SelectedForge Is Nothing Then Throw New Exception(T("Forge 列表中没有已安装的 {0}", Components.ModLoaderVersions(ModLoaders.Forge)))
         End If
         'NeoForge
         If Components.ModLoaderVersions.ContainsKey(ModLoaders.NeoForge) Then
             SelectedNeoForge = DlNeoForgeListLoader.Output.Value.FirstOrDefault(
                 Function(v) v.Inherit = MinecraftVersion AndAlso v.VersionName = Components.ModLoaderVersions(ModLoaders.NeoForge))
-            If SelectedNeoForge Is Nothing Then Throw New Exception($"NeoForge 列表中没有已安装的 {Components.ModLoaderVersions(ModLoaders.NeoForge)}")
+            If SelectedNeoForge Is Nothing Then Throw New Exception(T("NeoForge 列表中没有已安装的 {0}", Components.ModLoaderVersions(ModLoaders.NeoForge)))
         End If
         'Fabric
         If Components.ModLoaderVersions.ContainsKey(ModLoaders.Fabric) Then
@@ -156,7 +156,7 @@ Public Class PageDownloadModify
                 Function(v) v("version").ToString.Replace("+build", "") = Components.ModLoaderVersions(ModLoaders.Fabric))
             If FabricEntry Is Nothing OrElse Not DlFabricListLoader.Output.Value("game").OfType(Of JObject).
                     Any(Function(v) v("version").ToString = MinecraftVersion.Replace("∞", "infinite").Replace("Combat Test 7c", "1.16_combat-3")) Then
-                Throw New Exception($"Fabric 列表中没有已安装的 {Components.ModLoaderVersions(ModLoaders.Fabric)}")
+                Throw New Exception(T("Fabric 列表中没有已安装的 {0}", Components.ModLoaderVersions(ModLoaders.Fabric)))
             End If
             SelectedFabric = FabricEntry("version").ToString
         End If
@@ -164,21 +164,21 @@ Public Class PageDownloadModify
         If Components.ModLoaderVersions.ContainsKey(ModLoaders.LiteLoader) Then
             SelectedLiteLoader = DlLiteLoaderListLoader.Output.Value.FirstOrDefault(
                 Function(v) v.Inherit = MinecraftVersion AndAlso v.JsonToken("version").ToString = Components.ModLoaderVersions(ModLoaders.LiteLoader))
-            If SelectedLiteLoader Is Nothing Then Throw New Exception($"LiteLoader 列表中没有已安装的 {Components.ModLoaderVersions(ModLoaders.LiteLoader)}")
+            If SelectedLiteLoader Is Nothing Then Throw New Exception(T("LiteLoader 列表中没有已安装的 {0}", Components.ModLoaderVersions(ModLoaders.LiteLoader)))
         End If
         'Fabric API
         If Components.FabricApiVersion IsNot Nothing Then
             SelectedFabricApi = DlFabricApiLoader.Output.FirstOrDefault(
                 Function(v) (v.Version = Components.FabricApiVersion OrElse v.Id = Components.FabricApiVersion OrElse
                              v.Display = Components.FabricApiVersion) AndAlso IsFabricApiCompatible(v, MinecraftVersion))
-            If SelectedFabricApi Is Nothing Then Throw New Exception($"Fabric API 列表中没有已安装的 {Components.FabricApiVersion}")
+            If SelectedFabricApi Is Nothing Then Throw New Exception(T("Fabric API 列表中没有已安装的 {0}", Components.FabricApiVersion))
         End If
         'OptiFabric
         If Components.OptiFabricVersion IsNot Nothing Then
             SelectedOptiFabric = DlOptiFabricLoader.Output.FirstOrDefault(
                 Function(v) (v.Version = Components.OptiFabricVersion OrElse v.Id = Components.OptiFabricVersion OrElse
                              v.Display = Components.OptiFabricVersion) AndAlso IsOptiFabricCompatible(v, MinecraftVersion))
-            If SelectedOptiFabric Is Nothing Then Throw New Exception($"OptiFabric 列表中没有已安装的 {Components.OptiFabricVersion}")
+            If SelectedOptiFabric Is Nothing Then Throw New Exception(T("OptiFabric 列表中没有已安装的 {0}", Components.OptiFabricVersion))
         End If
 
         '扫描尚未识别的 Mod 组件
@@ -253,7 +253,7 @@ Public Class PageDownloadModify
                 Dim Match = DlOptiFineListLoader.Output.Value.FirstOrDefault(
                         Function(v) v.Inherit = MinecraftVersion AndAlso v.FileName = Entry.OriginalName AndAlso (SelectedForge Is Nothing OrElse IsOptiFineSuitForForge(v, SelectedForge)))
                 If Match Is Nothing Then
-                    Hint($"无法从 OptiFine 列表还原 {Entry.File.Name} 对应的 {Entry.OriginalName}，将跳过该文件。")
+                    Hint(T("无法从 OptiFine 列表还原 {0} 对应的 {1}，将跳过该文件。", Entry.File.Name, Entry.OriginalName))
                     Continue For
                 End If
                 Matches.Add((Entry.File, Entry.Sha1, Match))
@@ -288,8 +288,8 @@ Public Class PageDownloadModify
         If Matches.Count = 0 Then Return Nothing
         If Matches.Count = 1 Then Return Matches(0)
         Dim Choice As Integer? = Nothing
-        RunInUiWait(Sub() Choice = MyMsgBoxSelect(Matches.Select(Function(Entry) CType(New MyRadioBox With {.Text = Entry.File.Name}, IMyRadio)), $"选择当前使用的 {ComponentName}"))
-        If Not Choice.HasValue Then Throw New Exception($"发现了多个 {ComponentName}")
+        RunInUiWait(Sub() Choice = MyMsgBoxSelect(Matches.Select(Function(Entry) CType(New MyRadioBox With {.Text = Entry.File.Name}, IMyRadio)), ModLanguage.T("选择当前使用的 {0}", ComponentName)))
+        If Not Choice.HasValue Then Throw New Exception(ModLanguage.T("发现了多个 {0}", ComponentName))
         Return Matches(Choice.Value)
     End Function
 
@@ -316,9 +316,9 @@ Public Class PageDownloadModify
         BtnBack.Visibility = Visibility.Collapsed
         ImgLogo.Margin = New Thickness(15, 15, 0, 0)
         TextSelectName.Margin = New Thickness(56, 16, 16, 0)
-        LabSelectName.Text = $"原名 :   {OriginalName}"
+        LabSelectName.Text = T("原名 :   {0}", OriginalName)
         UpdateOriginalNameVisibility()
-        BtnStart.Text = "开始修改"
+        BtnStart.Text = T("开始修改")
         BtnStart.Logo = FrmInstanceLeft.ItemModify.Logo
         AutoSelectedFabricApi = SelectedFabric IsNot Nothing
         AutoSelectedOptiFabric = SelectedFabric IsNot Nothing AndAlso SelectedOptiFine IsNot Nothing
@@ -345,13 +345,13 @@ Public Class PageDownloadModify
         BtnLiteLoaderRestore.Tag = SelectedLiteLoader
         ImgMinecraftOld.Source = VanillaIcon
         LabMinecraftOld.Text = LabMinecraftVersion.Text
-        LabOptiFineOld.Text = If(SelectedOptiFine Is Nothing, "无", LabOptiFine.Text)
-        LabForgeOld.Text = If(SelectedForge Is Nothing, "无", LabForge.Text)
-        LabNeoForgeOld.Text = If(SelectedNeoForge Is Nothing, "无", LabNeoForge.Text)
-        LabFabricOld.Text = If(SelectedFabric Is Nothing, "无", LabFabric.Text)
-        LabLiteLoaderOld.Text = If(SelectedLiteLoader Is Nothing, "无", LabLiteLoader.Text)
-        LabFabricApiOld.Text = If(SelectedFabricApi Is Nothing, "无", LabFabricApi.Text)
-        LabOptiFabricOld.Text = If(SelectedOptiFabric Is Nothing, "无", LabOptiFabric.Text)
+        LabOptiFineOld.Text = If(SelectedOptiFine Is Nothing, T("无"), LabOptiFine.Text)
+        LabForgeOld.Text = If(SelectedForge Is Nothing, T("无"), LabForge.Text)
+        LabNeoForgeOld.Text = If(SelectedNeoForge Is Nothing, T("无"), LabNeoForge.Text)
+        LabFabricOld.Text = If(SelectedFabric Is Nothing, T("无"), LabFabric.Text)
+        LabLiteLoaderOld.Text = If(SelectedLiteLoader Is Nothing, T("无"), LabLiteLoader.Text)
+        LabFabricApiOld.Text = If(SelectedFabricApi Is Nothing, T("无"), LabFabricApi.Text)
+        LabOptiFabricOld.Text = If(SelectedOptiFabric Is Nothing, T("无"), LabOptiFabric.Text)
         RefreshComparisons()
     End Sub
 
@@ -401,7 +401,7 @@ Public Class PageDownloadModify
                             Continue For
                         End If
                         If DirectCast(Loader, LoaderTask(Of String, List(Of DlForgeVersionEntry))).Input <> VanillaName Then Continue For
-                        If Loader.State = LoadState.Failed AndAlso Loader.Error.Message = "无" Then
+                        If Loader.State = LoadState.Failed AndAlso Loader.Error.Message = T("无") Then
                             PendingComponents.Remove(LoadingComponent)
                             Continue For
                         End If
@@ -526,29 +526,29 @@ Public Class PageDownloadModify
             If RestoreButton Is BtnOptiFineRestore Then
                 UnavailableReason = LoadOptiFineGetError()
             ElseIf RestoreButton Is BtnForgeRestore Then
-                UnavailableReason = If(McVersion.IsStandardFormat(VanillaName), LoadForgeGetError(), "无")
+                UnavailableReason = If(McVersion.IsStandardFormat(VanillaName), LoadForgeGetError(), T("无"))
             ElseIf RestoreButton Is BtnNeoForgeRestore Then
-                UnavailableReason = If(CardNeoForge.Visibility = Visibility.Collapsed, "无", LoadNeoForgeGetError())
+                UnavailableReason = If(CardNeoForge.Visibility = Visibility.Collapsed, T("无"), LoadNeoForgeGetError())
             ElseIf RestoreButton Is BtnFabricRestore Then
-                UnavailableReason = If(CardFabric.Visibility = Visibility.Collapsed, "无", LoadFabricGetError())
+                UnavailableReason = If(CardFabric.Visibility = Visibility.Collapsed, T("无"), LoadFabricGetError())
             ElseIf RestoreButton Is BtnLiteLoaderRestore Then
-                UnavailableReason = If(CardLiteLoader.Visibility = Visibility.Collapsed, "无", LoadLiteLoaderGetError())
+                UnavailableReason = If(CardLiteLoader.Visibility = Visibility.Collapsed, T("无"), LoadLiteLoaderGetError())
             ElseIf RestoreButton Is BtnFabricApiRestore Then
                 UnavailableReason = LoadFabricApiGetError()
             ElseIf RestoreButton Is BtnOptiFabricRestore Then
                 UnavailableReason = LoadOptiFabricGetError()
             End If
-            NewText = If(UnavailableReason, "可以添加")
+            NewText = If(UnavailableReason, T("可以添加"))
         End If
         '修改对比
-        Dim IsPending = NewVersion Is Nothing AndAlso (NewText = "获取中……" OrElse NewText.StartsWithF("获取失败："))
+        Dim IsPending = NewVersion Is Nothing AndAlso (NewText = T("获取中……") OrElse NewText.StartsWithF(T("获取失败：")))
         Dim IsChanged = OldVersion <> NewVersion AndAlso Not IsPending
         CanRestore = IsChanged AndAlso OldVersion IsNot Nothing AndAlso CanRestore
         ComparePanel.Visibility = If(IsChanged, Visibility.Visible, Visibility.Collapsed)
         CurrentPanel.Visibility = If(IsChanged, Visibility.Collapsed, Visibility.Visible)
         '还原与取消安装按钮
         RestoreButton.Visibility = If(CanRestore, Visibility.Visible, Visibility.Collapsed)
-        If ClearButton IsNot Nothing Then ClearButton.ToolTip = If(OldVersion Is Nothing, "取消安装", "移除")
+        If ClearButton IsNot Nothing Then ClearButton.ToolTip = If(OldVersion Is Nothing, T("取消安装"), T("移除"))
         Dim HasClearButton = ClearButton IsNot Nothing AndAlso ClearButton.Visibility = Visibility.Visible
         RestoreButton.Margin = New Thickness(0, 5, If(CanRestore AndAlso HasClearButton, 60, 32), 0)
         ComparePanel.Margin = New Thickness(ComparePanel.Margin.Left, ComparePanel.Margin.Top,
@@ -570,9 +570,9 @@ Public Class PageDownloadModify
         NewSide.Children(0).Visibility = If(NewVersion Is Nothing, Visibility.Collapsed, Visibility.Visible)
         Dim NewLabel = CType(NewSide.Children(1), TextBlock)
         NewLabel.Margin = If(NewVersion Is Nothing, New Thickness(0), New Thickness(7, 0, 0, 0))
-        NewLabel.Text = If(NewVersion Is Nothing, "移除", NewText)
+        NewLabel.Text = If(NewVersion Is Nothing, T("移除"), NewText)
         If NewVersion Is Nothing AndAlso UnavailableReason IsNot Nothing Then
-            NewLabel.Inlines.Add(New Run($"（{If(UnavailableReason = "无", "无可用版本", UnavailableReason)}）") With {.Foreground = ColorGray4})
+            NewLabel.Inlines.Add(New Run(T("（{0}）", If(UnavailableReason = T("无"), T("无可用版本"), UnavailableReason))) With {.Foreground = ColorGray4})
         End If
     End Sub
 
@@ -632,6 +632,11 @@ Public Class PageDownloadModify
     End Sub
 
     Private Sub CardMinecraft_MouseLeftButtonUp(sender As Object, e As MouseButtonEventArgs) Handles CardMinecraft.MouseLeftButtonUp
+        If IsGameDownloadRestricted Then
+            Hint(GameDownloadRestrictedMessage, HintType.Red)
+            e.Handled = True
+            Return
+        End If
         ShowMinecraftVersionList()
         e.Handled = True
     End Sub
@@ -677,15 +682,15 @@ Public Class PageDownloadModify
         Dim Warnings As New List(Of String)
         If (SelectedForge IsNot Nothing OrElse SelectedNeoForge IsNot Nothing OrElse SelectedFabric IsNot Nothing) AndAlso
            Not PathUtils.IsSame(TargetInstance.PathIndie, TargetInstance.PathVersion) Then
-            Warnings.Add("该版本尚未开启版本隔离，可能与别的 MC 版本共用同一个 Mod 和存档文件夹。" & vbCrLf &
-                         "修改版本后，已有的 Mod、存档等需要手动迁移到新的游戏目录。")
+            Warnings.Add(T("该版本尚未开启版本隔离，可能与别的 MC 版本共用同一个 Mod 和存档文件夹。") & vbCrLf &
+                         T("修改版本后，已有的 Mod、存档等需要手动迁移到新的游戏目录。"))
         End If
         Dim IsMinecraftVersionChanged = InitialTarget.MinecraftVersion <> Target.MinecraftVersion
         If Not IsVanillaVersionReliable AndAlso Not IsMinecraftVersionChanged Then
-            Warnings.Add($"FXL 未能精准识别该版本，请确认它是不是 Minecraft {InitialTarget.MinecraftVersion}，如果不正确，请取消并选择正确的版本！")
+            Warnings.Add(T("FXL 未能精准识别该版本，请确认它是不是 Minecraft {0}，如果不正确，请取消并选择正确的版本！", InitialTarget.MinecraftVersion))
         End If
         If Not Configs.HintModifyInstanceWarning.Get() Then
-            Warnings.Add("如果该版本安装了 FXL 不兼容的加载器，或经过第三方修改，这些改动将会丢失！")
+            Warnings.Add(T("如果该版本安装了 FXL 不兼容的加载器，或经过第三方修改，这些改动将会丢失！"))
         End If
         Dim IsModLoaderChanged As Boolean = False
         For Each Loader In InitialTarget.ModLoaderVersions.Keys.Union(Target.ModLoaderVersions.Keys)
@@ -698,10 +703,10 @@ Public Class PageDownloadModify
             End If
         Next
         If (IsModLoaderChanged OrElse IsMinecraftVersionChanged) AndAlso InitialTarget.ModLoaderVersions.Any Then
-            Warnings.Add("现有的 Mod、资源包等在修改后可能会不兼容！")
+            Warnings.Add(T("现有的 Mod、资源包等在修改后可能会不兼容！"))
         End If
         If Warnings.Any() Then
-            If MyMsgBox("请注意：" & vbCrLf & "• " & Warnings.Join(vbCrLf & "• "), "修改确认", "开始修改", "取消", IsWarn:=True) <> 1 Then Return
+            If MyMsgBox(T("请注意：") & vbCrLf & "• " & Warnings.Join(vbCrLf & "• "), T("修改确认"), T("开始修改"), T("取消"), IsWarn:=True) <> 1 Then Return
         End If
         If Not Configs.HintModifyInstanceWarning.Get() Then Configs.HintModifyInstanceWarning.Set(True)
         '开始修改
@@ -713,7 +718,7 @@ Public Class PageDownloadModify
                 If PageInstanceLeft.Instance IsNot Nothing AndAlso PathUtils.IsSame(PageInstanceLeft.Instance.PathVersion, OldPath) Then PageInstanceLeft.Instance = RenamedInstance
                 If McInstanceSelected IsNot Nothing AndAlso PathUtils.IsSame(McInstanceSelected.PathVersion, OldPath) Then McInstanceSelected = RenamedInstance
                 PageInstanceLeft.ReloadCurrentJava()
-                Hint("重命名成功！", HintType.Green)
+                Hint(T("重命名成功！"), HintType.Green)
                 LoaderFolderRun(McInstanceListLoader, McFolderSelected, LoaderFolderRunType.ForceRun, MaxDepth:=1, ExtraPath:="versions\")
                 FrmMain.PageBack()
             Catch ex As Exception

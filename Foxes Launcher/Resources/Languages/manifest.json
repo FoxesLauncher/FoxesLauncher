@@ -1,0 +1,37 @@
+{
+  "default": "zh_cn",
+  "languages": [
+    {
+      "code": "zh_cn",
+      "name": "简体中文（中国大陆）",
+      "authors": [
+        "FoxesLauncher"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "code": "zh_tw",
+      "name": "繁體中文（中國臺灣）",
+      "authors": [
+        "FoxesLauncher"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "code": "zh_hk",
+      "name": "繁體中文（香港特別行政區）",
+      "authors": [
+        "FoxesLauncher"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "code": "en_us",
+      "name": "English (US)",
+      "authors": [
+        "FoxesLauncher"
+      ],
+      "version": "1.0.0"
+    }
+  ]
+}

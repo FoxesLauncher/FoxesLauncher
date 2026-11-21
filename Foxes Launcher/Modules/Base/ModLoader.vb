@@ -17,7 +17,11 @@ Public Module ModLoader
         ''' <summary>
         ''' 加载器的名称。
         ''' </summary>
-        Public Name As String = "未命名任务 " & Uuid & "#"
+        Public Name As String = T("未命名任务 {0}#", Uuid)
+        ''' <summary>
+        ''' 供代码比较的稳定标识，不随界面语言变化。
+        ''' </summary>
+        Public Tag As Object = Nothing
         ''' <summary>
         ''' 用于状态改变检测的同步锁。
         ''' </summary>
@@ -202,8 +206,6 @@ Public Module ModLoader
         End Function
 
         '等待结束
-        Public Const WaitForExitTimeoutMessage As String = "等待加载器执行超时。"
-
         ''' <summary>
         ''' 无限期地等待加载器完成，直到结束或抛出异常。若加载器尚未开始，则会开始执行。
         ''' </summary>
@@ -219,9 +221,9 @@ Public Module ModLoader
             If State = LoadState.Finished Then
                 Return
             ElseIf State = LoadState.Canceled Then
-                Throw New OperationCanceledException("加载器执行已中断")
+                Throw New OperationCanceledException(T("加载器执行已中断"))
             ElseIf IsNothing([Error]) Then
-                Throw New Exception("未知错误！")
+                Throw New Exception(T("未知错误！"))
             Else
                 Throw New Exception([Error].Message, [Error]) '保留调用堆栈，同时不影响信息输出与单元测试
             End If
@@ -231,7 +233,8 @@ Public Module ModLoader
         ''' </summary>
         ''' <param name="Timeout">等待的超时时间，以毫秒为单位。</param>
         ''' <param name="TimeoutMessage">若执行超时，将会抛出的异常信息。</param>
-        Public Sub WaitForExitTime(Timeout As Integer, Optional Input As Object = Nothing, Optional TimeoutMessage As String = WaitForExitTimeoutMessage, Optional LoaderToSyncProgress As Object = Nothing, Optional IsForceRestart As Boolean = False)
+        Public Sub WaitForExitTime(Timeout As Integer, Optional Input As Object = Nothing, Optional TimeoutMessage As String = Nothing, Optional LoaderToSyncProgress As Object = Nothing, Optional IsForceRestart As Boolean = False)
+            If TimeoutMessage Is Nothing Then TimeoutMessage = T("等待加载器执行超时。")
             Start(Input, IsForceRestart)
             Do While State = LoadState.Loading
                 If LoaderToSyncProgress IsNot Nothing Then LoaderToSyncProgress.Progress = Progress
@@ -242,9 +245,9 @@ Public Module ModLoader
             If State = LoadState.Finished Then
                 Return
             ElseIf State = LoadState.Canceled Then
-                Throw New OperationCanceledException("加载器执行已中断")
+                Throw New OperationCanceledException(T("加载器执行已中断"))
             ElseIf IsNothing([Error]) Then
-                Throw New Exception("未知错误！")
+                Throw New Exception(T("未知错误！"))
             Else
                 Throw [Error]
             End If
@@ -485,7 +488,7 @@ Public Module ModLoader
                 End Select
             End Get
             Set(value As Double)
-                Throw New Exception("多重加载器不支持设置进度")
+                Throw New Exception(T("多重加载器不支持设置进度"))
             End Set
         End Property
 
@@ -575,7 +578,7 @@ Public Module ModLoader
                     Cancel()
                 Case LoadState.Failed
                     '完蛋，出错了
-                    Failed(New Exception(Loader.Name & "失败", Loader.Error))
+                    Failed(New Exception(T("{0}失败", Loader.Name), Loader.Error))
             End Select
         End Sub
         ''' <summary>
@@ -625,7 +628,7 @@ Restart:
                             ElseIf TypeOf Loader Is LoaderDownload Then
                                 Loader.Start(If(TypeOf Input Is List(Of NetFile), Input, Nothing), IsForceRestarting)
                             Else
-                                Throw New Exception("未知的加载器类型（" & Loader.GetType.Name & "）")
+                                Throw New Exception(T("未知的加载器类型（{0}）", Loader.GetType.Name))
                             End If
                         Else
                             Loader.Start(IsForceRestart:=IsForceRestarting)

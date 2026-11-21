@@ -48,13 +48,13 @@ Public Class PageLoginAuthSkin
         If McLoginLoader.State = LoadState.Loading Then
             Logger.Warn("要求更换角色，但登录加载器繁忙")
             If TypeOf McLoginLoader.Input Is McLoginServer AndAlso CType(McLoginLoader.Input, McLoginServer).ForceReselectProfile Then
-                Hint("正在尝试更换，请稍候！")
+                Hint(T("正在尝试更换，请稍候！"))
             Else
-                Hint("正在登录中，请稍后再更换角色！", HintType.Red)
+                Hint(T("正在登录中，请稍后再更换角色！"), HintType.Red)
             End If
             Return
         End If
-        Hint("正在尝试更换，请稍候！")
+        Hint(T("正在尝试更换，请稍候！"))
         Settings.Set("CacheAuthUuid", "") '清空选择缓存
         Settings.Set("CacheAuthName", "")
         RunInThread(

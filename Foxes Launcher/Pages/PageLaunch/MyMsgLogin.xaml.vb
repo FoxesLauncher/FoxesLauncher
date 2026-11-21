@@ -84,11 +84,11 @@ Public Class MyMsgLogin
         DeviceCode = Data("device_code")
         Website = Data("verification_uri")
         '设置 UI
-        LabTitle.Text = "登录 Minecraft"
+        LabTitle.Text = T("登录 Minecraft")
         LabCaption.Text =
-            $"登录网页将自动开启，请在网页中输入 {UserCode}（已自动复制）。" & vbCrLf & vbCrLf &
-            $"如果网络环境不佳，网页可能一直加载不出来，届时请使用加速器或 VPN 改善网络环境。" & vbCrLf &
-            $"你也可以用其他设备打开 {Website} 并输入上述代码。"
+            T("登录网页将自动开启，请在网页中输入 {0}（已自动复制）。", UserCode) & vbCrLf & vbCrLf &
+            T("如果网络环境不佳，网页可能一直加载不出来，届时请使用加速器或 VPN 改善网络环境。") & vbCrLf &
+            T("你也可以用其他设备打开 {0} 并输入上述代码。", Website)
         CustomEventService.SetEventData(Btn1, Website)
         CustomEventService.SetEventData(Btn2, UserCode)
         '启动工作线程
@@ -118,7 +118,7 @@ Public Class MyMsgLogin
                 '获取结果
                 Dim ResultJson As JObject = Result.DeserializeJson()
                 McLaunchLog($"令牌过期时间：{ResultJson("expires_in")} 秒")
-                Hint("网页登录成功！", HintType.Green)
+                Hint(T("网页登录成功！"), HintType.Green)
                 Finished({ResultJson("access_token").ToString, ResultJson("refresh_token").ToString})
                 Return
             Catch ex As Exception
@@ -126,16 +126,16 @@ Public Class MyMsgLogin
                 If TypeOf ex Is HttpRequestCodeException Then
                     Dim Response = CType(ex, HttpRequestCodeException).Response
                     If Response.Contains("authorization_declined") Then
-                        Finished(New Exception("$你拒绝了 FXL 申请的权限……"))
+                        Finished(New BriefException(T("你拒绝了 FXL 申请的权限……")))
                         Return
                     ElseIf Response.Contains("expired_token") Then
-                        Finished(New Exception("$登录用时太长啦，重新试试吧！"))
+                        Finished(New BriefException(T("登录用时太长啦，重新试试吧！")))
                         Return
                     ElseIf Response.Contains("Account security interrupt") Then
-                        Finished(New Exception("$该账号由于安全问题无法登陆，请前往微软账户页获取更多信息。"))
+                        Finished(New BriefException(T("该账号由于安全问题无法登陆，请前往微软账户页获取更多信息。")))
                         Return
                     ElseIf Response.Contains("service abuse") Then
-                        Finished(New Exception("$非常抱歉，该账号已被微软封禁，无法登录。"))
+                        Finished(New BriefException(T("非常抱歉，该账号已被微软封禁，无法登录。")))
                         Return
                     ElseIf Response.Contains("AADSTS70000") Then '可能不能判 “invalid_grant”，见 #269
                         Finished(New RestartException)
@@ -150,7 +150,7 @@ Public Class MyMsgLogin
                     Logger.Warn(ex, $"登录轮询第 {UnknownFailureCount} 次失败")
                     Thread.Sleep(2000)
                 Else
-                    Finished(New Exception("登录轮询失败", ex))
+                    Finished(New Exception(T("登录轮询失败"), ex))
                     Return
                 End If
             End Try

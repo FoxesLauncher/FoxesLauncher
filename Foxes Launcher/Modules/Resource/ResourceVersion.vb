@@ -43,6 +43,18 @@ Public Class ResourceVersion
     ''' 支持的游戏版本列表。类型包括："26.1.5"，"26.1"，"26.1 预览版"，"1.18.5"，"1.18"，"1.18 预览版"，"21w15a"，"未知版本"。
     ''' </summary>
     Public GameVersions As List(Of String)
+    ''' <summary>
+    ''' GameVersions 中属于快照/预览版的显示字符串。
+    ''' </summary>
+    Public ReadOnly GameVersionSnapshots As New HashSet(Of String)
+
+    ''' <summary>
+    ''' 判断某个显示版本是否为快照/预览版，不依赖界面语言。
+    ''' </summary>
+    Public Function IsSnapshotGameVersion(Display As String) As Boolean
+        If GameVersionSnapshots.Contains(Display) Then Return True
+        Return Not Display.Contains(".")
+    End Function
 
     ''' <summary>
     ''' 发布状态。
@@ -56,11 +68,11 @@ Public Class ResourceVersion
         Get
             Select Case ReleaseType
                 Case ReleaseTypes.Release
-                    Return "正式版"
+                    Return T("正式版")
                 Case ReleaseTypes.Beta
-                    Return If(ModeDebug, "Beta 版", "测试版")
+                    Return If(ModeDebug, T("Beta 版"), T("测试版"))
                 Case Else
-                    Return If(ModeDebug, "Alpha 版", "早期测试版")
+                    Return If(ModeDebug, T("Alpha 版"), T("早期测试版"))
             End Select
         End Get
     End Property
@@ -145,17 +157,20 @@ Public Class ResourceVersion
                 End If
                 'GameVersions
                 Dim RawVersions As List(Of String) = Data("gameVersions").Select(Function(t) t.ToString.Trim.Lower).ToList
-                .GameVersions = RawVersions.
-                        Where(Function(v) McVersion.IsStandardFormat(v)).
-                        Select(Function(v) v.Replace("-snapshot", " 预览版")).
-                        Distinct.ToList
+                .GameVersions = New List(Of String)
+                For Each RawVersion In RawVersions.Where(Function(v) McVersion.IsStandardFormat(v))
+                    Dim DisplayVersion As String = RawVersion.Replace("-snapshot", " " & T("预览版"))
+                    If .GameVersions.Contains(DisplayVersion) Then Continue For
+                    .GameVersions.Add(DisplayVersion)
+                    If RawVersion.Contains("-") Then .GameVersionSnapshots.Add(DisplayVersion)
+                Next
                 If .GameVersions.IsSingle Then
                     .GameVersions = .GameVersions.ToList
                 ElseIf .GameVersions.Count > 1 Then
                     .GameVersions = .GameVersions.SortByComparison(AddressOf McUtils.CompareVersionGE).ToList
                     If .ResourceType = ResourceTypes.ModPack Then .GameVersions = { .GameVersions(0)}.ToList '整合包理应只 “支持” 一个版本
                 Else
-                    .GameVersions = New List(Of String) From {"未知版本"}
+                    .GameVersions = New List(Of String) From {T("未知版本")}
                 End If
                 'ModLoaders
                 .ModLoaders = ModLoaders.None
@@ -203,9 +218,13 @@ Public Class ResourceVersion
                 End If
                 'GameVersions
                 Dim RawVersions As List(Of String) = Data("game_versions").Select(Function(t) t.ToString.Trim.Lower).ToList
-                .GameVersions = RawVersions.Where(Function(v) v.Contains(".")).
-                                               Select(Function(v) If(v.Contains("-"), v.BeforeFirst("-") & " 预览版", If(v.StartsWithF("b1."), "远古版本", v))).
-                                               Distinct.ToList
+                .GameVersions = New List(Of String)
+                For Each RawVersion In RawVersions.Where(Function(v) v.Contains("."))
+                    Dim DisplayVersion As String = If(RawVersion.Contains("-"), T("{0} 预览版", RawVersion.BeforeFirst("-")), If(RawVersion.StartsWithF("b1."), T("远古版本"), RawVersion))
+                    If .GameVersions.Contains(DisplayVersion) Then Continue For
+                    .GameVersions.Add(DisplayVersion)
+                    If RawVersion.Contains("-") Then .GameVersionSnapshots.Add(DisplayVersion)
+                Next
                 If .GameVersions.IsSingle Then
                     '无需处理
                 ElseIf .GameVersions.Count > 1 Then
@@ -214,7 +233,7 @@ Public Class ResourceVersion
                 ElseIf RawVersions.Any(Function(v) v.RegexCheck("[0-9]{2}w[0-9]{2}[a-z]")) Then
                     .GameVersions = RawVersions.Where(Function(v) v.RegexCheck("[0-9]{2}w[0-9]{2}[a-z]")).ToList
                 Else
-                    .GameVersions = New List(Of String) From {"未知版本"}
+                    .GameVersions = New List(Of String) From {T("未知版本")}
                 End If
 #End Region
             End If
@@ -225,7 +244,7 @@ Public Class ResourceVersion
     ''' 从项目 ID 获取其下的全部版本列表，并获取其前置项目信息。
     ''' </summary>
     Public Shared Function FromProjectId(ProjectId As String, Platform As ResourcePlatforms, Optional LoadDependencies As Boolean = True) As List(Of ResourceVersion)
-        If Not Platform.Flags.IsSingle Then Throw New ArgumentException($"必须指定单一平台，当前值为 {Platform}")
+        If Not Platform.Flags.IsSingle Then Throw New ArgumentException(T("必须指定单一平台，当前值为 {0}", Platform))
         Dim TargetProject = ResourceProject.FromProjectId(ProjectId, Platform)
         '获取项目对象的文件列表
         If Not ProjectFilesCache.ContainsKey(ProjectId) Then
@@ -250,7 +269,7 @@ Public Class ResourceVersion
                         Logger.Info($"返回的原始内容如下：{vbCrLf}{ResultJson}")
                     Else
                         Logger.Info($"CurseForge 返回的资源版本列表存在缺失，返回的原始内容如下：{vbCrLf}{ResultJson}")
-                        Throw New Exception("CurseForge 返回的资源版本列表存在缺失")
+                        Throw New Exception(T("CurseForge 返回的资源版本列表存在缺失"))
                     End If
                 Next
             Else 'Modrinth
@@ -302,6 +321,11 @@ Public Class ResourceVersion
             If Data.ContainsKey("Size") Then .Size = Data("Size").ToObject(Of Integer)
             If Data.ContainsKey("Hash") Then .Hash = Data("Hash").ToString
             If Data.ContainsKey("GameVersions") Then .GameVersions = Data("GameVersions").ToObject(Of List(Of String))
+            If Data.ContainsKey("GameVersionSnapshots") Then
+                For Each Snapshot As JToken In DirectCast(Data("GameVersionSnapshots"), JArray)
+                    .GameVersionSnapshots.Add(Snapshot.ToString)
+                Next
+            End If
             If Data.ContainsKey("RawDependencies") Then .RawDependencies = Data("RawDependencies").ToObject(Of List(Of String))
             If Data.ContainsKey("Dependencies") Then .Dependencies = Data("Dependencies").ToObject(Of List(Of String))
         End With
@@ -321,6 +345,7 @@ Public Class ResourceVersion
             .Add("DownloadCount", DownloadCount)
             .Add("ModLoaders", CInt(ModLoaders))
             .Add("GameVersions", New JArray(GameVersions))
+            If GameVersionSnapshots.Any Then .Add("GameVersionSnapshots", New JArray(GameVersionSnapshots))
             .Add("ReleaseType", CInt(ReleaseType))
             If FileName IsNot Nothing Then .Add("FileName", FileName)
             If DownloadUrls IsNot Nothing Then .Add("DownloadUrls", New JArray(DownloadUrls))
@@ -357,16 +382,16 @@ Public Class ResourceVersion
                 Iterator Function()
                     If ModLoaders <> ModLoaders.None Then Yield ModLoaders.Flags.Join("、"c)
                     If .Title <> PathUtils.GetFileNameWithoutExtension(FileName) Then Yield PathUtils.GetFileNameWithoutExtension(FileName)
-                    If Dependencies.Any Then Yield $"{Dependencies.Count} 项前置"
-                    If GameVersions.All(Function(v) Not v.Contains(".") OrElse {"w", "snapshot", "rc", "pre", "experimental", "-"}.Any(Function(s) v.ContainsIgnoreCase(s))) Then Yield $"游戏版本 {GameVersions.Join("、"c)}"
-                    If DownloadCount > 0 Then Yield $"下载 {If(DownloadCount > 100000, Math.Round(DownloadCount / 10000) & " 万", DownloadCount.ToString() + " ")}次" 'CurseForge 的下载次数经常错误地返回 0
-                    Yield $"更新于 {StringUtils.FormatTimeSpan(ReleaseDate - Date.Now, False)}"
+                    If Dependencies.Any Then Yield T("{0} 项前置", Dependencies.Count)
+                    If GameVersions.All(Function(v) Not v.Contains(".") OrElse {"w", "snapshot", "rc", "pre", "experimental", "-"}.Any(Function(s) v.ContainsIgnoreCase(s))) Then Yield T("游戏版本 {0}", GameVersions.Join("、"c))
+                    If DownloadCount > 0 Then Yield T("下载 {0}次", FormatDownloadCount(DownloadCount) & If(DownloadCount > 100000, "", " ")) 'CurseForge 的下载次数经常错误地返回 0
+                    Yield T("更新于 {0}", StringUtils.FormatTimeSpan(ReleaseDate - Date.Now, False))
                     If ReleaseType <> ReleaseTypes.Release Then Yield ReleaseTypeDisplay
                 End Function().Join("，"c)
 
                 '另存为按钮
                 If SaveAsButtonHandler IsNot Nothing Then
-                    Dim BtnSave As New MyIconButton With {.Logo = Logo.IconButtonSave, .ToolTip = "另存为"}
+                    Dim BtnSave As New MyIconButton With {.Logo = Logo.IconButtonSave, .ToolTip = T("另存为")}
                     AddHandler BtnSave.Click, SaveAsButtonHandler
                     .Buttons = {BtnSave}
                 End If

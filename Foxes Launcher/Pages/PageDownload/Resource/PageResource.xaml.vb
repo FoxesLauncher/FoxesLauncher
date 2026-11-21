@@ -19,31 +19,47 @@ Public Class PageResource
     ''' </summary>
     Public Property TypeName As String
         Get
-            Return _TypeName
+            Return GetValue(TypeNameProperty)
         End Get
         Set(Value As String)
-            If _TypeName = Value Then Return
-            _TypeName = Value
-            Loader.Name = $"社区资源获取：{Value}"
+            SetValue(TypeNameProperty, Value)
         End Set
     End Property
-    Private _TypeName As String = ""
+    Public Shared ReadOnly TypeNameProperty As DependencyProperty = DependencyProperty.Register("TypeName", GetType(String), GetType(PageResource), New PropertyMetadata("", AddressOf OnTypeNameChanged))
+    Private Shared Sub OnTypeNameChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        Dim Page = DirectCast(d, PageResource)
+        Dim Value As String = DirectCast(If(e.NewValue, ""), String)
+        If Page.Loader IsNot Nothing Then Page.Loader.Name = T("社区资源获取：{0}", Value)
+    End Sub
 
     ''' <summary>
     ''' 英文前后含一个空格的可读资源类型名，例如 " Mod "、"整合包"。
     ''' </summary>
     Public Property TypeNameSpaced As String
         Get
-            Return _TypeNameSpaced
+            Return GetValue(TypeNameSpacedProperty)
         End Get
         Set(Value As String)
-            If _TypeNameSpaced = Value Then Return
-            _TypeNameSpaced = Value
-            PanAlways.Title = $"搜索{Value}"
-            Load.Text = $"正在获取{Value}列表"
+            SetValue(TypeNameSpacedProperty, Value)
         End Set
     End Property
-    Private _TypeNameSpaced As String = ""
+    Public Shared ReadOnly TypeNameSpacedProperty As DependencyProperty = DependencyProperty.Register("TypeNameSpaced", GetType(String), GetType(PageResource), New PropertyMetadata("", AddressOf OnTypeNameSpacedChanged))
+    Private Shared Sub OnTypeNameSpacedChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        Dim Page = DirectCast(d, PageResource)
+        If Page.PanAlways Is Nothing OrElse Page.Load Is Nothing Then Return
+        Dim Value As String = DirectCast(If(e.NewValue, ""), String)
+        Page.PanAlways.Title = T("搜索{0}", Value)
+        Page.Load.Text = T("正在获取{0}列表", Value)
+    End Sub
+    ''' <summary>
+    ''' 在控件初始化完成后刷新资源类型相关文本。
+    ''' </summary>
+    Private Sub RefreshTypeNameText()
+        If PanAlways Is Nothing OrElse Load Is Nothing Then Return
+        Dim Value As String = TypeNameSpaced
+        PanAlways.Title = T("搜索{0}", Value)
+        Load.Text = T("正在获取{0}列表", Value)
+    End Sub
 
     ''' <summary>
     ''' 该页面对应的资源类型。
@@ -78,6 +94,7 @@ Public Class PageResource
 
     Private Sub PageResource_Loaded(sender As Object, e As EventArgs) Handles Me.Loaded
         Static IsFirstLoaded As Boolean = False
+        RefreshTypeNameText()
         '不知道从 Initialized 改成 Loaded 会不会有问题，但用 Initialized 会导致初始的筛选器修改被覆盖回默认值
         If TargetInstance IsNot Nothing Then
             '设置目标
@@ -120,7 +137,7 @@ Public Class PageResource
     End Sub
     Private Function LoaderInput() As ResourceSearcher.SearchRequest
         Dim Request As New ResourceSearcher.SearchRequest(PageType, Storage, (Page + 1) * PAGE_SIZE)
-        Dim GameVersion As String = If(TextSearchVersion.Text = "全部 (也可自行输入)", Nothing,
+        Dim GameVersion As String = If(TextSearchVersion.Text = T("全部 (也可自行输入)"), Nothing,
             If(TextSearchVersion.Text.Contains(".") OrElse TextSearchVersion.Text.Contains("w"), TextSearchVersion.Text, Nothing))
         With Request
             .SearchText = TextSearchName.Text
@@ -182,17 +199,6 @@ Public Class PageResource
     End Sub
 
     '自动重试
-    Private Sub Load_State(sender As Object, state As MyLoading.MyLoadingState, oldState As MyLoading.MyLoadingState) Handles Load.StateChanged
-        Select Case Loader.State
-            Case LoadState.Failed
-                Dim ErrorMessage As String = ""
-                If Loader.Error IsNot Nothing Then ErrorMessage = Loader.Error.Message
-                If ErrorMessage.Contains("不是有效的 json 文件") Then
-                    Logger.Warn($"下载的{TypeNameSpaced}列表 json 文件损坏，已自动重试")
-                    CType(Parent, MyPageRight).PageLoaderRestart()
-                End If
-        End Select
-    End Sub
 
     '切换页码
     Private Sub BtnPageFirst_Click(sender As Object, e As RoutedEventArgs) Handles BtnPageFirst.Click
@@ -232,7 +238,7 @@ Public Class PageResource
     '重置按钮
     Private Sub ResetFilter() Handles BtnSearchReset.Click
         TextSearchName.Text = ""
-        TextSearchVersion.Text = "全部 (也可自行输入)"
+        TextSearchVersion.Text = T("全部 (也可自行输入)")
         TextSearchVersion.SelectedIndex = 0
         ComboSearchSource.SelectedIndex = 0
         ComboSearchTag.SelectedIndex = 0

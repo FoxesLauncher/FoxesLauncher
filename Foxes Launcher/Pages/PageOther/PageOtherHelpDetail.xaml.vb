@@ -15,7 +15,7 @@ Public Class PageOtherHelpDetail
     ''' </summary>
     Public Function Init(Entry As HelpEntry) As Boolean
         Dim Content = If(Entry.XamlContent, "")
-        If Content = "" Then Throw New Exception("帮助 xaml 文件为空")
+        If Content = "" Then Throw New Exception(T("帮助 xaml 文件为空"))
         Try
             '修改时应同时修改 PageLaunchRight.LoadContent
             Content = ArgumentReplace(Content, AddressOf StringUtils.XmlEscape)

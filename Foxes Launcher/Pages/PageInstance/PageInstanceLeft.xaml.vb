@@ -58,7 +58,7 @@ Public Class PageInstanceLeft
                 If FrmDownloadModify Is Nothing Then FrmDownloadModify = New PageDownloadModify
                 Return FrmDownloadModify
             Case Else
-                Throw New Exception("未知的版本设置子页面种类：" & ID)
+                Throw New Exception(T("未知的版本设置子页面种类：{0}", ID))
         End Select
     End Function
 
@@ -68,7 +68,7 @@ Public Class PageInstanceLeft
     Public Sub PageChange(ID As FormMain.PageSubType)
         If PageID = ID Then Return
         If Instance IsNot Nothing AndAlso McInstanceLock.IsLocked(Instance) Then
-            Hint("该版本正在被修改，请稍后再切换页面！", HintType.Red)
+            Hint(T("该版本正在被修改，请稍后再切换页面！"), HintType.Red)
             Return
         End If
         AniControlEnabled += 1
@@ -110,7 +110,7 @@ Public Class PageInstanceLeft
     End Sub
     Public Sub Refresh(SubType As FormMain.PageSubType)
         If Instance IsNot Nothing AndAlso McInstanceLock.IsLocked(Instance) Then
-            Hint("该版本正在被修改，请稍后再刷新！", HintType.Red)
+            Hint(T("该版本正在被修改，请稍后再刷新！"), HintType.Red)
             Return
         End If
         Select Case SubType
@@ -127,7 +127,7 @@ Public Class PageInstanceLeft
     End Sub
 
     Public Sub Reset(sender As Object, e As EventArgs)
-        If MyMsgBox("是否要初始化该版本的版本独立设置？该操作不可撤销。", "初始化确认",, "取消", IsWarn:=True) = 1 Then
+        If MyMsgBox(T("是否要初始化该版本的版本独立设置？该操作不可撤销。"), T("初始化确认"),, T("取消"), IsWarn:=True) = 1 Then
             If IsNothing(FrmInstanceSetup) Then FrmInstanceSetup = New PageInstanceSetup
             FrmInstanceSetup.Reset()
             ItemSetup.Checked = True

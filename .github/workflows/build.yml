@@ -57,6 +57,18 @@ jobs:
     - name: Restore NuGet Packages
       run: dotnet restore FXLCS\FXLCS.csproj
 
+    - name: Self-test i18n checker
+      run: python build\i18n_check.py --self-test
+
+    - name: Validate i18n
+      run: python build\i18n_check.py
+
+    - name: Check unused i18n keys
+      run: python build\i18n_check.py --unused
+
+    - name: Check i18n fragment baseline
+      run: python build\i18n_check.py --report-fragments --max-fragments 27
+
     - name: Build
       env:
         FXL_MS_CLIENT_ID: ${{ secrets.CLIENT_ID }}

@@ -32,8 +32,8 @@ Public Class MyListItem
                 SetRowSpan(Rect, 999)
                 Children.Insert(0, Rect)
                 _RectBack = Rect
-                '<!--<Border x:Name = "RectBack" CornerRadius="3" RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True" 
-                'IsHitTestVisible = "False" Opacity="0" BorderThickness="1" 
+                '<!--<Border x:Name = "RectBack" CornerRadius="3" RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True"
+                'IsHitTestVisible = "False" Opacity="0" BorderThickness="1"
                 'Grid.ColumnSpan = "4" Background="{DynamicResource ColorBrush7}" BorderBrush="{DynamicResource ColorBrush6}"/>-->
             End If
             Return _RectBack
@@ -70,7 +70,7 @@ Public Class MyListItem
                 SetRow(Lab, 2)
                 Children.Add(Lab)
                 _LabInfo = Lab
-                '<TextBlock Grid.Row="2" SnapsToDevicePixels="False" UseLayoutRounding="False" HorizontalAlignment="Left" x:Name = "LabInfo" IsHitTestVisible="False" Grid.Column="2" 
+                '<TextBlock Grid.Row="2" SnapsToDevicePixels="False" UseLayoutRounding="False" HorizontalAlignment="Left" x:Name = "LabInfo" IsHitTestVisible="False" Grid.Column="2"
                 'TextTrimming = "CharacterEllipsis" Visibility="Collapsed" FontSize="12" Foreground="{StaticResource ColorBrushGray2}" Margin="4,0,0,0" />
             End If
             Return _LabInfo
@@ -191,19 +191,24 @@ Public Class MyListItem
     Public Shared ReadOnly FontSizeProperty As DependencyProperty = DependencyProperty.Register("FontSize", GetType(Double), GetType(MyListItem), New PropertyMetadata(CType(14, Double)))
 
     '信息
-    Private _Info As String = ""
     Public Property Info As String
         Get
-            Return _Info
+            Return DirectCast(If(GetValue(InfoProperty), ""), String).ReplaceLineEndings("")
         End Get
         Set(value As String)
-            If _Info = value Then Return
-            value = value.ReplaceLineEndings("")
-            _Info = value
-            LabInfo.Text = value
-            LabInfo.Visibility = If(value = "", Visibility.Collapsed, Visibility.Visible)
+            SetValue(InfoProperty, value)
         End Set
     End Property
+    Public Shared ReadOnly InfoProperty As DependencyProperty = DependencyProperty.Register("Info", GetType(String), GetType(MyListItem), New PropertyMetadata("", AddressOf OnInfoChanged))
+    Private Shared Sub OnInfoChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        Dim Item = DirectCast(d, MyListItem)
+        Dim Value As String = DirectCast(If(e.NewValue, ""), String)
+        Value = Value.ReplaceLineEndings("")
+        Dim InfoLabel = Item.LabInfo
+        If InfoLabel Is Nothing Then Return
+        InfoLabel.Text = Value
+        InfoLabel.Visibility = If(Value = "", Visibility.Collapsed, Visibility.Visible)
+    End Sub
 
     '图片
     Private _Logo As String = ""

@@ -189,7 +189,7 @@ Public Class MyResizer
         If rightElements.ContainsKey(key) Then resizeRight = True
         If upElements.ContainsKey(key) Then resizeUp = True
         If downElements.ContainsKey(key) Then resizeDown = True
-        RunInNewThread(AddressOf updateSizeLoop, "窗口大小调整检测")
+        RunInNewThread(AddressOf updateSizeLoop, T("窗口大小调整检测"))
     End Sub
 
     Private Sub updateSizeLoop()

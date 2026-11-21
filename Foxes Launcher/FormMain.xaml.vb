@@ -5,280 +5,6 @@ Public Class FormMain
 
 #Region "基础"
 
-    '更新日志
-    Private Sub ShowUpdateLog(LastVersion As Integer)
-        Dim FeatureCount As Integer = 0, BugCount As Integer = 0
-        Dim FeatureList As New List(Of KeyValuePair(Of Integer, String))
-        '统计更新日志条目
-        If BuildType = BuildTypes.Release Then
-            If LastVersion < 415 Then 'Release 2.99.0.1
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：为设置更新添加部分黑名单"))
-            End If
-            If LastVersion < 411 Then 'Release 2.14.0.0
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(4, "新增：允许修改、添加、移除、更新已安装版本的各个组件，可从版本设置中进入"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：启动游戏时允许按 Esc 取消"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：允许复制主页的启动日志中的内容"))
-                FeatureCount += 19
-                BugCount += 26
-            End If
-            If LastVersion < 408 Then 'Release 2.13.1.1
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：版本设置中，添加打开截图文件夹的快捷方式"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：导出整合包时，可以勾选导出光影设置文件"))
-                FeatureCount += 23
-                BugCount += 28
-            End If
-            If LastVersion < 406 Then 'Release 2.13.0.1
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(4, "新增：重做 Java 管理与相关设置，允许调整 Java 优先级、指定 Java 版本范围等"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：导出整合包时允许自动导出版本文件夹中的 Java"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：重做弹出提示的样式以及动画，以更符合现代 UI 审美"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：可能无法安装 OptiFine 26.1.2"))
-                FeatureCount += 35
-                BugCount += 17
-            End If
-            If LastVersion < 404 Then 'Release 2.12.8.2
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：Windows 7 无法正常联网"))
-                FeatureCount += 1
-                BugCount += 2
-            End If
-            If LastVersion < 402 Then 'Release 2.12.8.1
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：升级框架到 .NET Framework 4.8"))
-                FeatureCount += 35
-                BugCount += 21
-            End If
-            If LastVersion < 398 Then 'Release 2.12.7.3
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：下载游戏、整合包的稳定性"))
-                FeatureCount += 1
-                BugCount += 5
-            End If
-            If LastVersion < 391 Then 'Release 2.12.6.2
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：会为部分 Forge / NeoForge 选择不支持的 Java"))
-                BugCount += 4
-            End If
-            If LastVersion < 389 Then 'Release 2.12.6.1
-                If LastVersion = 387 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：无法使用 Java 25+ 启动 Forge"))
-                FeatureCount += 4
-                BugCount += 3
-            End If
-            If LastVersion < 387 Then 'Release 2.12.6
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：降低 Minecraft 的内存占用"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：Minecraft 使用 Java 25+ 时的一个性能问题"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：无法下载 NeoForge 26.1"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：部分关键词搜不到资源，特别是中文 Mod 搜索经常没有结果"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：老版本 Windows 无法启动游戏"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：连接 Mojang 的服务可能失败，提示错误码 421"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法访问爱发电"))
-                FeatureCount += 24
-                BugCount += 19
-            End If
-            If LastVersion < 383 Then 'Release 2.12.3
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：部分关键词搜不到资源，特别是中文 Mod 搜索经常没有结果"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：下载可能完全卡住，或是下载进度反复回退"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：内存管理设置，可以选择 G1GC、ZGC 或分代 ZGC"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：来自 Modrinth 的文件下载速度"))
-                FeatureCount += 15
-                BugCount += 16
-            End If
-            If LastVersion < 381 Then 'Release 2.12.2
-                FeatureCount += 3
-                BugCount += 13
-            End If
-            If LastVersion < 379 Then 'Release 2.12.1
-                If LastVersion >= 376 Then
-                    FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "删除：暂时隐藏联机入口……不过只是暂时关闭，它还会回来的！"))
-                End If
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "新增：适配新的 Minecraft 版本号系统与 Unobfuscated 版本"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：巨幅优化各个下载页面和 Mod 管理页面的性能"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：更换披风时会显示当前使用的披风"))
-                FeatureCount += 33
-                BugCount += 29
-            End If
-            If LastVersion < 376 Then 'Release 2.11.2
-                'FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "新增：联机功能！"))
-                FeatureCount += 32
-                BugCount += 21
-            End If
-        Else
-            '5：          FEAT+
-            '4：     IMP+ FEAT*
-            '3：BUG+ IMP* FEAT-
-            '2：BUG* IMP-
-            '1：BUG-
-            If LastVersion < 416 Then 'Snapshot 2.99.0.1
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：为设置更新添加部分黑名单"))
-            End If
-            If LastVersion < 412 Then 'Snapshot 2.14.0.0
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(4, "新增：允许修改、添加、移除、更新已安装版本的各个组件，可从版本设置中进入"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：启动游戏时允许按 Esc 取消"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：允许复制主页的启动日志中的内容"))
-                FeatureCount += 19
-                BugCount += 26
-            End If
-            If LastVersion < 410 Then 'Snapshot 2.13.1.1
-                If LastVersion = 409 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：更新 Mod 时可能更新成另一个 Mod 加载器的版本"))
-                FeatureCount += 2
-                BugCount += 6
-            End If
-            If LastVersion < 409 Then 'Snapshot 2.13.1.0
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：版本设置中，添加打开截图文件夹的快捷方式"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：导出整合包时，可以勾选导出光影设置文件"))
-                FeatureCount += 21
-                BugCount += 22
-            End If
-            If LastVersion < 407 Then 'Snapshot 2.13.0.1
-                If LastVersion = 405 Then
-                    FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：使用部分主页预设时崩溃"))
-                    FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法删除部分文件夹"))
-                    FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：版本设置中指定的 Java 无法被保存"))
-                    FeatureCount += 1
-                    BugCount += 3
-                End If
-                FeatureCount += 2
-            End If
-            If LastVersion < 405 Then 'Snapshot 2.13.0.0
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(4, "新增：重做 Java 管理与相关设置，允许调整 Java 优先级、指定 Java 版本范围等"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：导出整合包时允许自动导出版本文件夹中的 Java"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：重做弹出提示的样式以及动画，以更符合现代 UI 审美"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：可能无法安装 OptiFine 26.1.2"))
-                FeatureCount += 35
-                BugCount += 17
-            End If
-            If LastVersion < 403 Then 'Snapshot 2.12.8.2
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：Windows 7 无法正常联网"))
-                FeatureCount += 1
-                BugCount += 2
-            End If
-            If LastVersion < 401 Then 'Snapshot 2.12.8.1
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：可能无法更换披风"))
-                FeatureCount += 8
-                BugCount += 6
-            End If
-            If LastVersion < 399 Then 'Snapshot 2.12.8.0
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：升级框架到 .NET Framework 4.8"))
-                FeatureCount += 28
-                BugCount += 19
-            End If
-            If LastVersion < 397 Then 'Snapshot 2.12.7.3
-                '该版本中的主题相关修复已随主题功能一并移除
-            End If
-            If LastVersion < 395 Then 'Snapshot 2.12.7.2
-                If LastVersion = 393 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：部分个性化功能失效"))
-            End If
-            If LastVersion < 393 Then 'Snapshot 2.12.7.1
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：允许永久关闭启动页面的快照版提示"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：下载游戏、整合包的稳定性"))
-                FeatureCount += 1
-                BugCount += 5
-            End If
-            If LastVersion < 390 Then 'Snapshot 2.12.6.2
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：会为部分 Forge / NeoForge 选择不支持的 Java"))
-                BugCount += 4
-            End If
-            If LastVersion < 388 Then 'Snapshot 2.12.6.1
-                If LastVersion = 386 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：无法使用 Java 25+ 启动 Forge"))
-                FeatureCount += 4
-                BugCount += 3
-            End If
-            If LastVersion < 386 Then 'Snapshot 2.12.6
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：Minecraft 使用 Java 25+ 时的一个性能问题"))
-                If LastVersion = 384 OrElse LastVersion = 385 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：无法正常重命名游戏版本"))
-                If LastVersion = 385 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法显示 Modrinth 整合包的版本列表"))
-                BugCount += 1
-            End If
-            If LastVersion < 385 Then 'Snapshot 2.12.5
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：无法下载 NeoForge 26.1"))
-                If LastVersion = 384 Then
-                    FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：下载可能失败，提示任务管理刷新线程出错"))
-                    FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：无法保存选择的 Minecraft 文件夹"))
-                    FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：使用中文搜索 Mod 时，部分结果会忽略筛选条件"))
-                End If
-                FeatureCount += 3
-                BugCount += 6
-            End If
-            If LastVersion < 384 Then 'Snapshot 2.12.4
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：降低 Minecraft 的内存占用"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：部分关键词搜不到资源，特别是中文 Mod 搜索经常没有结果"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：老版本 Windows 无法启动游戏"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：连接 Mojang 的服务可能失败，提示错误码 421"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法访问爱发电"))
-                FeatureCount += 21
-                BugCount += 14
-            End If
-            If LastVersion < 382 Then 'Snapshot 2.12.3
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：下载可能完全卡住，或是下载进度反复回退"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：内存管理设置，可以选择 G1GC、ZGC 或分代 ZGC"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：来自 Modrinth 的文件下载速度"))
-                FeatureCount += 15
-                BugCount += 16
-            End If
-            If LastVersion < 380 Then 'Snapshot 2.12.2
-                FeatureCount += 3
-                BugCount += 13
-            End If
-            If LastVersion < 378 Then 'Snapshot 2.12.1
-                If LastVersion >= 377 Then
-                    FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：在版本列表中存在 OptiFine 时可能无法加载版本列表"))
-                    BugCount += 2
-                End If
-            End If
-            If LastVersion < 377 Then 'Snapshot 2.12.0
-                If LastVersion >= 373 Then
-                    FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "删除：暂时隐藏联机入口……不过只是暂时关闭，它还会回来的！"))
-                End If
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "新增：适配新的 Minecraft 版本号系统与 Unobfuscated 版本"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：巨幅优化各个下载页面和 Mod 管理页面的性能"))
-                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：更换披风时会显示当前使用的披风"))
-                FeatureCount += 33
-                BugCount += 29
-            End If
-            If LastVersion < 375 Then 'Snapshot 2.11.2
-                'If LastVersion >= 373 Then
-                '    FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：对联机进行了各种各样的优化，以改善稳定性"))
-                '    FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：若有加入者的网络环境比房主更好，会提示可以让那位加入者担任房主"))
-                'End If
-                FeatureCount += 16
-                BugCount += 4
-            End If
-            If LastVersion < 374 Then 'Snapshot 2.11.1
-                'If LastVersion >= 373 Then
-                '    FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：使用离线登录也可以直接加入联机房间了"))
-                '    FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：会从所有共享节点中自动选择负载最低的进行中继连接"))
-                '    FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：若复制了邀请码，则可以直接快速加入房间"))
-                '    FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：关闭 FXL 时总是会提示是否退出联机，防止在关闭 FXL 时无意地关闭或退出了房间"))
-                '    FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "新增：允许自定义要连接的节点"))
-                'End If
-                FeatureCount += 9
-                BugCount += 7
-            End If
-            If LastVersion < 373 Then 'Snapshot 2.11.0
-                'FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "新增：联机功能！"))
-                FeatureCount += 7
-                BugCount += 10
-            End If
-        End If
-        '整理更新日志文本
-        Dim ContentList As New List(Of String)
-        Dim SortedFeatures = FeatureList.OrderByDescending(Function(f) f.Key).ToList
-        If Not SortedFeatures.Any() AndAlso FeatureCount = 0 AndAlso BugCount = 0 Then ContentList.Add("没有更新日志……")
-        For i = 0 To Math.Min(9, SortedFeatures.Count - 1) '最多取 10 项
-            ContentList.Add(SortedFeatures(i).Value)
-        Next
-        If SortedFeatures.Count > 10 Then FeatureCount += SortedFeatures.Count - 10
-        If FeatureCount > 0 OrElse BugCount > 0 Then
-            ContentList.Add(If(FeatureCount > 0, FeatureCount & " 项小调整与修改", "") &
-                If(FeatureCount > 0 AndAlso BugCount > 0, "，", "") &
-                If(BugCount > 0, "修复了 " & BugCount & " 个 Bug", "") &
-                "，详见完整更新日志")
-        End If
-        Dim Content As String = "· " & ContentList.Join(vbCrLf & "· ")
-        '输出更新日志
-        RunInNewThread(
-        Sub()
-            If MyMsgBox(Content, "FoxesLauncher 已更新至" & VersionDisplay, "确定", "完整更新日志") = 2 Then
-                OpenWebsite("https://github.com/FoxesLauncher/FoxesLauncher/releases")
-            End If
-        End Sub, "UpdateLog Output")
-    End Sub
-
     '窗口加载
     Private IsWindowLoadFinished As Boolean = False
     Public Sub New()
@@ -338,8 +64,8 @@ Public Class FormMain
         PageRight = FrmLaunchRight
         FrmLaunchRight.PageState = MyPageRight.PageStates.ContentStay
         '模式提醒
-        If BuildType = BuildTypes.Debug Then Hint("[开发者模式] FXL 正以开发者模式运行，这可能会造成严重的性能下降，请务必立即向开发者反馈此问题！", HintType.Red)
-        If ModeDebug Then Hint("[调试模式] FXL 正以调试模式运行，这可能会导致性能下降，若无必要请不要开启！")
+        If BuildType = BuildTypes.Debug Then Hint(T("[开发者模式] FXL 正以开发者模式运行，这可能会造成严重的性能下降，请务必立即向开发者反馈此问题！"), HintType.Red)
+        If ModeDebug Then Hint(T("[调试模式] FXL 正以调试模式运行，这可能会导致性能下降，若无必要请不要开启！"))
         '尽早执行的加载池
         McFolderListLoader.Start(0) '为了让下载已存在文件检测可以正常运行，必须跑一次；为了让启动按钮尽快可用，需要尽早执行；为了与 PageLaunchLeft 联动，需要为 0 而不是 GetUuid
 
@@ -411,14 +137,16 @@ Public Class FormMain
         '加载池
         RunInNewThread(
         Sub()
+            '区域与语言提示
+            PromptRegionLanguageIfNeeded()
             'EULA 提示
             Const EulaVersion As Integer = 2
             If Settings.Get(Of Integer)("SystemEulaVersion") < EulaVersion Then
                 Select Case MyMsgBox(
                     If(Settings.Get(Of Integer)("SystemEulaVersion") = 0,
-                        "在使用 FXL 前，请先阅读用户协议与免责声明。",
-                        $"FXL 的用户协议与免责声明已更新。{vbCrLf}请阅读更新后的用户协议与免责声明。"),
-                        "协议授权", "同意", "拒绝", "查看用户协议与免责声明",
+                        T("再继续使用FxL前，您需要继续阅读并同意 PCL 用户许可协议和 Minecraft EULA。"),
+                        T("FXL 的用户协议与免责声明已更新。{0}请阅读更新后的用户协议与免责声明。", vbCrLf)),
+                        T("协议授权"), T("同意"), T("拒绝"), T("查看用户协议与免责声明"),
                         Button3Action:=Sub() OpenWebsite("https://shimo.im/docs/rGrd8pY8xWkt6ryW"))
                     Case 1
                         Settings.Set("SystemEulaVersion", EulaVersion)
@@ -438,12 +166,12 @@ Public Class FormMain
                 Logger.Error(ex, "初始化加载池运行失败")
             End Try
             '上报
-            Telemetry("启动")
+            Telemetry("LauncherStart")
             '开源版本提示
             If VersionBranchMain = "OpenSource" Then
-                MyMsgBox($"该版本中无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，然后在仓库根目录的 .env 中设置 FXL_CURSEFORGE_API_KEY{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，然后在仓库根目录的 .env 中设置 FXL_MS_CLIENT_ID{vbCrLf}- 更新与联网通知：避免滥用隐患", "开源版本说明")
+                MyMsgBox(T("该版本中无法使用以下特性：{0}- CurseForge API 调用：需要自行申请 API Key，然后在仓库根目录的 .env 中设置 FXL_CURSEFORGE_API_KEY{1}- 正版登录：需要自行向微软申请 Client ID，然后在仓库根目录的 .env 中设置 FXL_MS_CLIENT_ID{2}- 更新与联网通知：避免滥用隐患", vbCrLf, vbCrLf, vbCrLf), T("开源版本说明"))
             End If
-        End Sub, "初始化", ThreadPriority.Lowest)
+        End Sub, T("初始化"), ThreadPriority.Lowest)
 
         Logger.Info($"第三阶段加载用时：{GetTimeMs() - ApplicationStartTick} ms")
     End Sub
@@ -502,10 +230,6 @@ Public Class FormMain
             Settings.Reset("LaunchAdvanceJvm")
             Logger.Info("已重置 JVM 参数设置")
         End If
-        '输出更新日志
-        If LastVersionCode <= 0 Then Return
-        If HighestVersionCode >= VersionCode Then Return
-        ShowUpdateLog(HighestVersionCode)
     End Sub
     Private Sub DowngradeSub(LastVersionCode As Integer)
         Logger.Info($"版本号从 {LastVersionCode} 降低到 {VersionCode}")
@@ -528,14 +252,14 @@ Public Class FormMain
     Public Sub EndProgram(SendWarning As Boolean)
         '强行结束下载任务？
         If HasDownloadingTask() Then
-            If SendWarning AndAlso MyMsgBox("还有下载任务尚未完成，是否确定退出？", "提示", "确定", "取消") = 2 Then Return
+            If SendWarning AndAlso MyMsgBox(T("还有下载任务尚未完成，是否确定退出？"), T("提示"), T("确定"), T("取消")) = 2 Then Return
             RunInNewThread(
             Sub()
                 Logger.Info("正在强行停止任务")
                 For Each Task As LoaderBase In LoaderTaskbar.ToList()
                     Task.Cancel()
                 Next
-            End Sub, "强行停止下载任务")
+            End Sub, T("强行停止下载任务"))
         End If
         '关闭联机？
         If FrmLinkMain?.TryExit(Not SendWarning, True) Then Return
@@ -798,9 +522,9 @@ Public Class FormMain
         If e.Key = Key.F12 Then
             PageSetupUI.HiddenForceShow = Not PageSetupUI.HiddenForceShow
             If PageSetupUI.HiddenForceShow Then
-                Hint("功能隐藏设置已暂时关闭！", HintType.Green)
+                Hint(T("功能隐藏设置已暂时关闭！"), HintType.Green)
             Else
-                Hint("功能隐藏设置已重新开启！", HintType.Green)
+                Hint(T("功能隐藏设置已重新开启！"), HintType.Green)
             End If
             PageSetupUI.HiddenRefresh()
             Return
@@ -896,29 +620,29 @@ Public Class FormMain
                         Dim AuthlibServer As String = StringUtils.FormUrlUnescape(Str.Substring("authlib-injector:yggdrasil-server:".Length))
                         Logger.Info($"Authlib 拖拽：{AuthlibServer}")
                         If Not String.IsNullOrEmpty(New ValidateHttp().Validate(AuthlibServer)) Then
-                            Hint($"输入的 Authlib 验证服务器不符合网址格式（{AuthlibServer}）！", HintType.Red)
+                            Hint(T("输入的 Authlib 验证服务器不符合网址格式（{0}）！", AuthlibServer), HintType.Red)
                             Return
                         End If
                         Dim Target = If(PageCurrent = PageType.InstanceSetup, PageInstanceLeft.Instance, McInstanceSelected)
                         If Target Is Nothing Then
-                            Hint("请先下载游戏，再设置第三方登录！", HintType.Red)
+                            Hint(T("请先下载游戏，再设置第三方登录！"), HintType.Red)
                             Return
                         End If
                         If AuthlibServer = "https://littleskin.cn/api/yggdrasil" Then
                             'LittleSkin
-                            If MyMsgBox($"是否要在版本 {Target.Name} 中开启 LittleSkin 登录？" & vbCrLf &
-                                        "你可以在 版本设置 → 设置 → 服务器选项 中修改登录方式。", "第三方登录开启确认", "确定", "取消") = 2 Then
+                            If MyMsgBox(T("是否要在版本 {0} 中开启 LittleSkin 登录？", Target.Name) & vbCrLf &
+                                        T("你可以在 版本设置 → 设置 → 服务器选项 中修改登录方式。"), T("第三方登录开启确认"), T("确定"), T("取消")) = 2 Then
                                 Return
                             End If
                             Settings.Set("VersionServerLogin", 4, Instance:=Target)
                             Settings.Set("VersionServerAuthServer", "https://littleskin.cn/api/yggdrasil", Instance:=Target)
                             Settings.Set("VersionServerAuthRegister", "https://littleskin.cn/auth/register", Instance:=Target)
-                            Settings.Set("VersionServerAuthName", "LittleSkin 登录", Instance:=Target)
+                            Settings.Set("VersionServerAuthName", T("LittleSkin 登录"), Instance:=Target)
                         Else
                             '第三方 Authlib 服务器
-                            If MyMsgBox($"是否要在版本 {Target.Name} 中开启第三方登录？" & vbCrLf &
-                                        $"登录服务器：{AuthlibServer}" & vbCrLf & vbCrLf &
-                                        "你可以在 版本设置 → 设置 → 服务器选项 中修改登录方式。", "第三方登录开启确认", "确定", "取消") = 2 Then
+                            If MyMsgBox(T("是否要在版本 {0} 中开启第三方登录？", Target.Name) & vbCrLf &
+                                        T("登录服务器：{0}", AuthlibServer) & vbCrLf & vbCrLf &
+                                        T("你可以在 版本设置 → 设置 → 服务器选项 中修改登录方式。"), T("第三方登录开启确认"), T("确定"), T("取消")) = 2 Then
                                 Return
                             End If
                             Settings.Set("VersionServerLogin", 4, Instance:=Target)
@@ -948,7 +672,7 @@ Public Class FormMain
                 '获取文件并检查
                 Dim FilePathRaw = e.Data.GetData(DataFormats.FileDrop)
                 If FilePathRaw Is Nothing Then '#2690
-                    Hint("请将文件解压后再拖入！", HintType.Red)
+                    Hint(T("请将文件解压后再拖入！"), HintType.Red)
                     Return
                 End If
                 e.Handled = True
@@ -966,10 +690,10 @@ Public Class FormMain
             Logger.Warn($"接受文件拖拽：{FilePath}{If(FilePathList.Any, $" 等 {FilePathList.Count} 个文件", "")}")
             '基础检查
             If DirectoryUtils.Exists(FilePathList.First) AndAlso Not FileUtils.Exists(FilePathList.First) Then
-                Hint("请拖入一个文件，而非文件夹！", HintType.Red)
+                Hint(T("请拖入一个文件，而非文件夹！"), HintType.Red)
                 Return
             ElseIf Not FileUtils.Exists(FilePathList.First) Then
-                Hint("拖入的文件不存在：" & FilePathList.First, HintType.Red)
+                Hint(T("拖入的文件不存在：{0}", FilePathList.First), HintType.Red)
                 Return
             End If
             '多文件拖拽
@@ -978,7 +702,7 @@ Public Class FormMain
                 '必须要求全部为 jar 文件
                 For Each File In PathList
                     If Not {"jar", "litemod", "disabled", "old"}.Contains(PathUtils.GetExtension(File)) Then
-                        Hint("一次请只拖入一个文件！", HintType.Red)
+                        Hint(T("一次请只拖入一个文件！"), HintType.Red)
                         Return
                     End If
                 Next
@@ -988,7 +712,7 @@ Public Class FormMain
             If Extension = "xaml" Then
                 Logger.Info("文件后缀为 XAML，作为主页加载")
                 If FileUtils.Exists(Paths.Base & "FXL\Custom.xaml") Then
-                    If MyMsgBox("已存在一个主页文件，是否要将它覆盖？", "覆盖确认", "覆盖", "取消") = 2 Then
+                    If MyMsgBox(T("已存在一个主页文件，是否要将它覆盖？"), T("覆盖确认"), T("覆盖"), T("取消")) = 2 Then
                         Return
                     End If
                 End If
@@ -997,7 +721,7 @@ Public Class FormMain
                 Sub()
                     Settings.Set("UiCustomType", 1)
                     FrmLaunchRight.ForceRefresh()
-                    Hint("已加载主页自定义文件！", HintType.Green)
+                    Hint(T("已加载主页自定义文件！"), HintType.Green)
                 End Sub)
                 Return
             End If
@@ -1005,7 +729,7 @@ Public Class FormMain
             If PageInstanceMod.InstallMods(PathList) Then Return
             '安装整合包
             If {"zip", "rar", "mrpack"}.Any(Function(t) t = Extension) Then '部分压缩包是 zip 格式但后缀为 rar，总之试一试
-                Hint("正在读取压缩包……")
+                Hint(T("正在读取压缩包……"))
                 Try
                     Logger.Info("文件为压缩包，尝试作为整合包安装")
                     ModpackInstall(FilePath)
@@ -1018,7 +742,7 @@ Public Class FormMain
             End If
             'RAR 处理
             If Extension = "rar" Then
-                Hint("FXL 无法处理 rar 格式的压缩包，请在解压后重新压缩为 zip 格式再试！", HintType.Red)
+                Hint(T("FXL 无法处理 rar 格式的压缩包，请在解压后重新压缩为 zip 格式再试！"), HintType.Red)
                 Return
             End If
             '错误报告分析
@@ -1034,8 +758,8 @@ Public Class FormMain
                 Logger.Error(ex, "自主错误报告分析失败")
             End Try
             '未知操作
-            Hint("FXL 无法确定适合的操作……", HintType.Red)
-        End Sub, "文件拖拽")
+            Hint(T("FXL 无法确定适合的操作……"), HintType.Red)
+        End Sub, T("文件拖拽"))
     End Sub
 
     '接受到 Windows 窗体事件
@@ -1187,11 +911,11 @@ Public Class FormMain
     Private Function PageNameGet(Stack As PageStackData) As String
         Select Case Stack.Page
             Case PageType.InstanceSelect
-                Return "版本选择"
+                Return T("版本选择")
             Case PageType.TaskManager
-                Return "任务管理"
+                Return T("任务管理")
             Case PageType.InstanceSetup
-                Return "版本设置 - " & If(PageInstanceLeft.Instance Is Nothing, "未知版本", PageInstanceLeft.Instance.Name)
+                Return T("版本设置 - {0}", If(PageInstanceLeft.Instance Is Nothing, T("未知版本"), PageInstanceLeft.Instance.Name))
             Case PageType.ResourceDetail
                 Return CType(Stack.Additional(0), ResourceProject).TranslatedName
             Case PageType.HelpDetail
@@ -1345,7 +1069,7 @@ Public Class FormMain
     Private Sub PageChangeActual(Stack As PageStackData, Optional SubType As PageSubType = -1)
         If PageCurrent = Stack AndAlso (PageCurrentSub = SubType OrElse SubType = -1) Then Return
         If Stack.Page = PageType.InstanceSetup AndAlso PageInstanceLeft.Instance IsNot Nothing AndAlso McInstanceLock.IsLocked(PageInstanceLeft.Instance) Then
-            Hint("该版本正在被修改，暂时无法进入版本设置！", HintType.Red)
+            Hint(T("该版本正在被修改，暂时无法进入版本设置！"), HintType.Red)
             Return
         End If
         AniControlEnabled += 1
@@ -1603,7 +1327,7 @@ Public Class FormMain
             For Each Watcher In McWatcherList
                 Watcher.Kill()
             Next
-            Hint("已关闭运行中的 Minecraft！", HintType.Green)
+            Hint(T("已关闭运行中的 Minecraft！"), HintType.Green)
         Catch ex As Exception
             Logger.Error(ex, "强制关闭所有 Minecraft 失败")
         End Try

@@ -68,7 +68,7 @@ Public Class PageOtherLeft
                 If FrmOtherTest Is Nothing Then FrmOtherTest = New PageOtherTest
                 Return FrmOtherTest
             Case Else
-                Throw New Exception("未知的更多子页面种类：" & ID)
+                Throw New Exception(T("未知的更多子页面种类：{0}", ID))
         End Select
     End Function
 
@@ -116,7 +116,7 @@ Public Class PageOtherLeft
                 RefreshHelp()
                 ItemHelp.Checked = True
         End Select
-        Hint("正在刷新……", Log:=False)
+        Hint(T("正在刷新……"), Log:=False)
     End Sub
     Public Shared Sub RefreshHelp()
         Settings.Set("SystemHelpVersion", 0) '强制重新解压文件

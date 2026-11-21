@@ -6,7 +6,20 @@ Public Class MyComboBox
     '基础
     Public Uuid As Integer = GetUuid()
     Private TextBox As MyTextBox
-    Public Property HintText As String = ""
+    Public Property HintText As String
+        Get
+            Return GetValue(HintTextProperty)
+        End Get
+        Set(value As String)
+            SetValue(HintTextProperty, value)
+        End Set
+    End Property
+    Public Shared ReadOnly HintTextProperty As DependencyProperty = DependencyProperty.Register("HintText", GetType(String), GetType(MyComboBox), New PropertyMetadata("", AddressOf OnHintTextChanged))
+    Private Shared Sub OnHintTextChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        Dim Combo = DirectCast(d, MyComboBox)
+        Dim Value As String = DirectCast(If(e.NewValue, ""), String)
+        If Combo.TextBox IsNot Nothing Then Combo.TextBox.HintText = Value
+    End Sub
     Public Overrides Sub OnApplyTemplate()
         MyBase.OnApplyTemplate()
         If Not IsEditable Then Return
@@ -46,7 +59,7 @@ Public Class MyComboBox
                     TextBox.Text = value
                 End If
             Else
-                Throw New NotSupportedException("该 ComboBox 不支持修改文本。")
+                Throw New NotSupportedException(T("该 ComboBox 不支持修改文本。"))
             End If
         End Set
     End Property
@@ -142,11 +155,18 @@ Public Class MyComboBox
 #Region "设置"
 
     Private Sub RefreshSetting(NewValue As String) Implements ISettingControl.RefreshSetting
-        Dim TargetItem = Items.OfType(Of DependencyObject)().FirstOrDefault(Function(i) Val(If(SettingService.GetValue(i), -1)) = NewValue)
+        Dim TargetItem = Items.OfType(Of DependencyObject)().FirstOrDefault(
+            Function(i)
+                Dim ItemValue As String = SettingService.GetValue(i)
+                Return ItemValue IsNot Nothing AndAlso ItemValue = NewValue
+            End Function)
         If TargetItem IsNot Nothing Then
             SelectedItem = TargetItem
-        ElseIf Items.Count > NewValue Then
-            SelectedIndex = NewValue
+            Return
+        End If
+        Dim Index As Integer
+        If Integer.TryParse(NewValue, Index) AndAlso Index >= 0 AndAlso Index < Items.Count Then
+            SelectedIndex = Index
         Else
             Logger.Warn($"尝试显示设置 {SettingService.GetKey(Me)}，但没有找到设置值 {NewValue} 的对应项")
             SelectedIndex = -1

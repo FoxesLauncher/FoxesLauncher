@@ -9,6 +9,12 @@ Public Class Application
             '核心初始化
             FoxesCore.Main.Init("FXL")
             FoxesCore.Wpf.Main.Init()
+            '初始化语言包（必须早于任何窗口与页面的创建）
+            Try
+                ModLanguage.Initialize()
+            Catch ex As Exception
+                Logger.Error(ex, "初始化语言包失败")
+            End Try
             If Not (e.Args.Contains("--update") OrElse e.Args.Contains("--gpu") OrElse e.Args.Contains("--memory")) Then '若是通过命令行调用，则不检查单例、不轮换日志（#9137）
                 WaitingMutex(e)
                 Logger.Instance = New FxlLogger With {.logFolder = Paths.BaseThenName, .MinLevel = If(ModeDebug, LogLevel.Trace, LogLevel.Info)}
@@ -56,7 +62,7 @@ Public Class Application
                     Try
                         PageOtherTest.MemoryOptimizeInternal(False)
                     Catch ex As Exception
-                        MsgBox(ex.Message, MsgBoxStyle.Critical, "内存优化失败")
+                        MsgBox(ex.Message, MsgBoxStyle.Critical, T("内存优化失败"))
                         Environment.Exit(-1)
                     End Try
                     If My.Computer.Info.AvailablePhysicalMemory < Ram Then '避免 ULong 相减出现负数
@@ -72,11 +78,11 @@ Public Class Application
                 DirectoryUtils.Create(Paths.Base & "FXL\Musics\")
                 CheckPermissionWithException(Paths.Base & "FXL\")
             Catch ex As Exception
-                MsgBox($"FXL 没有对当前文件夹的权限（{Paths.Base}FXL\），请尝试：" & vbCrLf &
-                  "1. 将 FXL 移动到其他文件夹" & If(PathUtils.GetDiskName(Paths.Base) = "C"c, "，例如 C 盘和桌面以外的其他位置。", "。") & vbCrLf &
-                  "2. 删除当前目录中的 FXL 文件夹，然后再试。" & vbCrLf &
-                  "3. 右键 FXL 选择属性，打开 兼容性 中的 以管理员身份运行此程序。",
-                MsgBoxStyle.Critical, "运行环境错误")
+                MsgBox(T("FXL 没有对当前文件夹的权限（{0}FXL\），请尝试：", Paths.Base) & vbCrLf &
+                  If(PathUtils.GetDiskName(Paths.Base) = "C"c, T("1. 将 FXL 移动到其他文件夹，例如 C 盘和桌面以外的其他位置。"), T("1. 将 FXL 移动到其他文件夹。")) & vbCrLf &
+                  T("2. 删除当前目录中的 FXL 文件夹，然后再试。") & vbCrLf &
+                  T("3. 右键 FXL 选择属性，打开 兼容性 中的 以管理员身份运行此程序。"),
+                MsgBoxStyle.Critical, T("运行环境错误"))
                 Environment.[Exit](ProcessReturnValues.Cancel)
             End Try
 RetryCacheCheck:
@@ -85,9 +91,9 @@ RetryCacheCheck:
                 CheckPermissionWithException(PathTemp)
             Catch ex As Exception
                 If PathUtils.IsSame(PathTemp, Path.GetTempPath() & "FXL\") Then
-                    MyMsgBox("FXL 无法访问缓存文件夹，可能导致程序出错或无法正常使用！" & vbCrLf & vbCrLf & "错误原因：" & ex.GetDisplay(True), "缓存文件夹不可用")
+                    MyMsgBox(T("FXL 无法访问缓存文件夹，可能导致程序出错或无法正常使用！") & vbCrLf & vbCrLf & T("错误原因：{0}", ex.GetDisplay(True)), T("缓存文件夹不可用"))
                 Else
-                    MyMsgBox("手动设置的缓存文件夹不可用，FXL 将使用默认缓存文件夹。" & vbCrLf & vbCrLf & "错误原因：" & ex.GetDisplay(True), "缓存文件夹不可用")
+                    MyMsgBox(T("手动设置的缓存文件夹不可用，FXL 将使用默认缓存文件夹。") & vbCrLf & vbCrLf & T("错误原因：{0}", ex.GetDisplay(True)), T("缓存文件夹不可用"))
                     Settings.Set("SystemSystemCache", "")
                     PathTemp = Path.GetTempPath() & "FXL\"
                     GoTo RetryCacheCheck
@@ -121,11 +127,11 @@ RetryCacheCheck:
             Logger.Info($"管理员权限：{WindowsUtils.HasAdminRole()}")
             '检测异常环境
             If Paths.Base.Contains(Path.GetTempPath()) OrElse Paths.Base.Contains("AppData\Local\Temp\") Then
-                MyMsgBox("请将 FXL 从压缩包中解压后再使用！" & vbCrLf & "如果不会解压，可以在网上寻找教程。", "需要解压！", "我知道了", IsWarn:=True, ForceWait:=True)
+                MyMsgBox(T("请将 FXL 从压缩包中解压后再使用！") & vbCrLf & T("如果不会解压，可以在网上寻找教程。"), T("需要解压！"), T("我知道了"), IsWarn:=True, ForceWait:=True)
                 FormMain.EndProgramForce(ProcessReturnValues.Cancel)
             End If
             If Not Environment.Is64BitOperatingSystem Then
-                MyMsgBox("FXL 和新版 Minecraft 均不再支持 32 位系统，请重装为 64 位系统后再进行游戏！", "环境警告", "我知道了", IsWarn:=True, ForceWait:=True)
+                MyMsgBox(T("FXL 和新版 Minecraft 均不再支持 32 位系统，请重装为 64 位系统后再进行游戏！"), T("环境警告"), T("我知道了"), IsWarn:=True, ForceWait:=True)
                 FormMain.EndProgramForce(ProcessReturnValues.Cancel)
             End If
             '计时
@@ -138,7 +144,7 @@ RetryCacheCheck:
                 FilePath = PathExe
             Catch
             End Try
-            MsgBox(ex.GetDisplay(True) & vbCrLf & "FXL 所在路径：" & If(String.IsNullOrEmpty(FilePath), "获取失败", FilePath), MsgBoxStyle.Critical, "FXL 初始化错误")
+            MsgBox(T("{0}{1}FXL 所在路径：{2}", ex.GetDisplay(True), vbCrLf, If(String.IsNullOrEmpty(FilePath), T("获取失败"), FilePath)), MsgBoxStyle.Critical, T("FXL 初始化错误"))
             FormMain.EndProgramForce(ProcessReturnValues.Exception)
         End Try
     End Sub
@@ -196,7 +202,7 @@ RetryCacheCheck:
         If IsProgramEnding Then Return
         FeedbackInfo()
         Dim Detail As String = e.Exception.GetDisplay(True)
-        If Detail.Contains("System.Windows.Threading.Dispatcher.Invoke") OrElse Detail.Contains("MS.Internal.AppModel.ITaskbarList.HrInit") OrElse Detail.Contains("未能加载文件或程序集") OrElse
+        If Detail.Contains("System.Windows.Threading.Dispatcher.Invoke") OrElse Detail.Contains("MS.Internal.AppModel.ITaskbarList.HrInit") OrElse Detail.Contains("未能加载文件或程序集") OrElse Detail.Contains("Could not load file or assembly") OrElse
            Detail.Contains(".NET Framework") Then ' “自动错误判断” 的结果分析
             OldEnvironmentAssert(e.Exception)
         Else

@@ -88,7 +88,7 @@ Partial Public Module ModMain
             For Each e In Events
                 e.Raise()
             Next
-        End Sub, "执行自定义事件 " & GetUuid())
+        End Sub, T("执行自定义事件 {0}", GetUuid()))
     End Sub
 
 End Module
@@ -187,10 +187,10 @@ Public Class CustomEvent
                 Case EventType.打开网页
                     Arg = Arg.Replace("\", "/")
                     If Not Arg.Contains("://") OrElse Arg.StartsWithF("file", True) Then '为了支持更多协议（#2200）
-                        MyMsgBox("EventData 必须为一个网址。" & vbCrLf & "如果想要启动程序，请将 EventType 改为 打开文件。", "事件执行失败")
+                        MyMsgBox(T("EventData 必须为一个网址。") & vbCrLf & T("如果想要启动程序，请将 EventType 改为 打开文件。"), T("事件执行失败"))
                         Return
                     End If
-                    Hint("正在开启，请稍候：" & Arg)
+                    Hint(T("正在开启，请稍候：{0}", Arg))
                     RunInThread(Sub() OpenWebsite(Arg))
 
                 Case EventType.打开文件, EventType.打开帮助, EventType.执行命令
@@ -205,7 +205,7 @@ Public Class CustomEvent
                             If Type = EventType.打开帮助 Then
                                 PageOtherHelp.EnterHelpPage(Location)
                             Else
-                                If Not EventSafetyConfirm("即将执行：" & Location & If(Args.Length >= 2, " " & Arg1, "")) Then Return
+                                If Not EventSafetyConfirm(T("即将执行：{0}{1}", Location, If(Args.Length >= 2, " " & Arg1, ""))) Then Return
                                 Dim Info As New ProcessStartInfo With {
                                     .Arguments = If(Args.Length >= 2, Arg1, ""),
                                     .FileName = Location,
@@ -221,7 +221,7 @@ Public Class CustomEvent
                 Case EventType.启动游戏
                     If Arg0 = "\current" Then
                         If McInstanceSelected Is Nothing Then
-                            Hint("请先选择一个 Minecraft 版本！", HintType.Red)
+                            Hint(T("请先选择一个 Minecraft 版本！"), HintType.Red)
                             Return
                         Else
                             Arg0 = McInstanceSelected.Name
@@ -231,7 +231,7 @@ Public Class CustomEvent
                     Sub()
                         If McLaunchStart(New McLaunchOptions With
                                 {.ServerIp = If(Args.Length >= 2, Args(1), Nothing), .Instance = New McInstance(Arg0)}) Then
-                            Hint($"正在启动 {Arg0}……")
+                            Hint(T("正在启动 {0}……", Arg0))
                         End If
                     End Sub)
 
@@ -242,20 +242,20 @@ Public Class CustomEvent
                     RunInUi(
                     Sub()
                         FrmLaunchRight.ForceRefresh()
-                        If String.IsNullOrEmpty(Arg) Then Hint("已刷新！", HintType.Green)
+                        If String.IsNullOrEmpty(Arg) Then Hint(T("已刷新！"), HintType.Green)
                     End Sub)
 
                 Case EventType.刷新页面
                     If TypeOf FrmMain.PageRight Is IRefreshable Then
                         RunInUiWait(Sub() CType(FrmMain.PageRight, IRefreshable).Refresh())
-                        If String.IsNullOrEmpty(Arg) Then Hint("已刷新！", HintType.Green)
+                        If String.IsNullOrEmpty(Arg) Then Hint(T("已刷新！"), HintType.Green)
                     Else
-                        Hint("当前页面不支持刷新操作！", HintType.Red)
+                        Hint(T("当前页面不支持刷新操作！"), HintType.Red)
                     End If
 
                 Case EventType.刷新帮助
                     RunInUiWait(Sub() PageOtherLeft.RefreshHelp())
-                    If String.IsNullOrEmpty(Arg) Then Hint("已刷新！", HintType.Green)
+                    If String.IsNullOrEmpty(Arg) Then Hint(T("已刷新！"), HintType.Green)
 
                 Case EventType.内存优化
                     RunInThread(Sub() PageOtherTest.MemoryOptimize(True))
@@ -264,8 +264,8 @@ Public Class CustomEvent
                     RunInThread(Sub() PageOtherTest.RubbishClear())
 
                 Case EventType.弹出窗口
-                    If Args.Length = 1 Then Throw New Exception($"EventType {Type} 需要至少 2 个以 | 分割的参数，例如 弹窗标题|弹窗内容")
-                    MyMsgBox(Arg1.BeforeLast("|").Replace("\n", vbCrLf), Arg0.Replace("\n", vbCrLf), If(Args.Length > 2, Arg1.AfterLast("|"), "确定"))
+                    If Args.Length = 1 Then Throw New Exception(T("EventType {0} 需要至少 2 个以 | 分割的参数，例如 弹窗标题|弹窗内容", Type))
+                    MyMsgBox(Arg1.BeforeLast("|").Replace("\n", vbCrLf), Arg0.Replace("\n", vbCrLf), If(Args.Length > 2, Arg1.AfterLast("|"), T("确定")))
 
                 Case EventType.弹出提示
                     Hint(Arg0.Replace("\n", vbCrLf), If(Args.Length = 1, HintType.Blue, EnumUtils.FromString(Of HintType)(Arg1)))
@@ -276,11 +276,11 @@ Public Class CustomEvent
                         Dim TargetPage = EnumUtils.FromString(Of PageType)(Arg0)
                         If TargetPage = PageType.InstanceSetup Then
                             If McInstanceSelected Is Nothing Then
-                                Hint("请先选择一个 Minecraft 版本！", HintType.Red)
+                                Hint(T("请先选择一个 Minecraft 版本！"), HintType.Red)
                                 Return
                             End If
                             If McInstanceLock.IsLocked(McInstanceSelected) Then
-                                Hint("该版本正在被修改，暂时无法进入版本设置！", HintType.Red)
+                                Hint(T("该版本正在被修改，暂时无法进入版本设置！"), HintType.Red)
                                 Return
                             End If
                             PageInstanceLeft.Instance = McInstanceSelected
@@ -295,10 +295,10 @@ Public Class CustomEvent
                 Case EventType.下载文件
                     Arg0 = Arg0.Replace("\", "/")
                     If Not (Arg0.StartsWithF("http://", True) OrElse Arg0.StartsWithF("https://", True)) Then
-                        MyMsgBox("EventData 必须为以 http:// 或 https:// 开头的网址。" & vbCrLf & "FXL 不支持其他乱七八糟的下载协议。", "事件执行失败")
+                        MyMsgBox(T("EventData 必须为以 http:// 或 https:// 开头的网址。") & vbCrLf & T("FXL 不支持其他乱七八糟的下载协议。"), T("事件执行失败"))
                         Return
                     End If
-                    If Not EventSafetyConfirm("即将从该网址下载文件：" & vbCrLf & Arg0) Then Return
+                    If Not EventSafetyConfirm(T("即将从该网址下载文件：") & vbCrLf & Arg0) Then Return
                     RunInUi(
                     Sub()
                         Try
@@ -311,20 +311,20 @@ Public Class CustomEvent
                                     PageOtherTest.StartCustomDownload(Arg0, Args(1), Args(2))
                             End Select
                         Catch
-                            PageOtherTest.StartCustomDownload(Arg0, "未知")
+                            PageOtherTest.StartCustomDownload(Arg0, T("未知"))
                         End Try
                     End Sub)
 
                 Case EventType.修改设置, EventType.写入设置
-                    If Args.Length = 1 Then Throw New Exception($"EventType {Type} 需要至少 2 个以 | 分割的参数，例如 UiLauncherTransparent|400")
+                    If Args.Length = 1 Then Throw New Exception(T("EventType {0} 需要至少 2 个以 | 分割的参数，例如 UiLauncherTransparent|400", Type))
                     Settings.SetSafe(Arg0, Args(1), Instance:=McInstanceSelected)
-                    If Args.Length = 2 Then Hint($"已写入设置：{Arg0} → {Args(1)}", HintType.Green)
+                    If Args.Length = 2 Then Hint(T("已写入设置：{0} → {1}", Arg0, Args(1)), HintType.Green)
 
                 Case EventType.修改变量, EventType.写入变量
-                    If Args.Length = 1 Then Throw New Exception($"EventType {Type} 需要至少 2 个以 | 分割的参数，例如 VariableName|SomeValue")
+                    If Args.Length = 1 Then Throw New Exception(T("EventType {0} 需要至少 2 个以 | 分割的参数，例如 VariableName|SomeValue", Type))
                     Try
                         RegistryUtils.Write($"HKEY_CURRENT_USER\Software\{RegFolder}", $"CustomEvent{Arg0}", Args(1))
-                        If Args.Length = 2 Then Hint($"已写入变量：{Arg0} → {Args(1)}", HintType.Green)
+                        If Args.Length = 2 Then Hint(T("已写入变量：{0} → {1}", Arg0, Args(1)), HintType.Green)
                     Catch ex As Exception
                         Logger.Warn(ex, $"写入变量失败：{Arg0} → {Args(1)}", LogBehavior.Toast)
                     End Try
@@ -335,7 +335,7 @@ Public Class CustomEvent
                         If String.IsNullOrWhiteSpace(Arg) Then
                             PageLinkMain.Join()
                         Else
-                            If Not EventSafetyConfirm("即将加入第三方联机房间。") Then Return
+                            If Not EventSafetyConfirm(T("即将加入第三方联机房间。")) Then Return
                             PageLinkMain.Join(Arg)
                         End If
                     End Sub)
@@ -344,7 +344,7 @@ Public Class CustomEvent
                     UpdateCheckByButton()
 
                 Case Else
-                    MyMsgBox("未知的事件类型：" & Type & vbCrLf & "请检查事件类型填写是否正确，或者 FXL 是否为最新版本。", "事件执行失败")
+                    MyMsgBox(T("未知的事件类型：{0}", Type) & vbCrLf & T("请检查事件类型填写是否正确，或者 FXL 是否为最新版本。"), T("事件执行失败"))
             End Select
         Catch ex As Exception
             Logger.Error(ex, $"事件执行失败（{Type}, {Arg}）", LogBehavior.Alert)
@@ -360,18 +360,15 @@ Public Class CustomEvent
         '网页确认
         If RelativeUrl.StartsWithF("http", True) Then
             If RunInUi() Then
-                Throw New Exception("能打开联网帮助页面的 MyListItem 必须手动设置 Title、Info 属性！")
+                Throw New Exception(T("能打开联网帮助页面的 MyListItem 必须手动设置 Title、Info 属性！"))
             End If
             '获取文件名
             Dim RawFileName As String
             Try
                 RawFileName = PathUtils.GetLastPart(RelativeUrl)
-                If Not PathUtils.GetExtension(RawFileName) = "json" Then Throw New Exception("未指向 .json 后缀的文件")
+                If Not PathUtils.GetExtension(RawFileName) = "json" Then Throw New Exception(T("未指向 .json 后缀的文件"))
             Catch ex As Exception
-                Throw New Exception("联网帮助页面须指向一个帮助 JSON 文件，并在同路径下包含相应 XAML 文件！" & vbCrLf &
-                                    "例如：" & vbCrLf &
-                                    " - https://www.baidu.com/test.json（填写这个路径）" & vbCrLf &
-                                    " - https://www.baidu.com/test.xaml（同时也需要包含这个文件）", ex)
+                Throw New Exception(T("联网帮助页面须指向一个帮助 JSON 文件，并在同路径下包含相应 XAML 文件！") & vbCrLf & T("例如：") & vbCrLf & " - " & T("https://www.baidu.com/test.json（填写这个路径）") & vbCrLf & " - " & T("https://www.baidu.com/test.xaml（同时也需要包含这个文件）"), ex)
             End Try
             '下载文件
             Dim LocalTemp As String = RequestTaskTempFolder() & RawFileName
@@ -380,11 +377,7 @@ Public Class CustomEvent
                 NetDownloadByClient(RelativeUrl, LocalTemp)
                 NetDownloadByClient(RelativeUrl.Replace(".json", ".xaml"), LocalTemp.Replace(".json", ".xaml"))
             Catch ex As Exception
-                Throw New Exception("下载指定的文件失败！" & vbCrLf &
-                                    "注意，联网帮助页面须指向一个帮助 JSON 文件，并在同路径下包含相应 XAML 文件！" & vbCrLf &
-                                    "例如：" & vbCrLf &
-                                    " - https://www.baidu.com/test.json（填写这个路径）" & vbCrLf &
-                                    " - https://www.baidu.com/test.xaml（同时也需要包含这个文件）", ex)
+                Throw New Exception(T("下载指定的文件失败！") & vbCrLf & T("注意，联网帮助页面须指向一个帮助 JSON 文件，并在同路径下包含相应 XAML 文件！") & vbCrLf & T("例如：") & vbCrLf & " - " & T("https://www.baidu.com/test.json（填写这个路径）") & vbCrLf & " - " & T("https://www.baidu.com/test.xaml（同时也需要包含这个文件）"), ex)
             End Try
             RelativeUrl = LocalTemp
         End If
@@ -417,7 +410,7 @@ Public Class CustomEvent
             Logger.Info($"自定义事件中直接{Type}：{Location}")
         Else
             '打开帮助，但是格式不对劲
-            Throw New FileNotFoundException("未找到 EventData 指向的本地 xaml 文件：" & RelativeUrl, RelativeUrl)
+            Throw New FileNotFoundException(T("未找到 EventData 指向的本地 xaml 文件：{0}", RelativeUrl), RelativeUrl)
         End If
 
         Return {Location, WorkingDir}
@@ -428,7 +421,7 @@ Public Class CustomEvent
     ''' </summary>
     Private Shared Function EventSafetyConfirm(Message As String) As Boolean
         If Settings.Get(Of Boolean)("HintCustomCommand") Then Return True
-        Select Case MyMsgBox(Message & vbCrLf & "请在确认没有安全隐患后再继续。", "执行确认", "继续", "继续且今后不再要求确认", "取消")
+        Select Case MyMsgBox(Message & vbCrLf & T("请在确认没有安全隐患后再继续。"), T("执行确认"), T("继续"), T("继续且今后不再要求确认"), T("取消"))
             Case 1
                 Return True
             Case 2

@@ -121,18 +121,18 @@ Public Class PageLaunchLeft
         '修改登陆方式
         Select Case Settings.Get(Of McLoginType)("LoginType")
             Case McLoginType.Legacy
-                LabLaunchingMethod.Text = "离线登录"
+                LabLaunchingMethod.Text = T("离线登录")
             Case McLoginType.Ms
-                LabLaunchingMethod.Text = "正版登录"
+                LabLaunchingMethod.Text = T("正版登录")
             Case McLoginType.Nide
-                LabLaunchingMethod.Text = "统一通行证"
+                LabLaunchingMethod.Text = T("统一通行证")
             Case McLoginType.Auth
                 LabLaunchingMethod.Text = "Authlib-Injector"
         End Select
         '初始化页面
         LabLaunchingName.Text = McInstanceSelected.Name
-        LabLaunchingStage.Text = "初始化"
-        LabLaunchingTitle.Text = If(CurrentLaunchOptions?.SaveBatch Is Nothing, "正在启动游戏", "正在导出启动脚本")
+        LabLaunchingStage.Text = T("初始化")
+        LabLaunchingTitle.Text = If(CurrentLaunchOptions?.SaveBatch Is Nothing, T("正在启动游戏"), T("正在导出启动脚本"))
         LabLaunchingProgress.Text = "0.00 %"
         LabLaunchingProgress.Opacity = 1
         LabLaunchingDownload.Visibility = Visibility.Visible
@@ -223,7 +223,7 @@ Public Class PageLaunchLeft
                 If IsNothing(FrmLoginMsSkin) Then FrmLoginMsSkin = New PageLoginMsSkin
                 Return FrmLoginMsSkin
             Case Else
-                Throw New ArgumentOutOfRangeException("Type", "即将切换的登录分页编号越界")
+                Throw New ArgumentOutOfRangeException("Type", T("即将切换的登录分页编号越界"))
         End Select
     End Function
     ''' <summary>
@@ -320,7 +320,7 @@ UnknownType:
                 PanType.Visibility = Visibility.Collapsed
                 PanTypeOne.Visibility = Visibility.Visible
                 PathTypeOne.Data = (New GeometryConverter).ConvertFromString(Logo.IconButtonShield)
-                LabTypeOne.Text = "正版登录"
+                LabTypeOne.Text = T("正版登录")
                 RadioLoginType5.Visibility = Visibility.Visible
                 RadioLoginType0.Visibility = Visibility.Collapsed
             Case 2 '仅离线
@@ -329,7 +329,7 @@ UnknownType:
                 PanType.Visibility = Visibility.Collapsed
                 PanTypeOne.Visibility = Visibility.Visible
                 PathTypeOne.Data = (New GeometryConverter).ConvertFromString(Logo.IconButtonOffline)
-                LabTypeOne.Text = "离线登录"
+                LabTypeOne.Text = T("离线登录")
             Case 3 '统一通行证
                 If Settings.Get(Of String)("CacheNideAccess") = "" Then
                     Type = PageType.Nide
@@ -340,7 +340,7 @@ UnknownType:
                 PanType.Visibility = Visibility.Collapsed
                 PanTypeOne.Visibility = Visibility.Visible
                 PathTypeOne.Data = (New GeometryConverter).ConvertFromString(Logo.IconButtonCard)
-                LabTypeOne.Text = "统一通行证登录"
+                LabTypeOne.Text = T("统一通行证登录")
             Case 4 'Authlib-Injector
                 If Settings.Get(Of String)("CacheAuthAccess") = "" Then
                     Type = PageType.Auth
@@ -352,7 +352,7 @@ UnknownType:
                 PanTypeOne.Visibility = Visibility.Visible
                 PathTypeOne.Data = (New GeometryConverter).ConvertFromString(Logo.IconButtonCard)
                 LabTypeOne.Text = If(McInstanceSelected Is Nothing, Settings.Get(Of String)("CacheAuthServerName"), Settings.Get(Of String)("VersionServerAuthName", Instance:=McInstanceSelected))
-                If LabTypeOne.Text = "" Then LabTypeOne.Text = "第三方登录"
+                If LabTypeOne.Text = "" Then LabTypeOne.Text = T("第三方登录")
             Case Else
                 Logger.Error($"未知的登录页面：{LoginPageType}", LogBehavior.Toast)
                 GoTo UnknownType
@@ -391,9 +391,9 @@ UnknownType:
         End If
         Try
             Dim Result As String = McSkinGetAddress(Uuid, "Ms")
-            If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & UserName)
+            If Data.IsCanceled Then Throw New OperationCanceledException(T("当前任务已取消：{0}", UserName))
             Result = McSkinDownload(Result)
-            If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & UserName)
+            If Data.IsCanceled Then Throw New OperationCanceledException(T("当前任务已取消：{0}", UserName))
             Data.Output = Result
         Catch ex As Exception
             If ex.IsCanceled Then
@@ -402,7 +402,7 @@ UnknownType:
             ElseIf ex.GetDisplay(False).Contains("(429)") Then
                 Data.Output = PathImage & "Skins/" & McSkinSex(McLoginLegacyUuid(UserName)) & ".png"
                 Logger.Error($"获取正版皮肤失败（{UserName}）：获取皮肤太过频繁，请 5 分钟后再试！", LogBehavior.Toast)
-            ElseIf ex.GetDisplay(False).Contains("未设置自定义皮肤") Then
+            ElseIf IsSkinNotSetException(ex) Then
                 Data.Output = PathImage & "Skins/" & McSkinSex(McLoginLegacyUuid(UserName)) & ".png"
                 Logger.Info("用户未设置自定义皮肤，跳过皮肤加载")
             Else
@@ -458,11 +458,11 @@ UseDefault:
                         Data.Output = PathImage & "Skins/Steve.png"
                     Else
                         Dim Result As String = McLoginMojangUuid(ID, True)
-                        If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & ID)
+                        If Data.IsCanceled Then Throw New OperationCanceledException(T("当前任务已取消：{0}", ID))
                         Result = McSkinGetAddress(Result, "Mojang")
-                        If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & ID)
+                        If Data.IsCanceled Then Throw New OperationCanceledException(T("当前任务已取消：{0}", ID))
                         Result = McSkinDownload(Result)
-                        If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & ID)
+                        If Data.IsCanceled Then Throw New OperationCanceledException(T("当前任务已取消：{0}", ID))
                         Data.Output = Result
                     End If
                 Catch ex As Exception
@@ -479,7 +479,7 @@ UseDefault:
                 End Try
             Case 4 '自定义
                 If Not FileUtils.Exists(Paths.AppDataThenName & "CustomSkin.png") Then
-                    Hint("未找到离线皮肤自定义文件，可能它已被删除。FXL 将使用默认的 Steve 皮肤！")
+                    Hint(T("未找到离线皮肤自定义文件，可能它已被删除。FXL 将使用默认的 Steve 皮肤！"))
                     Settings.Set("LaunchSkinType", 1)
                     GoTo UseDefault
                 End If
@@ -513,9 +513,9 @@ UseDefault:
         End If
         Try
             Dim Result As String = McSkinGetAddress(Uuid, "Nide")
-            If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & UserName)
+            If Data.IsCanceled Then Throw New OperationCanceledException(T("当前任务已取消：{0}", UserName))
             Result = McSkinDownload(Result)
-            If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & UserName)
+            If Data.IsCanceled Then Throw New OperationCanceledException(T("当前任务已取消：{0}", UserName))
             Data.Output = Result
         Catch ex As Exception
             If ex.IsCanceled Then
@@ -524,7 +524,7 @@ UseDefault:
             ElseIf ex.GetDisplay(False).Contains("(429)") Then
                 Data.Output = PathImage & "Skins/Steve.png"
                 Logger.Error($"获取统一通行证皮肤失败（{UserName}）：获取皮肤太过频繁，请 5 分钟后再试！", LogBehavior.Toast)
-            ElseIf ex.GetDisplay(False).Contains("未设置自定义皮肤") Then
+            ElseIf IsSkinNotSetException(ex) Then
                 Data.Output = PathImage & "Skins/Steve.png"
                 Logger.Info("用户未设置自定义皮肤，跳过皮肤加载")
             Else
@@ -561,9 +561,9 @@ Finish:
         End If
         Try
             Dim Result As String = McSkinGetAddress(UUID, "Auth")
-            If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & UserName)
+            If Data.IsCanceled Then Throw New OperationCanceledException(T("当前任务已取消：{0}", UserName))
             Result = McSkinDownload(Result)
-            If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & UserName)
+            If Data.IsCanceled Then Throw New OperationCanceledException(T("当前任务已取消：{0}", UserName))
             Data.Output = Result
         Catch ex As Exception
             If ex.IsCanceled Then
@@ -572,7 +572,7 @@ Finish:
             ElseIf ex.GetDisplay(False).Contains("(429)") Then
                 Data.Output = PathImage & "Skins/Steve.png"
                 Logger.Error($"获取 Authlib-Injector 皮肤失败（{UserName}）：获取皮肤太过频繁，请 5 分钟后再试！", LogBehavior.Toast)
-            ElseIf ex.GetDisplay(False).Contains("未设置自定义皮肤") Then
+            ElseIf IsSkinNotSetException(ex) Then
                 Data.Output = PathImage & "Skins/Steve.png"
                 Logger.Info("用户未设置自定义皮肤，跳过皮肤加载")
             Else
@@ -604,10 +604,10 @@ Finish:
     Public Sub LaunchButtonClick() Handles BtnLaunch.Click
         If McLaunchLoader.State = LoadState.Loading OrElse Not BtnLaunch.IsEnabled OrElse
             (FrmMain.PageRight IsNot Nothing AndAlso FrmMain.PageRight.PageState <> MyPageRight.PageStates.ContentStay AndAlso FrmMain.PageRight.PageState <> MyPageRight.PageStates.ContentEnter) Then Return
-        '实际的启动
-        If BtnLaunch.Text = "启动游戏" Then
+        '实际的启动（使用状态而不是按钮文字，避免多语言下行为失效）
+        If BtnLaunchState = 3 Then
             McLaunchStart()
-        ElseIf BtnLaunch.Text = "下载游戏" Then
+        ElseIf BtnLaunchState = 2 Then
             FrmMain.PageChange(FormMain.PageType.Download, FormMain.PageSubType.DownloadInstall)
         End If
     End Sub
@@ -638,28 +638,28 @@ Finish:
         Select Case CurrentState
             Case 0
                 Logger.Info("启动按钮：正在加载 Minecraft 版本")
-                FrmLaunchLeft.BtnLaunch.Text = "正在加载"
+                FrmLaunchLeft.BtnLaunch.Text = T("正在加载")
                 FrmLaunchLeft.BtnLaunch.IsEnabled = False
-                FrmLaunchLeft.LabVersion.Text = "正在加载中，请稍候"
+                FrmLaunchLeft.LabVersion.Text = T("正在加载中，请稍候")
                 FrmLaunchLeft.BtnVersion.IsEnabled = False
                 FrmLaunchLeft.BtnMore.Visibility = Visibility.Collapsed
             Case 1
                 Logger.Info("启动按钮：无 Minecraft 版本，下载已禁用")
-                FrmLaunchLeft.BtnLaunch.Text = "启动游戏"
+                FrmLaunchLeft.BtnLaunch.Text = T("启动游戏")
                 FrmLaunchLeft.BtnLaunch.IsEnabled = False
-                FrmLaunchLeft.LabVersion.Text = "未找到可用的游戏版本"
+                FrmLaunchLeft.LabVersion.Text = T("未找到可用的游戏版本")
                 FrmLaunchLeft.BtnVersion.IsEnabled = True
                 FrmLaunchLeft.BtnMore.Visibility = Visibility.Collapsed
             Case 2
                 Logger.Info("启动按钮：无 Minecraft 版本，要求下载")
-                FrmLaunchLeft.BtnLaunch.Text = "下载游戏"
+                FrmLaunchLeft.BtnLaunch.Text = T("下载游戏")
                 FrmLaunchLeft.BtnLaunch.IsEnabled = True
-                FrmLaunchLeft.LabVersion.Text = "未找到可用的游戏版本"
+                FrmLaunchLeft.LabVersion.Text = T("未找到可用的游戏版本")
                 FrmLaunchLeft.BtnVersion.IsEnabled = True
                 FrmLaunchLeft.BtnMore.Visibility = Visibility.Collapsed
             Case 3
                 Logger.Info($"启动按钮：Minecraft 版本：{McInstanceSelected.PathVersion}")
-                FrmLaunchLeft.BtnLaunch.Text = "启动游戏"
+                FrmLaunchLeft.BtnLaunch.Text = T("启动游戏")
                 FrmLaunchLeft.BtnVersion.IsEnabled = True
                 FrmLaunchLeft.BtnLaunch.IsEnabled = True
                 FrmLaunchLeft.LabVersion.Text = McInstanceSelected.Name
@@ -692,7 +692,7 @@ ExitRefresh:
     Private Sub BtnMore_Click() Handles BtnMore.Click
         If McLaunchLoader.State = LoadState.Loading Then Return
         If McInstanceLock.IsLocked(McInstanceSelected) Then
-            Hint("该版本正在被修改，暂时无法进入版本设置！", HintType.Red)
+            Hint(T("该版本正在被修改，暂时无法进入版本设置！"), HintType.Red)
             Return
         End If
         McInstanceSelected.Load()
@@ -711,18 +711,18 @@ ExitRefresh:
                 For Each Loader In McLaunchLoaderReal.GetLoaderList(False)
                     If Loader.State = LoadState.Loading OrElse Loader.State = LoadState.Waiting Then
                         LabLaunchingStage.Text = Loader.Name
-                        IsLaunched = Loader.Name = "等待游戏窗口出现" OrElse Loader.Name = "结束处理"
+                        IsLaunched = Loader.Tag?.ToString() = "WaitWindow" OrElse Loader.Tag?.ToString() = "EndProcessing"
                         Exit Try
                     End If
                 Next
-                LabLaunchingStage.Text = "已完成"
+                LabLaunchingStage.Text = T("已完成")
             Catch ex As Exception
                 Logger.Warn(ex, "获取是否启动完成失败，可能是由于启动状态改变导致集合已修改")
                 Return
             End Try
             LabLaunchingTitle.Text = If(IsLaunched OrElse McLaunchLoaderReal.State = LoadState.Finished,
-                "已启动游戏",
-                If(CurrentLaunchOptions.SaveBatch Is Nothing, "正在启动游戏", "正在导出启动脚本"))
+                T("已启动游戏"),
+                If(CurrentLaunchOptions.SaveBatch Is Nothing, T("正在启动游戏"), T("正在导出启动脚本")))
             If AniIsRun("Launch State Page") Then IsLaunched = False '等待页面切换动画完成
             '更新进度
             Dim ActualProgress = McLaunchLoaderReal.Progress
@@ -738,7 +738,7 @@ ExitRefresh:
                     HasLaunchDownloader = False
                 Else
                     For Each Loader In NetManager.Tasks
-                        If Loader.RealParent IsNot Nothing AndAlso Loader.RealParent.Name = "Minecraft 启动" AndAlso Loader.State = LoadState.Loading Then HasLaunchDownloader = True
+                        If Loader.RealParent IsNot Nothing AndAlso Loader.RealParent.Tag?.ToString() = "MinecraftLaunch" AndAlso Loader.State = LoadState.Loading Then HasLaunchDownloader = True
                     Next
                 End If
             Catch ex As Exception

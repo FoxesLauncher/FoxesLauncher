@@ -6,24 +6,40 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "0.0.1.0" '显示用版本名
+    Public Const VersionBaseName As String = "0.0.1.1" '显示用版本名
     'CommitHash 由 build\GenerateSecrets.ps1 在构建时写入 GeneratedSecrets.vb
 #If RELEASE Then
-    Public Const VersionCode As Integer = 415 '正式版
+    Public Const VersionCode As Integer = 416 '正式版
 #Else
-    Public Const VersionCode As Integer = 416 '快照版
+    Public Const VersionCode As Integer = 417 '快照版
 #End If
 
     '版本信息
-    Public Const VersionDisplay As String = BuildTypeDisplay & " " & VersionBaseName
+    Public ReadOnly Property VersionDisplay As String
+        Get
+            Return BuildTypeDisplay & " " & VersionBaseName
+        End Get
+    End Property
 #If DEBUG Then
-    Public Const BuildTypeDisplay As String = "开发版"
+    Public ReadOnly Property BuildTypeDisplay As String
+        Get
+            Return T("开发版")
+        End Get
+    End Property
     Public Const BuildType As BuildTypes = BuildTypes.Debug
 #ElseIf RELEASE Then
-    Public Const BuildTypeDisplay As String = "正式版"
+    Public ReadOnly Property BuildTypeDisplay As String
+        Get
+            Return T("正式版")
+        End Get
+    End Property
     Public Const BuildType As BuildTypes = BuildTypes.Release
 #Else
-    Public Const BuildTypeDisplay As String = "快照版"
+    Public ReadOnly Property BuildTypeDisplay As String
+        Get
+            Return T("快照版")
+        End Get
+    End Property
     Public Const BuildType As BuildTypes = BuildTypes.Snapshot
 #End If
     Public Enum BuildTypes
@@ -512,7 +528,7 @@ Public Module ModBase
     Public Sub WriteIni(FileName As String, Key As String, Value As String)
         Try
             '预处理
-            If Key.Contains(":") Then Throw New Exception($"尝试写入 ini 文件 {FileName} 的键名中包含了冒号：{Key}")
+            If Key.Contains(":") Then Throw New Exception(T("尝试写入 ini 文件 {0} 的键名中包含了冒号：{1}", FileName, Key))
             Key = Key.ReplaceLineEndings("")
             Value = Value?.ReplaceLineEndings("")
             '获取目前文件
@@ -555,7 +571,7 @@ Public Module ModBase
             If Folder.EndsWithF(":\System Volume Information\", True) OrElse Folder.EndsWithF(":\$RECYCLE.BIN\", True) Then Return False
             If Not DirectoryUtils.Exists(Folder) Then Return False
             Dim TestFilePath As String = $"{Folder}CheckPermission{GetUuid()}.txt"
-            FileUtils.Write(TestFilePath, "临时文件，用于检测该文件夹的权限是否正常。")
+            FileUtils.Write(TestFilePath, T("临时文件，用于检测该文件夹的权限是否正常。"))
             FileUtils.Delete(TestFilePath)
             Return True
         Catch ex As Exception
@@ -567,12 +583,12 @@ Public Module ModBase
     ''' 检查是否拥有某一文件夹的 I/O 权限。如果出错，则抛出异常。
     ''' </summary>
     Public Sub CheckPermissionWithException(Folder As String)
-        If String.IsNullOrWhiteSpace(Folder) Then Throw New ArgumentNullException("文件夹名不能为空！")
+        If String.IsNullOrWhiteSpace(Folder) Then Throw New ArgumentNullException(T("文件夹名不能为空！"))
         Folder = PathUtils.AddSlashSuffix(Folder)
-        If Folder.EndsWithF(":\System Volume Information\", True) OrElse Folder.EndsWithF(":\$RECYCLE.BIN\", True) Then Throw New UnauthorizedAccessException("没有对系统文件夹的权限！")
-        If Not DirectoryUtils.Exists(Folder) Then Throw New DirectoryNotFoundException("文件夹不存在！")
+        If Folder.EndsWithF(":\System Volume Information\", True) OrElse Folder.EndsWithF(":\$RECYCLE.BIN\", True) Then Throw New UnauthorizedAccessException(T("没有对系统文件夹的权限！"))
+        If Not DirectoryUtils.Exists(Folder) Then Throw New DirectoryNotFoundException(T("文件夹不存在！"))
         Dim TestFilePath As String = $"{Folder}CheckPermission{GetUuid()}.txt"
-        FileUtils.Write(TestFilePath, "临时文件，用于检测该文件夹的权限是否正常。")
+        FileUtils.Write(TestFilePath, T("临时文件，用于检测该文件夹的权限是否正常。"))
         FileUtils.Delete(TestFilePath)
     End Sub
 
@@ -745,7 +761,7 @@ Public Module ModBase
         Dim DelayTask = Task.Delay(TimeoutMs)
         If Task.WhenAny(TargetTask, DelayTask).ConfigureAwait(False).GetAwaiter().GetResult() Is DelayTask Then
             TokenSource.Cancel()
-            Throw New TimeoutException($"任务超时（{TimeoutMs} ms）")
+            Throw New TimeoutException(ModLanguage.T("任务超时（{0} ms）", TimeoutMs))
         End If
         Return TargetTask.Run()
     End Function
@@ -756,7 +772,7 @@ Public Module ModBase
         Dim DelayTask = Task.Delay(TimeoutMs)
         If Task.WhenAny(TargetTask, DelayTask).ConfigureAwait(False).GetAwaiter().GetResult() Is DelayTask Then
             TokenSource.Cancel()
-            Throw New TimeoutException($"任务超时（{TimeoutMs} ms）")
+            Throw New TimeoutException(ModLanguage.T("任务超时（{0} ms）", TimeoutMs))
         End If
         TargetTask.Run()
     End Sub
@@ -955,15 +971,15 @@ Public Module ModBase
     Public Sub OpenWebsite(Url As String)
         Try
             If Not Url.StartsWithF("http", True) AndAlso Not Url.StartsWithF("minecraft://", True) AndAlso Not Url.StartsWithF("minecraft-preview://", True) Then
-                Throw New Exception(Url & " 不是一个有效的网址，它必须以 http 开头！")
+                Throw New Exception(T("{0} 不是一个有效的网址，它必须以 http 开头！", Url))
             End If
             Logger.Info($"正在打开网页：{Url}")
             StartProcess(Url)
         Catch ex As Exception
             Logger.Warn(ex, $"无法打开网页（{Url}）")
             ClipboardSet(Url, False)
-            MyMsgBox("可能由于浏览器未正确配置，FXL 无法为你打开网页。" & vbCrLf & "网址已经复制到剪贴板，若有需要可以手动粘贴访问。" & vbCrLf &
-                     $"网址：{Url}", "无法打开网页")
+            MyMsgBox(T("可能由于浏览器未正确配置，FXL 无法为你打开网页。") & vbCrLf & T("网址已经复制到剪贴板，若有需要可以手动粘贴访问。") & vbCrLf &
+                     T("网址：{0}", Url), T("无法打开网页"))
         End Try
     End Sub
     ''' <summary>
@@ -999,7 +1015,7 @@ Public Module ModBase
                         If Not String.IsNullOrEmpty(Text) Then My.Computer.Clipboard.SetText(Text)
                     End Sub)
                 End Sub)
-                If ShowSuccessHint Then Hint("已成功复制！", HintType.Green)
+                If ShowSuccessHint Then Hint(T("已成功复制！"), HintType.Green)
             Catch ex As Exception
                 Logger.Error(ex, "可能由于剪贴板被其他程序占用，文本复制失败", LogBehavior.Toast)
             End Try
@@ -1037,7 +1053,7 @@ Public Module ModBase
             Logger.Info($"将资源写入到文件：{ResourceName} → {FilePath}")
             FileUtils.Write(FilePath, Content)
         Else
-            Throw New Exception($"资源 {ResourceName} 的类型不支持：{Resource.GetType.Name}")
+            Throw New Exception(T("资源 {0} 的类型不支持：{1}", ResourceName, Resource.GetType.Name))
         End If
     End Sub
 
@@ -1086,11 +1102,11 @@ Public Module ModBase
             Using Reader As New XamlXmlReader(Stream)
                 While Reader.Read()
                     For Each BlackListType In {GetType(WebBrowser), GetType(Frame), GetType(MediaElement), GetType(ObjectDataProvider), GetType(XamlReader), GetType(Window), GetType(XmlDataProvider), GetType(SettingService)}
-                        If Reader.Type IsNot Nothing AndAlso BlackListType.IsAssignableFrom(Reader.Type.UnderlyingType) Then Throw New UnauthorizedAccessException($"基于安全考虑，不允许使用 {BlackListType.Name} 类型。")
-                        If Reader.Value IsNot Nothing AndAlso Reader.Value = BlackListType.Name Then Throw New UnauthorizedAccessException($"基于安全考虑，不允许使用 {BlackListType.Name} 值。")
+                        If Reader.Type IsNot Nothing AndAlso BlackListType.IsAssignableFrom(Reader.Type.UnderlyingType) Then Throw New UnauthorizedAccessException(T("基于安全考虑，不允许使用 {0} 类型。", BlackListType.Name))
+                        If Reader.Value IsNot Nothing AndAlso Reader.Value = BlackListType.Name Then Throw New UnauthorizedAccessException(T("基于安全考虑，不允许使用 {0} 值。", BlackListType.Name))
                     Next
                     For Each BlackListMember In {"Code", "FactoryMethod", "Static"}
-                        If Reader.Member IsNot Nothing AndAlso Reader.Member.Name = BlackListMember Then Throw New UnauthorizedAccessException($"基于安全考虑，不允许使用 {BlackListMember} 成员。")
+                        If Reader.Member IsNot Nothing AndAlso Reader.Member.Name = BlackListMember Then Throw New UnauthorizedAccessException(T("基于安全考虑，不允许使用 {0} 成员。", BlackListMember))
                     Next
                 End While
             End Using

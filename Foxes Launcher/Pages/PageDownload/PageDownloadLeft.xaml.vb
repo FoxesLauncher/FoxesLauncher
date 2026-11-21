@@ -39,7 +39,7 @@ Public Class PageDownloadLeft
                 If FrmDownloadDataPack Is Nothing Then FrmDownloadDataPack = New PageDownloadDataPack
                 Return FrmDownloadDataPack
             Case Else
-                Throw New Exception("未知的下载子页面种类：" & ID)
+                Throw New Exception(T("未知的下载子页面种类：{0}", ID))
         End Select
     End Function
 
@@ -93,14 +93,16 @@ Public Class PageDownloadLeft
         ResourceVersion.ProjectFilesCache.Clear()
         Select Case SubType
             Case FormMain.PageSubType.DownloadInstall
-                DlClientListLoader.Start(IsForceRestart:=True)
-                DlOptiFineListLoader.Start(IsForceRestart:=True)
-                DlForgeListLoader.Start(IsForceRestart:=True)
-                DlNeoForgeListLoader.Start(IsForceRestart:=True)
-                DlLiteLoaderListLoader.Start(IsForceRestart:=True)
-                DlFabricListLoader.Start(IsForceRestart:=True)
-                DlFabricApiLoader.Start(IsForceRestart:=True)
-                DlOptiFabricLoader.Start(IsForceRestart:=True)
+                If Not IsGameDownloadRestricted Then
+                    DlClientListLoader.Start(IsForceRestart:=True)
+                    DlOptiFineListLoader.Start(IsForceRestart:=True)
+                    DlForgeListLoader.Start(IsForceRestart:=True)
+                    DlNeoForgeListLoader.Start(IsForceRestart:=True)
+                    DlLiteLoaderListLoader.Start(IsForceRestart:=True)
+                    DlFabricListLoader.Start(IsForceRestart:=True)
+                    DlFabricApiLoader.Start(IsForceRestart:=True)
+                    DlOptiFabricLoader.Start(IsForceRestart:=True)
+                End If
                 ItemInstall.Checked = True
             Case FormMain.PageSubType.DownloadMod
                 If FrmDownloadMod IsNot Nothing Then
@@ -138,7 +140,7 @@ Public Class PageDownloadLeft
                 End If
                 ItemDataPack.Checked = True
         End Select
-        Hint("正在刷新……", Log:=False)
+        Hint(T("正在刷新……"), Log:=False)
     End Sub
 
     '点击返回

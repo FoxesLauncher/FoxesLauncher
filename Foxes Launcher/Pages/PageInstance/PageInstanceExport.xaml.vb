@@ -1,6 +1,23 @@
 Public Class ExportOption
+    Inherits DependencyObject
     Public Property Title As String
+        Get
+            Return GetValue(TitleProperty)
+        End Get
+        Set(value As String)
+            SetValue(TitleProperty, value)
+        End Set
+    End Property
+    Public Shared ReadOnly TitleProperty As DependencyProperty = DependencyProperty.Register("Title", GetType(String), GetType(ExportOption), New PropertyMetadata(""))
     Public Property Description As String
+        Get
+            Return GetValue(DescriptionProperty)
+        End Get
+        Set(value As String)
+            SetValue(DescriptionProperty, value)
+        End Set
+    End Property
+    Public Shared ReadOnly DescriptionProperty As DependencyProperty = DependencyProperty.Register("Description", GetType(String), GetType(ExportOption), New PropertyMetadata(""))
     Public Property Rules As String
     ''' <summary>
     ''' 如果 Rules 为空，则根据 ShowRules 的内容判断是否应该显示这个复选框。
@@ -76,7 +93,7 @@ Public Class PageInstanceExport
                     If Not SubFolder.EnumerateFileSystemInfos().Any() Then Continue For
                     Dim NewCheckBox As New MyCheckBox With {. _
                         Tag = New ExportOption With {.Title = SubFolder.Name, .DefaultChecked = True, .Rules = StringUtils.LikePatternEscape($"{Folder}/{SubFolder.Name}/")}}
-                    If AcceptCompressedFile Then GetExportOption(NewCheckBox).Description = "文件夹"
+                    If AcceptCompressedFile Then GetExportOption(NewCheckBox).Description = T("文件夹")
                     If Panel Is PanOptionsSaves Then GetExportOption(NewCheckBox).Description = SubFolder.LastWriteTime.ToString("yyyy'/'MM'/'dd HH':'mm")
                     Panel.Children.Add(NewCheckBox)
                 Next
@@ -221,13 +238,13 @@ Public Class PageInstanceExport
                 BtnOverrideCancel.Visibility = Visibility.Collapsed
                 PanOptions.Visibility = Visibility.Visible
                 CardOptions.Inlines.Clear()
-                CardOptions.Inlines.Add(New Run("导出内容列表") With {.FontWeight = FontWeights.Bold})
+                CardOptions.Inlines.Add(New Run(T("导出内容列表")) With {.FontWeight = FontWeights.Bold})
             Else
                 BtnOverrideCancel.Visibility = Visibility.Visible
                 PanOptions.Visibility = Visibility.Collapsed
                 CardOptions.Inlines.Clear()
-                CardOptions.Inlines.Add(New Run("导出内容列表:    ") With {.FontWeight = FontWeights.Bold})
-                CardOptions.Inlines.Add(New Run("从配置文件中读取") With {.FontWeight = FontWeights.Normal})
+                CardOptions.Inlines.Add(New Run(T("导出内容列表：")) With {.FontWeight = FontWeights.Bold})
+                CardOptions.Inlines.Add(New Run(T("从配置文件中读取")) With {.FontWeight = FontWeights.Normal})
             End If
         End Set
     End Property
@@ -244,8 +261,8 @@ Public Class PageInstanceExport
         Else
             '从当前勾选的所有选项中获取所有规则行
             Yield ""
-            Yield "# 修改下方的规则以控制需要导出的内容。"
-            Yield "# 以 ! 开头以反选。可以使用 *、?、[] 通配符。靠后的行覆盖靠前的。"
+            Yield T("# 修改下方的规则以控制需要导出的内容。")
+            Yield T("# 以 ! 开头以反选。可以使用 *、?、[] 通配符。靠后的行覆盖靠前的。")
             Yield ""
             For Each CheckBox In GetAllOptions(False)
                 If Not CheckBox.Checked Then Continue For
@@ -270,7 +287,7 @@ Public Class PageInstanceExport
                 Next
                 Yield ""
             Next
-            Yield "# 排除的文件"
+            Yield T("# 排除的文件")
             Yield "!*.log"
             Yield "!*.dat_old"
             Yield "!*.BakaCoreInfo"
@@ -295,8 +312,8 @@ Public Class PageInstanceExport
         Else
             '从当前勾选的所有选项中获取所有规则行
             Yield ""
-            Yield "# 如果想将额外的文件自动放到压缩包根目录中，可以将它们的路径写在下方。"
-            Yield "# 必须是完整路径。每行中，若以 \ 结尾则代表是文件夹，不以 \ 结尾则代表是文件。"
+            Yield T("# 如果想将额外的文件自动放到压缩包根目录中，可以将它们的路径写在下方。")
+            Yield T("# 必须是完整路径。每行中，若以 \ 结尾则代表是文件夹，不以 \ 结尾则代表是文件。")
             Yield ""
         End If
     End Function
@@ -322,7 +339,7 @@ Public Class PageInstanceExport
     '保存配置文件
     Private Sub ExportConfig() Handles BtnAdvancedExport.Click
         Try
-            Dim ConfigPath As String = Dialogs.SaveFile("选择文件位置", "export_config.txt", Settings.Get(Of String)("CacheExportConfig"), {("txt", "整合包导出配置")})
+            Dim ConfigPath As String = Dialogs.SaveFile(T("选择文件位置"), "export_config.txt", Settings.Get(Of String)("CacheExportConfig"), {("txt", T("整合包导出配置"))})
             If ConfigPath Is Nothing Then Return
             Settings.Set("CacheExportConfig", ConfigPath)
             Dim ConfigLines As New List(Of String)
@@ -330,28 +347,28 @@ Public Class PageInstanceExport
             ConfigLines.Add("Name:" & TextExportName.Text)
             ConfigLines.Add("Version:" & TextExportVersion.Text)
             ConfigLines.Add("")
-            ConfigLines.Add($"# 当版本设置中选择了 {vbLQ}使用版本文件夹中的 Java{vbRQ} 时，是否打包版本文件夹中的 Java。")
+            ConfigLines.Add(T("# 当版本设置中选择了 {0}使用版本文件夹中的 Java{1} 时，是否打包版本文件夹中的 Java。", vbLQ, vbRQ))
             ConfigLines.Add("IncludeJava:" & CheckOptionsJava.Checked)
             ConfigLines.Add("")
-            ConfigLines.Add("# 是否打包正式版 FXL，以便没有启动器的玩家安装整合包。")
+            ConfigLines.Add(T("# 是否打包正式版 FXL，以便没有启动器的玩家安装整合包。"))
             ConfigLines.Add("IncludeLauncher:" & CheckOptionsFxl.Checked)
             ConfigLines.Add("")
-            ConfigLines.Add("# 是否打包 FXL 个性化内容，例如功能隐藏设置、主页、背景音乐和图片等。")
+            ConfigLines.Add(T("# 是否打包 FXL 个性化内容，例如功能隐藏设置、主页、背景音乐和图片等。"))
             ConfigLines.Add("IncludeLauncherCustom:" & CheckOptionsFxlCustom.Checked)
             ConfigLines.Add("")
-            ConfigLines.Add("# 是否将 Mod、资源包、光影包的文件直接放入整合包中，这样在导入时就无需联网下载它们。")
-            ConfigLines.Add("# 建议仅在无法稳定连接 CurseForge 或 Modrinth 时才考虑启用。")
-            ConfigLines.Add("# 二次分发可能违反使用协议，请尽量不要公开发布包含资源文件的整合包！")
+            ConfigLines.Add(T("# 是否将 Mod、资源包、光影包的文件直接放入整合包中，这样在导入时就无需联网下载它们。"))
+            ConfigLines.Add(T("# 建议仅在无法稳定连接 CurseForge 或 Modrinth 时才考虑启用。"))
+            ConfigLines.Add(T("# 二次分发可能违反使用协议，请尽量不要公开发布包含资源文件的整合包！"))
             ConfigLines.Add("DontCheckHostedAssets:" & CheckAdvancedInclude.Checked)
             ConfigLines.Add("")
-            ConfigLines.Add("# 若资源未在 Modrinth 上托管，则将其原始文件直接放入整合包中。")
-            ConfigLines.Add("# 如果你想将整合包上传到 Modrinth，这能帮助你分辨哪些文件未在 Modrinth 上托管。")
-            ConfigLines.Add("# 此选项与 DontCheckHostedAssets 冲突。")
+            ConfigLines.Add(T("# 若资源未在 Modrinth 上托管，则将其原始文件直接放入整合包中。"))
+            ConfigLines.Add(T("# 如果你想将整合包上传到 Modrinth，这能帮助你分辨哪些文件未在 Modrinth 上托管。"))
+            ConfigLines.Add(T("# 此选项与 DontCheckHostedAssets 冲突。"))
             ConfigLines.Add("ModrinthUploadMode:" & CheckAdvancedModrinth.Checked)
             ConfigLines.Add("")
-            ConfigLines.Add("# 导出的文件的存放位置。")
-            ConfigLines.Add("# 若设置了此项，在导出时会直接将文件放到此路径，不会弹窗要求选择。")
-            ConfigLines.Add("# 若 IncludeLauncher 为 True，应以 .zip 结尾；若为 False，应以 .mrpack 结尾。")
+            ConfigLines.Add(T("# 导出的文件的存放位置。"))
+            ConfigLines.Add(T("# 若设置了此项，在导出时会直接将文件放到此路径，不会弹窗要求选择。"))
+            ConfigLines.Add(T("# 若 IncludeLauncher 为 True，应以 .zip 结尾；若为 False，应以 .mrpack 结尾。"))
             ConfigLines.Add("PackPath:" & If(ConfigPackPath, ""))
             ConfigLines.Add("")
             '导出内容段
@@ -362,7 +379,7 @@ Public Class PageInstanceExport
             ConfigLines.AddRange(GetExtraFileLines())
             '结束
             FileUtils.Write(ConfigPath, ConfigLines.Join(vbCrLf))
-            Hint("已保存配置文件：" & ConfigPath, HintType.Green)
+            Hint(T("已保存配置文件：{0}", ConfigPath), HintType.Green)
             OpenExplorer(ConfigPath)
         Catch ex As Exception
             Logger.Error(ex, "保存配置失败", LogBehavior.Alert)
@@ -371,7 +388,7 @@ Public Class PageInstanceExport
     '读取配置文件
     Private Sub ImportConfig() Handles BtnAdvancedImport.Click
         Try
-            Dim ConfigPath As String = Dialogs.SelectFile("选择配置文件", False, Settings.Get(Of String)("CacheExportConfig"), {({"txt"}, "整合包导出配置")}).FirstOrDefault()
+            Dim ConfigPath As String = Dialogs.SelectFile(T("选择配置文件"), False, Settings.Get(Of String)("CacheExportConfig"), {({"txt"}, T("整合包导出配置"))}).FirstOrDefault()
             If String.IsNullOrEmpty(ConfigPath) Then Return
             Settings.Set("CacheExportConfig", ConfigPath)
             Dim Segments As String() = FileUtils.ReadAsString(ConfigPath).Split(Sperator)
@@ -400,7 +417,7 @@ Public Class PageInstanceExport
                 ExtraFiles = Nothing
             End If
             '结束
-            Hint("已读取配置文件：" & ConfigPath, HintType.Green)
+            Hint(T("已读取配置文件：{0}", ConfigPath), HintType.Green)
         Catch ex As Exception
             Logger.Error(ex, "读取配置失败", LogBehavior.Alert)
         End Try
@@ -423,9 +440,9 @@ Public Class PageInstanceExport
         Dim PackVersion As String = If(String.IsNullOrEmpty(TextExportVersion.Text), "1.0.0", TextExportVersion.Text)
 
         '重复任务检查
-        Dim LoaderName As String = $"导出整合包：" & PackName
+        Dim LoaderName As String =T("导出整合包：{0}", PackName)
         For Each OngoingLoader In LoaderTaskbar
-            If OngoingLoader.Name <> LoaderName Then Continue For
+            If OngoingLoader.Tag?.ToString() <> "ExportPack:" & PackName Then Continue For
             FrmMain.PageChange(FormMain.PageType.TaskManager)
             Return
         Next
@@ -440,15 +457,15 @@ Public Class PageInstanceExport
                 Logger.Info($"使用配置文件中指定的导出路径：{ConfigPackPath}")
             Catch ex As Exception
                 Logger.Warn(ex, $"无法使用配置文件中指定的导出路径（{ConfigPackPath}）")
-                If MyMsgBox($"指定的路径：{ConfigPackPath}{vbCrLf}{vbCrLf}{ex.GetDisplay(True)}", "无法使用配置文件中指定的导出路径", "确定", "取消") = 2 Then Return
+                If MyMsgBox(T("指定的路径：{0}{1}{2}{3}", ConfigPackPath, vbCrLf, vbCrLf, ex.GetDisplay(True)), T("无法使用配置文件中指定的导出路径"), T("确定"), T("取消")) = 2 Then Return
             End Try
         End If
         If PackPath Is Nothing Then
             Dim Extensions As New List(Of (Extension As String, Display As String))
-            If Not CheckOptionsFxl.Checked AndAlso CheckAdvancedModrinth.Checked Then Extensions.Add(("mrpack", "Modrinth 整合包文件"))
-            Extensions.Add(("zip", "压缩文件"))
-            If Not CheckOptionsFxl.Checked AndAlso Not CheckAdvancedModrinth.Checked Then Extensions.Add(("mrpack", "Modrinth 整合包文件"))
-            PackPath = Dialogs.SaveFile("选择导出位置",
+            If Not CheckOptionsFxl.Checked AndAlso CheckAdvancedModrinth.Checked Then Extensions.Add(("mrpack", T("Modrinth 整合包文件")))
+            Extensions.Add(("zip", T("压缩文件")))
+            If Not CheckOptionsFxl.Checked AndAlso Not CheckAdvancedModrinth.Checked Then Extensions.Add(("mrpack", T("Modrinth 整合包文件")))
+            PackPath = Dialogs.SaveFile(T("选择导出位置"),
                 PackName & If(String.IsNullOrEmpty(TextExportVersion.Text), "", " " & TextExportVersion.Text), filter:=Extensions)
             Logger.Info($"手动指定的导出路径：{PackPath}")
         End If
@@ -476,7 +493,7 @@ Public Class PageInstanceExport
 #Region "准备 FXL 文件"
 
         If BuildType <> BuildTypes.Release AndAlso IncludeFXL Then
-            Loaders.Add(New LoaderTask(Of Integer, Integer)("下载 FXL 正式版",
+            Loaders.Add(New LoaderTask(Of Integer, Integer)(T("下载 FXL 正式版"),
             Sub(Loader As LoaderTask(Of Integer, Integer))
                 DownloadLatestFXL(Loader)
                 FileUtils.Copy(PathTemp & "Latest.exe", CacheFolder & "Foxes Launcher.exe")
@@ -487,7 +504,7 @@ Public Class PageInstanceExport
 
 #Region "复制文件"
 
-        Loaders.Add(New LoaderTask(Of Integer, List(Of LocalResourceFile))("复制导出内容",
+        Loaders.Add(New LoaderTask(Of Integer, List(Of LocalResourceFile))(T("复制导出内容"),
         Sub(Loader As LoaderTask(Of Integer, List(Of LocalResourceFile)))
             Loader.Output = New List(Of LocalResourceFile)
             '复制版本文件
@@ -537,7 +554,7 @@ Public Class PageInstanceExport
             '复制 Java
             If IncludeJava Then
                 Dim JavaToExport = SelectOrDownloadJava(TargetInstance, False, Loader.CreateCancellationToken, Loader.CreateSyncProgressProvider(0.85, 0.93))
-                If JavaToExport Is Nothing Then Throw New FileNotFoundException("版本文件夹中没有找到可导出的 Java。")
+                If JavaToExport Is Nothing Then Throw New FileNotFoundException(T("版本文件夹中没有找到可导出的 Java。"))
                 Dim JavaFolder = PathUtils.RemoveLastPart(JavaToExport.Folder)
                 Dim DestFolder As String = Path.Combine(OverridesFolder, JavaFolder.AfterFirst(TargetInstance.PathVersion, True))
                 DirectoryUtils.Copy(JavaFolder, DestFolder)
@@ -551,13 +568,13 @@ Public Class PageInstanceExport
                     If DirectoryUtils.Exists(Line) Then
                         DirectoryUtils.Copy(Line, BaseFolder & PathUtils.GetLastPart(Line) & "\")
                     Else
-                        Hint($"未找到配置文件中指定的文件夹：{Line}", HintType.Red)
+                        Hint(T("未找到配置文件中指定的文件夹：{0}", Line), HintType.Red)
                     End If
                 Else
                     If FileUtils.Exists(Line) Then
                         FileUtils.Copy(Line, BaseFolder & PathUtils.GetLastPart(Line))
                     Else
-                        Hint($"未找到配置文件中指定的单个文件：{Line}", HintType.Red)
+                        Hint(T("未找到配置文件中指定的单个文件：{0}", Line), HintType.Red)
                     End If
                 End If
             Next
@@ -582,7 +599,7 @@ Public Class PageInstanceExport
 
 #Region "联网检查"
 
-        Loaders.Add(New LoaderTask(Of List(Of LocalResourceFile), Dictionary(Of LocalResourceFile, List(Of String)))("联网获取文件信息",
+        Loaders.Add(New LoaderTask(Of List(Of LocalResourceFile), Dictionary(Of LocalResourceFile, List(Of String)))(T("联网获取文件信息"),
         Sub(Loader As LoaderTask(Of List(Of LocalResourceFile), Dictionary(Of LocalResourceFile, List(Of String))))
             Loader.Output = New Dictionary(Of LocalResourceFile, List(Of String))
             If Not CheckHostedAssets Then Logger.Info($"要求跳过联网获取步骤") : Return
@@ -653,15 +670,15 @@ Public Class PageInstanceExport
 
             '若失败，确认是否继续
             If FailedExceptions.Count = 1 Then
-                If MyMsgBox("联网获取部分文件信息失败，是否继续导出？" & vbCrLf & vbCrLf &
-                            "若继续，无法获取信息的文件将被直接打包。" & vbCrLf &
-                            "由于二次分发可能违反使用协议，请尽量不要公开发布导出的整合包！",
-                            "部分文件信息获取失败", "继续", "取消") = 2 Then Throw FailedExceptions.First
+                If MyMsgBox(T("联网获取部分文件信息失败，是否继续导出？") & vbCrLf & vbCrLf &
+                            T("若继续，无法获取信息的文件将被直接打包。") & vbCrLf &
+                            T("由于二次分发可能违反使用协议，请尽量不要公开发布导出的整合包！"),
+                            T("部分文件信息获取失败"), T("继续"), T("取消")) = 2 Then Throw FailedExceptions.First
             ElseIf FailedExceptions.Count > 1 Then
-                If MyMsgBox("联网获取文件信息失败，是否继续导出？" & vbCrLf & vbCrLf &
-                            "若继续，所有文件都将被直接打包。" & vbCrLf &
-                            "由于二次分发可能违反使用协议，请尽量不要公开发布导出的整合包！",
-                            "文件信息获取失败", "继续", "取消") = 2 Then Throw FailedExceptions.First
+                If MyMsgBox(T("联网获取文件信息失败，是否继续导出？") & vbCrLf & vbCrLf &
+                            T("若继续，所有文件都将被直接打包。") & vbCrLf &
+                            T("由于二次分发可能违反使用协议，请尽量不要公开发布导出的整合包！"),
+                            T("文件信息获取失败"), T("继续"), T("取消")) = 2 Then Throw FailedExceptions.First
             End If
         End Sub) With {.Show = CheckHostedAssets, .ProgressWeight = If(CheckHostedAssets, 2, 0.01)})
 
@@ -669,7 +686,7 @@ Public Class PageInstanceExport
 
 #Region "生成压缩包"
 
-        Loaders.Add(New LoaderTask(Of Dictionary(Of LocalResourceFile, List(Of String)), Integer)("生成压缩包",
+        Loaders.Add(New LoaderTask(Of Dictionary(Of LocalResourceFile, List(Of String)), Integer)(T("生成压缩包"),
         Sub(Loader As LoaderTask(Of Dictionary(Of LocalResourceFile, List(Of String)), Integer))
             '整理文件列表
             Dim Files As New JArray
@@ -720,7 +737,7 @@ Public Class PageInstanceExport
 #End Region
 
         '启动
-        Dim MainLoader As New LoaderCombo(Of String)(LoaderName, Loaders) With {.OnStateChanged = AddressOf LoaderStateChangedHintOnly}
+        Dim MainLoader As New LoaderCombo(Of String)(LoaderName, Loaders) With {.OnStateChanged = AddressOf LoaderStateChangedHintOnly, .Tag = "ExportPack:" & PackName}
         MainLoader.Start()
         LoaderTaskbarAdd(MainLoader)
         FrmMain.BtnExtraDownload.ShowRefresh()
@@ -751,12 +768,12 @@ Public Class PageInstanceExport
             BtnExport.IsEnabled = True
             HintJava.Visibility = Visibility.Visible
             HintJava.Theme = MyHint.Themes.Yellow
-            HintJava.Text = $"该版本设置要求 {vbLQ}使用指定的 Java{vbRQ}，这在导出后很可能会失效。建议修改为 {vbLQ}使用版本文件夹中的 Java{vbRQ}。"
+            HintJava.Text = T("该版本设置要求 {0}使用指定的 Java{1}，这在导出后很可能会失效。建议修改为 {2}使用版本文件夹中的 Java{3}。", vbLQ, vbRQ, vbLQ, vbRQ)
         ElseIf JavaType = 2 AndAlso JavaWorker.HasSucceeded AndAlso JavaWorker.LastResult Is Nothing Then
             BtnExport.IsEnabled = False
             HintJava.Visibility = Visibility.Visible
             HintJava.Theme = MyHint.Themes.Red
-            HintJava.Text = $"该版本设置要求 {vbLQ}使用版本文件夹中的 Java{vbRQ}，但版本文件夹中没能找到任何 Java。"
+            HintJava.Text = T("该版本设置要求 {0}使用版本文件夹中的 Java{1}，但版本文件夹中没能找到任何 Java。", vbLQ, vbRQ)
         Else
             BtnExport.IsEnabled = True
             HintJava.Visibility = Visibility.Collapsed

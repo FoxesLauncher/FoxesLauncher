@@ -201,7 +201,7 @@ Public Class MyPageRight
             Case PageStates.ContentEnter
                 '重复调用 PageOnEnter，直接忽略
             Case Else
-                Throw New Exception("在状态为 " & PageState.ToString() & " 时触发了 PageOnEnter 事件。")
+                Throw New Exception(T("在状态为 {0} 时触发了 PageOnEnter 事件。", PageState.ToString()))
         End Select
     End Sub
     Public Event PageEnter()
@@ -255,7 +255,7 @@ Public Class MyPageRight
         Logger.Trace("已触发 PageOnContentExit")
         If PageLoader IsNot Nothing AndAlso PageLoader.State = LoadState.Loading Then
             'Loading 的加载器可能触发进一步变化，难以预测会触发子页面的动画还是加载器完成的动画
-            Throw New Exception("在调用 PageOnContentExit 时，加载器不能为 Loading 状态")
+            Throw New Exception(T("在调用 PageOnContentExit 时，加载器不能为 Loading 状态"))
         End If
         Select Case PageState
             Case PageStates.ContentEnter, PageStates.ContentStay
@@ -289,7 +289,7 @@ Public Class MyPageRight
                 PageState = PageStates.LoaderStayForce
                 AniStart(AaCode(AddressOf PageOnLoaderStayFinished, 400), "PageRight PageChange " & PageUuid)
             Case Else
-                Throw New Exception("在状态为 " & PageState.ToString() & " 时触发了 PageOnEnterAnimationFinished 事件。")
+                Throw New Exception(T("在状态为 {0} 时触发了 PageOnEnterAnimationFinished 事件。", PageState.ToString()))
         End Select
     End Sub
     ''' <summary>
@@ -307,7 +307,7 @@ Public Class MyPageRight
                 PageState = PageStates.ContentEnter
                 TriggerEnterAnimation(PanContent)
             Case Else
-                Throw New Exception("在状态为 " & PageState.ToString() & " 时触发了 PageOnExitAnimationFinished 事件。")
+                Throw New Exception(T("在状态为 {0} 时触发了 PageOnExitAnimationFinished 事件。", PageState.ToString()))
         End Select
     End Sub
     ''' <summary>
@@ -325,7 +325,7 @@ Public Class MyPageRight
                     TriggerEnterAnimation(PanLoader)
                 End If
             Case Else
-                Throw New Exception("在状态为 " & PageState.ToString() & " 时触发了 PageOnLoaderWaitFinished 事件。")
+                Throw New Exception(T("在状态为 {0} 时触发了 PageOnLoaderWaitFinished 事件。", PageState.ToString()))
         End Select
     End Sub
     ''' <summary>
@@ -343,7 +343,7 @@ Public Class MyPageRight
                     PageState = PageStates.LoaderStay
                 End If
             Case Else
-                Throw New Exception("在状态为 " & PageState.ToString() & " 时触发了 PageOnLoaderWaitFinished 事件。")
+                Throw New Exception(T("在状态为 {0} 时触发了 PageOnLoaderWaitFinished 事件。", PageState.ToString()))
         End Select
     End Sub
 
