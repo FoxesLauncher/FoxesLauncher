@@ -9,9 +9,9 @@ Public Module ModBase
     Public Const VersionBaseName As String = "0.1.0.0" '显示用版本名
     'CommitHash 由 build\GenerateSecrets.ps1 在构建时写入 GeneratedSecrets.vb
 #If RELEASE Then
-    Public Const VersionCode As Integer = 416 '正式版
+    Public Const VersionCode As Integer = 500 '正式版
 #Else
-    Public Const VersionCode As Integer = 417 '快照版
+    Public Const VersionCode As Integer = 501 '快照版
 #End If
 
     '版本信息

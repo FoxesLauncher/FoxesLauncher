@@ -28,6 +28,13 @@ import sys
 import tempfile
 from pathlib import Path
 
+# Windows CI 的默认控制台编码可能是 cp1252；强制 UTF-8，避免打印中文时崩溃。
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 CJK_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 HASH_KEY_RE = re.compile(r"\.[0-9a-f]{8}$")
 T_START_RE = re.compile(r"(?<![A-Za-z0-9_.])(?:ModLanguage\.)?T\(")

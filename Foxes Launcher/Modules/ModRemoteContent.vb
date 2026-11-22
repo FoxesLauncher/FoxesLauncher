@@ -213,7 +213,10 @@ Friend Module ModRemoteContent
             Dim Body = Notice.Body
             If Body.Length > 1500 Then Body = Body.Substring(0, 1500) & "..."
             Dim Message = Body
-            If Notice.Link.Length > 0 Then Message &= vbCrLf & vbCrLf & T("相关链接：{0}", Notice.Link)
+            If Notice.Link.Length > 0 Then
+                Dim LinkText = T("相关链接：{0}", Notice.Link)
+                Message &= vbCrLf & vbCrLf & LinkText
+            End If
             Dim IsWarn = Notice.Level = "warn" OrElse Notice.Level = "critical"
 
             Dim Choice As Integer

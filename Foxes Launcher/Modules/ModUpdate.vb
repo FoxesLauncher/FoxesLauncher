@@ -399,15 +399,18 @@ Friend Module ModUpdate
 
     Private Sub ShowUpdateCheckResult(Result As UpdateCheckResult)
         If Not Result.Success Then
-            MyMsgBox(T("检查更新失败。") & vbCrLf & vbCrLf & Result.ErrorMessage, T("检查更新"), IsWarn:=True)
+            Dim CheckTitle = T("检查更新")
+            MyMsgBox(T("检查更新失败。") & vbCrLf & vbCrLf & Result.ErrorMessage, CheckTitle, IsWarn:=True)
             Return
         End If
 
         Dim Info = Result.Info
         If Info Is Nothing OrElse Info.VersionCode <= VersionCode Then
             Dim Suffix = If(Result.FromCache, T("（来自 {0} 的本地缓存）", Result.SourceName), T("（来源：{0}）", Result.SourceName))
-            MyMsgBox(T("当前已是最新版本。") & vbCrLf & vbCrLf & T("当前版本：{0} ({1})", VersionBaseName, VersionCode) & vbCrLf & Suffix,
-                T("检查更新"))
+            Dim NewestText = T("当前已是最新版本。")
+            Dim CurrentText = T("当前版本：{0} ({1})", VersionBaseName, VersionCode)
+            Dim CheckTitle = T("检查更新")
+            MyMsgBox(NewestText & vbCrLf & vbCrLf & CurrentText & vbCrLf & Suffix, CheckTitle)
             Return
         End If
 
@@ -417,8 +420,14 @@ Friend Module ModUpdate
             T("最新版本：{0} ({1})", Info.VersionName, Info.VersionCode) & vbCrLf &
             T("安装包大小：{0}", AssetSize) & vbCrLf &
             T("更新来源：{0}", Result.SourceName)
-        If Info.MustUpdate Then Message &= vbCrLf & vbCrLf & T("此版本要求至少更新到 {0}。", Info.MinVersionCode)
-        If Not String.IsNullOrWhiteSpace(Info.NotesUrl) Then Message &= vbCrLf & T("更新日志：{0}", Info.NotesUrl)
+        If Info.MustUpdate Then
+            Dim MustText = T("此版本要求至少更新到 {0}。", Info.MinVersionCode)
+            Message &= vbCrLf & vbCrLf & MustText
+        End If
+        If Not String.IsNullOrWhiteSpace(Info.NotesUrl) Then
+            Dim NotesText = T("更新日志：{0}", Info.NotesUrl)
+            Message &= vbCrLf & NotesText
+        End If
 
         Dim Choice As Integer
         If Not String.IsNullOrWhiteSpace(Info.NotesUrl) Then
