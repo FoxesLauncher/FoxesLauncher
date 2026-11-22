@@ -507,6 +507,32 @@ Friend Module ModUpdate
         End Sub, "Update Download", ThreadPriority.BelowNormal)
     End Sub
 
+    ''' <summary>
+    ''' 按区域与用户偏好调整安装包镜像顺序，避免华区先尝试不可达的 GitHub。
+    ''' </summary>
+    Private Function OrderAssetUrls(Urls As IEnumerable(Of String)) As List(Of String)
+        Dim China = IsChinaRegion()
+        Dim Preferred = Settings.Get(Of String)("UpdateSource")
+        Return Urls.OrderBy(Function(u) GetAssetUrlRank(u, China, Preferred)).ToList()
+    End Function
+
+    Private Function GetAssetUrlRank(Url As String, China As Boolean, Preferred As String) As Integer
+        Dim IsGitHub = Url IsNot Nothing AndAlso Url.IndexOf("github.com", StringComparison.OrdinalIgnoreCase) >= 0
+        Dim IsGitCode = Url IsNot Nothing AndAlso Url.IndexOf("gitcode.com", StringComparison.OrdinalIgnoreCase) >= 0
+        If Preferred = "gitcode" AndAlso IsGitCode Then Return 0
+        If Preferred = "github" AndAlso IsGitHub Then Return 0
+        If Preferred = "cloudflare" AndAlso Not IsGitHub AndAlso Not IsGitCode Then Return 0
+        If China Then
+            If IsGitCode Then Return 1
+            If IsGitHub Then Return 2
+            Return 3
+        Else
+            If IsGitHub Then Return 1
+            If IsGitCode Then Return 2
+            Return 3
+        End If
+    End Function
+
     Private Function FormatSize(Bytes As Long) As String
         If Bytes >= 1024L * 1024 * 1024 Then Return (Bytes / 1024.0 / 1024 / 1024).ToString("0.0") & " GB"
         If Bytes >= 1024L * 1024 Then Return (Bytes / 1024.0 / 1024).ToString("0.0") & " MB"
@@ -534,7 +560,7 @@ Friend Module ModUpdate
         DirectoryUtils.Create(Folder)
         If FileUtils.Exists(Target) Then FileUtils.Delete(Target)
 
-        NetDownloadByLoader(Asset.Urls, Target, LoaderToSyncProgress,
+        NetDownloadByLoader(OrderAssetUrls(Asset.Urls), Target, LoaderToSyncProgress,
             New FileChecker With {.ActualSize = If(Asset.Size > 0, Asset.Size, -1), .Hash = Asset.Sha256})
 
         Dim SignError As String = Nothing
@@ -688,7 +714,7 @@ Friend Module ModUpdate
             If Result.Success AndAlso Result.Info IsNot Nothing AndAlso Result.Info.Assets.Count > 0 Then
                 Dim Asset = Result.Info.Assets(0)
                 If FileUtils.Exists(Target) Then FileUtils.Delete(Target)
-                NetDownloadByLoader(Asset.Urls, Target, LoaderToSyncProgress,
+                NetDownloadByLoader(OrderAssetUrls(Asset.Urls), Target, LoaderToSyncProgress,
                     New FileChecker With {.ActualSize = If(Asset.Size > 0, Asset.Size, -1), .Hash = Asset.Sha256})
                 Logger.Info($"已下载最新正式版 FXL：{Result.Info.VersionName} ({Result.Info.VersionCode})")
                 Return
