@@ -2066,5 +2066,6 @@
   "返回内容过大": "Response content is too large.",
   "配置验签失败：{0}": "Config signature verification failed: {0}",
   "（来源：{0}）": "(Source: {0})",
-  "（来自 {0} 的本地缓存）": "(Local cache from {0})"
+  "（来自 {0} 的本地缓存）": "(Local cache from {0})",
+  "GitCode Release 中未找到 latest.json 资产": "The GitCode release does not contain a latest.json asset."
 }

@@ -46,6 +46,7 @@ Friend Module ModUpdate
     Private Class UpdateSourceEntry
         Public Name As String
         Public Url As String
+        Public IsGitCodeApi As Boolean
     End Class
 
 #End Region
@@ -67,9 +68,11 @@ Friend Module ModUpdate
         Dim Channel = GetUpdateChannel()
         Dim Platform = If(String.IsNullOrWhiteSpace(UpdatePlatform), "win-x64", UpdatePlatform)
         Dim R2Url = UpdateR2Latest.Replace("{channel}", Channel).Replace("{platform}", Platform)
+        Dim GitCodeIsApi = Not String.IsNullOrWhiteSpace(UpdateGitCodeApiLatest)
+        Dim GitCodeUrl = If(GitCodeIsApi, UpdateGitCodeApiLatest, UpdateGitCodeLatest)
 
         Dim All As New List(Of UpdateSourceEntry) From {
-            New UpdateSourceEntry With {.Name = "gitcode", .Url = UpdateGitCodeLatest},
+            New UpdateSourceEntry With {.Name = "gitcode", .Url = GitCodeUrl, .IsGitCodeApi = GitCodeIsApi},
             New UpdateSourceEntry With {.Name = "github", .Url = UpdateGitHubLatest},
             New UpdateSourceEntry With {.Name = "cloudflare", .Url = R2Url}
         }
@@ -142,7 +145,13 @@ Friend Module ModUpdate
             LastSource = Source.Name
             Dim SourceStart = GetTimeMs()
             Try
-                Dim Raw = NetRequestByClient(Source.Url, Timeout:=Math.Min(10000, CInt(Remaining)), MakeLog:=False)
+                Dim Timeout = Math.Min(10000, CInt(Remaining))
+                Dim Raw As String
+                If Source.IsGitCodeApi Then
+                    Raw = ResolveGitCodeLatestManifest(Source.Url, Timeout)
+                Else
+                    Raw = NetRequestByClient(Source.Url, Timeout:=Timeout, MakeLog:=False)
+                End If
                 Dim Document As ModRemoteCrypto.RemoteSignedDocument = Nothing
                 Dim VerifyError As String = Nothing
                 If Not ModRemoteCrypto.VerifySignedDocument(Raw, Document, VerifyError) Then
@@ -215,6 +224,30 @@ Friend Module ModUpdate
         Catch
             Return DefaultValue
         End Try
+    End Function
+
+    ''' <summary>
+    ''' GitCode 的 releases/latest 静态地址会返回网页而不是 JSON；
+    ''' 先请求 release API，取出 latest.json 资产的真实下载地址，再下载签名 manifest。
+    ''' </summary>
+    Private Function ResolveGitCodeLatestManifest(ApiUrl As String, Timeout As Integer) As String
+        Dim PartTimeout = Math.Max(3000, Timeout \ 2)
+        Dim MetaRaw = NetRequestByClient(ApiUrl, Timeout:=PartTimeout, MakeLog:=False)
+        Dim Meta = MetaRaw.DeserializeJson()
+        Dim Assets = TryCast(Meta("assets"), JArray)
+        If Assets IsNot Nothing Then
+            For Each Token In Assets
+                Dim Asset = TryCast(Token, JObject)
+                If Asset Is Nothing Then Continue For
+                Dim Name = Asset("name")?.ToString
+                If Not String.Equals(Name, "latest.json", StringComparison.OrdinalIgnoreCase) Then Continue For
+                Dim Url = Asset("browser_download_url")?.ToString
+                If Not String.IsNullOrWhiteSpace(Url) Then
+                    Return NetRequestByClient(Url, Timeout:=PartTimeout, MakeLog:=False)
+                End If
+            Next
+        End If
+        Throw New Exception(T("GitCode Release 中未找到 latest.json 资产"))
     End Function
 
     Private Function ParseManifest(Payload As JObject, SourceName As String) As UpdateInfo

@@ -136,6 +136,7 @@ $updatePlatform = Resolve-ConfigValue -Key 'FXL_UPDATE_PLATFORM' -Default 'win-x
 $updateR2Latest = Resolve-ConfigValue -Key 'FXL_UPDATE_R2_LATEST'
 $updateGitHubLatest = Resolve-ConfigValue -Key 'FXL_UPDATE_GITHUB_LATEST'
 $updateGitCodeLatest = Resolve-ConfigValue -Key 'FXL_UPDATE_GITCODE_LATEST'
+$updateGitCodeApiLatest = Resolve-ConfigValue -Key 'FXL_UPDATE_GITCODE_API_LATEST'
 $updateNoticesUrl = Resolve-ConfigValue -Key 'FXL_UPDATE_NOTICES_URL'
 $updateNoticesFallbacks = Resolve-ConfigValue -Key 'FXL_UPDATE_NOTICES_FALLBACK_URLS'
 $updateConfigUrl = Resolve-ConfigValue -Key 'FXL_UPDATE_CONFIG_URL'
@@ -189,6 +190,8 @@ Friend Module ModBuildSecrets
     Public Const UpdateGitHubLatest As String = $(ConvertTo-VbStringLiteral $updateGitHubLatest)
     ' FXL_UPDATE_GITCODE_LATEST: GitCode latest.json URL
     Public Const UpdateGitCodeLatest As String = $(ConvertTo-VbStringLiteral $updateGitCodeLatest)
+    ' FXL_UPDATE_GITCODE_API_LATEST: GitCode release API URL; resolves the latest.json asset dynamically
+    Public Const UpdateGitCodeApiLatest As String = $(ConvertTo-VbStringLiteral $updateGitCodeApiLatest)
     ' FXL_UPDATE_NOTICES_URL: signed notices JSON URL
     Public Const UpdateNoticesUrl As String = $(ConvertTo-VbStringLiteral $updateNoticesUrl)
     ' FXL_UPDATE_NOTICES_FALLBACK_URLS: additional notices URLs separated by commas
