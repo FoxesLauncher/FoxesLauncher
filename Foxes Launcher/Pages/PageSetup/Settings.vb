@@ -37,6 +37,7 @@ Public Class Settings
         New Setting("UpdateAutoCheck", True, Source:=Sources.Registry),
         New Setting("UpdateLastCheck", 0L, Source:=Sources.Registry),
         New Setting("UpdateLastSeenCode", 0, Source:=Sources.Registry),
+        New Setting("UpdatePostponedCode", 0, Source:=Sources.Registry),
         New Setting("NoticeRevision", 0, Source:=Sources.Registry),
         New Setting("NoticeDismissed", "", Source:=Sources.Registry),
         New Setting("CacheDrops", "", Source:=Sources.Registry),

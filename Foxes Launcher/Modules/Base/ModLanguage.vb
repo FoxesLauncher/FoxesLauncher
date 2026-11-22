@@ -209,6 +209,14 @@ Public Module ModLanguage
         Dim Value As String = Nothing
         If Not LanguageData.TryGetValue(Key, Value) Then
             If MissingKeys.Add(Key) Then Logger.Warn($"缺少语言键：{Key}")
+            ' 缺键时至少把参数填进去，避免界面直接显示 {0}。
+            If Args IsNot Nothing AndAlso Args.Length > 0 Then
+                Try
+                    Return String.Format(Key, Args)
+                Catch ex As FormatException
+                    Logger.Warn(ex, $"缺键回退格式错误：{Key}")
+                End Try
+            End If
             Return Key
         End If
         If Args Is Nothing OrElse Args.Length = 0 Then Return Value

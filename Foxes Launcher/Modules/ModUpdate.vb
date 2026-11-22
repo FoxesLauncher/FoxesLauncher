@@ -362,7 +362,9 @@ Friend Module ModUpdate
                 Thread.Sleep(8000)
                 Dim Result = CheckForUpdate(False)
                 If Result.Success AndAlso Result.Info IsNot Nothing AndAlso Result.Info.VersionCode > VersionCode Then
-                    RunInUi(Sub() Hint(T("发现新版本 {0}，可在 设置 → 系统 中检查更新", Result.Info.VersionName), HintType.Blue, False))
+                    If Settings.Get(Of Integer)("UpdatePostponedCode") <> Result.Info.VersionCode Then
+                        RunInUi(Sub() ShowUpdateCheckResult(Result, IsAutomatic:=True))
+                    End If
                 End If
                 If Result.Success Then CheckTlsSoftPinIfNeeded()
             Catch ex As Exception
@@ -397,7 +399,7 @@ Friend Module ModUpdate
 
     Private CheckingUpdate As Integer
 
-    Private Sub ShowUpdateCheckResult(Result As UpdateCheckResult)
+    Private Sub ShowUpdateCheckResult(Result As UpdateCheckResult, Optional IsAutomatic As Boolean = False)
         If Not Result.Success Then
             Dim CheckTitle = T("检查更新")
             MyMsgBox(T("检查更新失败。") & vbCrLf & vbCrLf & Result.ErrorMessage, CheckTitle, IsWarn:=True)
@@ -440,8 +442,10 @@ Friend Module ModUpdate
 
         Select Case Choice
             Case 1
+                Settings.Set("UpdatePostponedCode", 0)
                 StartUpdateDownload(Info)
             Case 2
+                If IsAutomatic Then Settings.Set("UpdatePostponedCode", Info.VersionCode)
                 Telemetry("UpdatePostponed", "FromVersionCode", VersionCode.ToString(), "ToVersionCode", Info.VersionCode.ToString())
             Case 3
                 Telemetry("NoticeClicked", "Kind", "update-notes")
