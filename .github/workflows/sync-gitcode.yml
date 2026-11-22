@@ -1,0 +1,43 @@
+name: Sync to GitCode
+
+on:
+  push:
+    branches: [dev, main]
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  sync:
+    if: ${{ vars.FXL_GITCODE_SYNC == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Push branch to GitCode
+        if: startsWith(github.ref, 'refs/heads/')
+        env:
+          GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
+          GITCODE_REPO: ${{ vars.FXL_GITCODE_REPO }}
+        run: |
+          set -euo pipefail
+          auth="$(printf 'oauth2:%s' "$GITCODE_TOKEN" | base64 -w0)"
+          git -c "http.extraHeader=Authorization: Basic $auth" \
+            push "https://gitcode.com/$GITCODE_REPO.git" \
+            "HEAD:refs/heads/$GITHUB_REF_NAME"
+
+      - name: Push tag to GitCode
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
+          GITCODE_REPO: ${{ vars.FXL_GITCODE_REPO }}
+        run: |
+          set -euo pipefail
+          auth="$(printf 'oauth2:%s' "$GITCODE_TOKEN" | base64 -w0)"
+          git -c "http.extraHeader=Authorization: Basic $auth" \
+            push "https://gitcode.com/$GITCODE_REPO.git" \
+            "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
