@@ -167,6 +167,9 @@ Public Class FormMain
             End Try
             '上报
             Telemetry("LauncherStart")
+            '后台检查更新与公告（不阻塞启动）
+            ModUpdate.StartAutomaticCheck()
+            ModRemoteContent.StartNotices()
             '开源版本提示
             If VersionBranchMain = "OpenSource" Then
                 MyMsgBox(T("该版本中无法使用以下特性：{0}- CurseForge API 调用：需要自行申请 API Key，然后在仓库根目录的 .env 中设置 FXL_CURSEFORGE_API_KEY{1}- 正版登录：需要自行向微软申请 Client ID，然后在仓库根目录的 .env 中设置 FXL_MS_CLIENT_ID{2}- 更新与联网通知：避免滥用隐患", vbCrLf, vbCrLf, vbCrLf), T("开源版本说明"))
@@ -312,6 +315,7 @@ Public Class FormMain
         End If
         Logger.Info($"程序已退出，返回值：{ReturnCode}")
         ConfigUtils.SaveAll()
+        ModTelemetry.FlushNow()
         Logger.Instance.Flush()
         If ReturnCode <> ProcessReturnValues.Success Then Environment.Exit(ReturnCode)
         Process.GetCurrentProcess.Kill()

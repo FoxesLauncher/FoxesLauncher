@@ -267,6 +267,10 @@
     <Compile Include="Modules\ModDevelop.vb" />
     <Compile Include="Modules\Minecraft\ModWatcher.vb" />
     <Compile Include="Modules\ModSecret.vb" />
+    <Compile Include="Modules\ModUpdate.vb" />
+    <Compile Include="Modules\ModTelemetry.vb" />
+    <Compile Include="Modules\ModRemoteCrypto.vb" />
+    <Compile Include="Modules\ModRemoteContent.vb" />
     <Compile Include="Modules\GeneratedSecrets.vb" Condition="'$(GeneratedSecretsIncluded)' == 'true'" />
     <Compile Include="Pages\PageDownload\Resource\PageResource.xaml.vb">
       <DependentUpon>PageResource.xaml</DependentUpon>

@@ -130,6 +130,25 @@ $msClientId = Resolve-ConfigValue -Key 'FXL_MS_CLIENT_ID'
 $curseForgeApiKey = Resolve-ConfigValue -Key 'FXL_CURSEFORGE_API_KEY'
 $clsBaseUrl = Resolve-ConfigValue -Key 'FXL_CLS_BASE_URL'
 
+# Update / telemetry configuration. Every address and key is supplied by .env.
+$updateChannel = Resolve-ConfigValue -Key 'FXL_UPDATE_CHANNEL' -Default 'official'
+$updatePlatform = Resolve-ConfigValue -Key 'FXL_UPDATE_PLATFORM' -Default 'win-x64'
+$updateR2Latest = Resolve-ConfigValue -Key 'FXL_UPDATE_R2_LATEST'
+$updateGitHubLatest = Resolve-ConfigValue -Key 'FXL_UPDATE_GITHUB_LATEST'
+$updateGitCodeLatest = Resolve-ConfigValue -Key 'FXL_UPDATE_GITCODE_LATEST'
+$updateNoticesUrl = Resolve-ConfigValue -Key 'FXL_UPDATE_NOTICES_URL'
+$updateNoticesFallbacks = Resolve-ConfigValue -Key 'FXL_UPDATE_NOTICES_FALLBACK_URLS'
+$updateConfigUrl = Resolve-ConfigValue -Key 'FXL_UPDATE_CONFIG_URL'
+$telemetryUrl = Resolve-ConfigValue -Key 'FXL_TELEMETRY_URL'
+$updatePublicKeys = Resolve-ConfigValue -Key 'FXL_UPDATE_PUBLIC_KEYS'
+$updateAuthenticode = Resolve-ConfigValue -Key 'FXL_UPDATE_AUTHENTICODE_THUMBPRINT'
+$tlsPinnedCas = Resolve-ConfigValue -Key 'FXL_TLS_PINNED_CA_THUMBPRINTS'
+$telemetryInterval = Resolve-ConfigValue -Key 'FXL_TELEMETRY_INTERVAL_SECONDS' -Default '15'
+$telemetryIntervalValue = 15
+if (-not [int]::TryParse($telemetryInterval, [ref]$telemetryIntervalValue) -or $telemetryIntervalValue -lt 5) {
+    $telemetryIntervalValue = 15
+}
+
 $commitHash = Resolve-ConfigValue -Key 'FXL_COMMIT_HASH'
 if ([string]::IsNullOrWhiteSpace($commitHash)) {
     $commitHash = Resolve-ConfigValue -Key 'GITHUB_SHA'
@@ -159,6 +178,34 @@ Friend Module ModBuildSecrets
     ' FXL_COMMIT_HASH: commit hash of this build
     Public Const CommitHash As String = $(ConvertTo-VbStringLiteral $commitHash)
 
+    ' ---- Update manifest / telemetry (all values come from .env) ----
+    ' FXL_UPDATE_CHANNEL: default update channel (official / snapshot / open-source)
+    Public Const UpdateChannel As String = $(ConvertTo-VbStringLiteral $updateChannel)
+    ' FXL_UPDATE_PLATFORM: manifest platform key
+    Public Const UpdatePlatform As String = $(ConvertTo-VbStringLiteral $updatePlatform)
+    ' FXL_UPDATE_R2_LATEST: Cloudflare R2 manifest URL template, may contain {channel} / {platform}
+    Public Const UpdateR2Latest As String = $(ConvertTo-VbStringLiteral $updateR2Latest)
+    ' FXL_UPDATE_GITHUB_LATEST: GitHub latest.json URL
+    Public Const UpdateGitHubLatest As String = $(ConvertTo-VbStringLiteral $updateGitHubLatest)
+    ' FXL_UPDATE_GITCODE_LATEST: GitCode latest.json URL
+    Public Const UpdateGitCodeLatest As String = $(ConvertTo-VbStringLiteral $updateGitCodeLatest)
+    ' FXL_UPDATE_NOTICES_URL: signed notices JSON URL
+    Public Const UpdateNoticesUrl As String = $(ConvertTo-VbStringLiteral $updateNoticesUrl)
+    ' FXL_UPDATE_NOTICES_FALLBACK_URLS: additional notices URLs separated by commas
+    Public Const UpdateNoticesFallbacks As String = $(ConvertTo-VbStringLiteral $updateNoticesFallbacks)
+    ' FXL_UPDATE_CONFIG_URL: signed dynamic config JSON URL
+    Public Const UpdateConfigUrl As String = $(ConvertTo-VbStringLiteral $updateConfigUrl)
+    ' FXL_TELEMETRY_URL: telemetry batch endpoint; empty disables telemetry
+    Public Const TelemetryUrl As String = $(ConvertTo-VbStringLiteral $telemetryUrl)
+    ' FXL_UPDATE_PUBLIC_KEYS: keyId=base64(RSA public key XML), separated by semicolons
+    Public Const UpdatePublicKeys As String = $(ConvertTo-VbStringLiteral $updatePublicKeys)
+    ' FXL_UPDATE_AUTHENTICODE_THUMBPRINT: expected Authenticode certificate thumbprint; empty skips the check
+    Public Const UpdateAuthenticodeThumbprint As String = $(ConvertTo-VbStringLiteral $updateAuthenticode)
+    ' FXL_TLS_PINNED_CA_THUMBPRINTS: expected CA thumbprints for soft pinning, separated by semicolons
+    Public Const TlsPinnedCaThumbprints As String = $(ConvertTo-VbStringLiteral $tlsPinnedCas)
+    ' FXL_TELEMETRY_INTERVAL_SECONDS: telemetry batch flush interval
+    Public Const TelemetryIntervalSeconds As Integer = $telemetryIntervalValue
+
 End Module
 "@
 
@@ -182,5 +229,5 @@ $configured = {
     param([string]$Value)
     if ([string]::IsNullOrWhiteSpace($Value)) { 'not set' } else { 'configured' }
 }
-Write-Host ("[GenerateSecrets] Branch: {0}; MS client ID: {1}; CurseForge key: {2}; telemetry: {3}" -f `
-    $versionBranch, (& $configured $msClientId), (& $configured $curseForgeApiKey), (& $configured $clsBaseUrl))
+Write-Host ("[GenerateSecrets] Branch: {0}; MS client ID: {1}; CurseForge key: {2}; telemetry: {3}; update: {4}" -f `
+    $versionBranch, (& $configured $msClientId), (& $configured $curseForgeApiKey), (& $configured $telemetryUrl), (& $configured $updatePublicKeys))

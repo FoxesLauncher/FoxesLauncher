@@ -74,6 +74,18 @@ jobs:
         FXL_MS_CLIENT_ID: ${{ secrets.CLIENT_ID }}
         FXL_CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
         FXL_COMMIT_HASH: ${{ github.sha }}
+        FXL_UPDATE_CHANNEL: ${{ vars.FXL_UPDATE_CHANNEL }}
+        FXL_UPDATE_PLATFORM: ${{ vars.FXL_UPDATE_PLATFORM }}
+        FXL_UPDATE_R2_LATEST: ${{ vars.FXL_UPDATE_R2_LATEST }}
+        FXL_UPDATE_GITHUB_LATEST: ${{ vars.FXL_UPDATE_GITHUB_LATEST }}
+        FXL_UPDATE_GITCODE_LATEST: ${{ vars.FXL_UPDATE_GITCODE_LATEST }}
+        FXL_UPDATE_NOTICES_URL: ${{ vars.FXL_UPDATE_NOTICES_URL }}
+        FXL_UPDATE_NOTICES_FALLBACK_URLS: ${{ vars.FXL_UPDATE_NOTICES_FALLBACK_URLS }}
+        FXL_UPDATE_CONFIG_URL: ${{ vars.FXL_UPDATE_CONFIG_URL }}
+        FXL_TELEMETRY_URL: ${{ vars.FXL_TELEMETRY_URL }}
+        FXL_UPDATE_PUBLIC_KEYS: ${{ vars.FXL_UPDATE_PUBLIC_KEYS }}
+        FXL_UPDATE_AUTHENTICODE_THUMBPRINT: ${{ vars.FXL_UPDATE_AUTHENTICODE_THUMBPRINT }}
+        FXL_TLS_PINNED_CA_THUMBPRINTS: ${{ vars.FXL_TLS_PINNED_CA_THUMBPRINTS }}
       run: msbuild "Foxes Launcher\Foxes Launcher.vbproj" -p:Configuration=${{ matrix.configuration }}
 
     - name: Upload a Build Artifact

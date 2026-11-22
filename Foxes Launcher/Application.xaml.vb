@@ -46,7 +46,11 @@ Public Class Application
             If e.Args.Length > 0 Then
                 If e.Args(0) = "--update" Then
                     '自动更新
-                    UpdateReplace(e.Args(1), e.Args(2).Trim(""""), e.Args(3).Trim(""""), e.Args(4))
+                    If e.Args.Length < 5 Then
+                        MsgBox(T("更新参数不完整。"), MsgBoxStyle.Critical, T("更新失败"))
+                        Environment.Exit(ProcessReturnValues.Fail)
+                    End If
+                    UpdateReplace(CInt(e.Args(1)), e.Args(2).Trim(""""), e.Args(3).Trim(""""), e.Args(4) = "1" OrElse e.Args(4).Equals("true", StringComparison.OrdinalIgnoreCase))
                     Environment.Exit(ProcessReturnValues.TaskDone)
                 ElseIf e.Args(0) = "--gpu" Then
                     '调整显卡设置

@@ -131,15 +131,13 @@ Public Class PageSetupSystem
     End Sub
     ''' <summary>
     ''' 启动器是否已经是最新版？
-    ''' 若返回 Nothing，则代表无更新缓存文件或出错。
+    ''' 若返回 Nothing，则代表没有有效的更新缓存或出错。
     ''' </summary>
     Public Shared Function IsLauncherNewest() As Boolean?
         Try
-            '确认服务器公告是否正常
-            Dim ServerContent As String = If(FileUtils.TryReadAsString(PathTemp & "Cache\Notice.cfg"), "")
-            If ServerContent.Split("|").Count < 3 Then Return Nothing
-            '确认是否为最新
-            Return ServerContent.Split("|")(If(BuildType = BuildTypes.Release, 2, 1)) <= VersionCode
+            Dim Cached = ModUpdate.TryGetCachedUpdate()
+            If Cached Is Nothing Then Return Nothing
+            Return Cached.VersionCode <= VersionCode
         Catch ex As Exception
             Logger.Error(ex, "确认启动器更新失败")
             Return Nothing
