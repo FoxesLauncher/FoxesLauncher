@@ -6,18 +6,18 @@ Imports System.Globalization
 Friend Module ModRemoteContent
 
     Private NoticesLoaded As Boolean
-    Private Const NoticeCacheMinutes As Integer = 10
+    Private Const RemoteContentCacheMinutes As Integer = 10
 
     ''' <summary>
-    ''' 拉取并验签动态配置（联机等设置）。
+    ''' 拉取并验签动态配置（联机等设置）。按区域选择来源，并缓存到本地。
     ''' </summary>
     Friend Sub LoadServerConfig()
         Try
-            If String.IsNullOrWhiteSpace(UpdateConfigUrl) Then Return
-            Dim Raw = NetRequestByClient(UpdateConfigUrl, Timeout:=10000, MakeLog:=False)
-            Dim Document As ModRemoteCrypto.RemoteSignedDocument = Nothing
+            Dim Urls = BuildConfigUrls()
+            If Urls.Count = 0 Then Return
             Dim ErrorMessage As String = Nothing
-            If Not ModRemoteCrypto.VerifySignedDocument(Raw, Document, ErrorMessage) Then
+            Dim Document = LoadSignedContent("Config", Urls, ErrorMessage)
+            If Document Is Nothing Then
                 Throw New Exception(T("配置验签失败：{0}", ErrorMessage))
             End If
             ServerConfig = Document.Payload
@@ -37,12 +37,12 @@ Friend Module ModRemoteContent
         Sub()
             Try
                 Thread.Sleep(3000)
-                Dim Raw = GetNoticesRaw()
-                If String.IsNullOrWhiteSpace(Raw) Then Return
-                Dim Document As ModRemoteCrypto.RemoteSignedDocument = Nothing
                 Dim ErrorMessage As String = Nothing
-                If Not ModRemoteCrypto.VerifySignedDocument(Raw, Document, ErrorMessage) Then
-                    Logger.Warn($"公告验签失败：{ErrorMessage}")
+                Dim Document = LoadSignedContent("Notices", BuildNoticesUrls(), ErrorMessage)
+                If Document Is Nothing Then
+                    If Not String.IsNullOrWhiteSpace(ErrorMessage) Then
+                        Logger.Warn($"公告加载失败：{ErrorMessage}")
+                    End If
                     Return
                 End If
                 Dim Notices = ParseNotices(Document.Payload)
@@ -53,48 +53,113 @@ Friend Module ModRemoteContent
         End Sub, "Notices", ThreadPriority.Lowest)
     End Sub
 
-    Private Function GetNoticesRaw() As String
-        Try
-            Dim CacheFile = PathTemp & "Cache\Notices\official.json"
-            Dim TimeFile = PathTemp & "Cache\Notices\official.time"
-            If FileUtils.Exists(CacheFile) AndAlso FileUtils.Exists(TimeFile) Then
-                Dim CachedAt As Long
-                If Long.TryParse(FileUtils.ReadAsString(TimeFile).Trim(), CachedAt) AndAlso
-                   DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - CachedAt <= NoticeCacheMinutes * 60 * 1000 Then
-                    Return FileUtils.ReadAsString(CacheFile)
-                End If
-            End If
-        Catch ex As Exception
-            Logger.Warn(ex, "读取公告缓存失败")
-        End Try
+    ''' <summary>
+    ''' 按区域排序公告来源：中国大陆/港澳台优先 GitCode，其他区域优先 GitHub。
+    ''' </summary>
+    Private Function BuildNoticesUrls() As List(Of String)
+        Dim Urls As New List(Of String)
+        If ModRegion.IsChinaRegion Then
+            Urls.Add(UpdateNoticesGitCodeUrl)
+            Urls.Add(UpdateNoticesUrl)
+        Else
+            Urls.Add(UpdateNoticesUrl)
+            Urls.Add(UpdateNoticesGitCodeUrl)
+        End If
+        AddFallbackUrls(Urls, UpdateNoticesFallbacks)
+        Return NormalizeUrls(Urls)
+    End Function
 
-        Dim Urls As New List(Of String) From {UpdateNoticesUrl}
-        If Not String.IsNullOrWhiteSpace(UpdateNoticesFallbacks) Then
-            Urls.AddRange(UpdateNoticesFallbacks.Split(","c).
-                Select(Function(u) u.Trim()).
-                Where(Function(u) u.Length > 0))
+    ''' <summary>
+    ''' 按区域排序动态配置来源，规则与公告一致。
+    ''' </summary>
+    Private Function BuildConfigUrls() As List(Of String)
+        Dim Urls As New List(Of String)
+        If ModRegion.IsChinaRegion Then
+            Urls.Add(UpdateConfigGitCodeUrl)
+            Urls.Add(UpdateConfigUrl)
+        Else
+            Urls.Add(UpdateConfigUrl)
+            Urls.Add(UpdateConfigGitCodeUrl)
+        End If
+        AddFallbackUrls(Urls, UpdateConfigFallbacks)
+        Return NormalizeUrls(Urls)
+    End Function
+
+    Private Sub AddFallbackUrls(Urls As List(Of String), Fallbacks As String)
+        If String.IsNullOrWhiteSpace(Fallbacks) Then Return
+        Urls.AddRange(Fallbacks.Split(","c).
+            Select(Function(u) u.Trim()).
+            Where(Function(u) u.Length > 0))
+    End Sub
+
+    Private Function NormalizeUrls(Urls As List(Of String)) As List(Of String)
+        Return Urls.
+            Where(Function(u) Not String.IsNullOrWhiteSpace(u)).
+            Distinct(StringComparer.OrdinalIgnoreCase).
+            ToList()
+    End Function
+
+    ''' <summary>
+    ''' 依次尝试本地缓存和各个来源，返回第一个验签通过的内容。
+    ''' 单个来源返回 HTML、错误页或签名不匹配时会继续尝试下一个来源。
+    ''' </summary>
+    Private Function LoadSignedContent(Folder As String, Urls As List(Of String), ByRef ErrorMessage As String) As ModRemoteCrypto.RemoteSignedDocument
+        Dim Cached = ReadRemoteContentCache(Folder)
+        If Not String.IsNullOrWhiteSpace(Cached) Then
+            Dim CachedDocument As ModRemoteCrypto.RemoteSignedDocument = Nothing
+            Dim CacheError As String = Nothing
+            If ModRemoteCrypto.VerifySignedDocument(Cached, CachedDocument, CacheError) Then Return CachedDocument
+            Logger.Warn($"本地缓存的远程内容验签失败，将重新下载：{CacheError}")
         End If
 
         For Each Url In Urls
-            If String.IsNullOrWhiteSpace(Url) Then Continue For
             Try
+                Logger.Info($"远程内容来源：{Url}")
                 Dim Raw = NetRequestByClient(Url, Timeout:=10000, MakeLog:=False)
-                If Not String.IsNullOrWhiteSpace(Raw) Then
-                    Try
-                        DirectoryUtils.Create(PathTemp & "Cache\Notices\")
-                        FileUtils.Write(PathTemp & "Cache\Notices\official.json", Raw)
-                        FileUtils.Write(PathTemp & "Cache\Notices\official.time", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString())
-                    Catch ex As Exception
-                        Logger.Warn(ex, "写入公告缓存失败")
-                    End Try
-                    Return Raw
+                If String.IsNullOrWhiteSpace(Raw) Then Continue For
+                Dim Document As ModRemoteCrypto.RemoteSignedDocument = Nothing
+                Dim VerifyError As String = Nothing
+                If Not ModRemoteCrypto.VerifySignedDocument(Raw, Document, VerifyError) Then
+                    ErrorMessage = VerifyError
+                    Logger.Warn($"远程内容验签失败（{Url}）：{VerifyError}")
+                    Continue For
                 End If
+                WriteRemoteContentCache(Folder, Raw)
+                Return Document
             Catch ex As Exception
-                Logger.Warn(ex, $"从 {Url} 获取公告失败")
+                ErrorMessage = ex.Message
+                Logger.Warn(ex, $"从 {Url} 获取远程内容失败")
             End Try
         Next
         Return Nothing
     End Function
+
+    Private Function ReadRemoteContentCache(Folder As String) As String
+        Try
+            Dim CacheFile = PathTemp & $"Cache\{Folder}\official.json"
+            Dim TimeFile = PathTemp & $"Cache\{Folder}\official.time"
+            If FileUtils.Exists(CacheFile) AndAlso FileUtils.Exists(TimeFile) Then
+                Dim CachedAt As Long
+                If Long.TryParse(FileUtils.ReadAsString(TimeFile).Trim(), CachedAt) AndAlso
+                   DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - CachedAt <= RemoteContentCacheMinutes * 60 * 1000 Then
+                    Return FileUtils.ReadAsString(CacheFile)
+                End If
+            End If
+        Catch ex As Exception
+            Logger.Warn(ex, "读取远程内容缓存失败")
+        End Try
+        Return Nothing
+    End Function
+
+    Private Sub WriteRemoteContentCache(Folder As String, Raw As String)
+        Try
+            DirectoryUtils.Create(PathTemp & $"Cache\{Folder}\")
+            FileUtils.Write(PathTemp & $"Cache\{Folder}\official.json", Raw)
+            FileUtils.Write(PathTemp & $"Cache\{Folder}\official.time", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString())
+        Catch ex As Exception
+            Logger.Warn(ex, "写入远程内容缓存失败")
+        End Try
+    End Sub
 
     Private Class NoticeItem
         Public Id As Integer

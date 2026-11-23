@@ -90,6 +90,15 @@ Public Module ModRegion
     End Property
 
     ''' <summary>
+    ''' 是否为需要优先使用 GitCode 源的区域（中国大陆 / 中国香港、中国澳门、中国台湾）。
+    ''' </summary>
+    Public ReadOnly Property IsChinaRegion As Boolean
+        Get
+            Return CurrentRegion = RegionAsiaMainlandChina OrElse CurrentRegion = RegionAsiaHongKongMacaoTaiwan
+        End Get
+    End Property
+
+    ''' <summary>
     ''' 是否限制 Minecraft 的下载与安装（亚洲（中国大陆））。
     ''' 限制时仅显示提示，不隐藏入口。
     ''' </summary>

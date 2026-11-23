@@ -138,8 +138,11 @@ $updateGitHubLatest = Resolve-ConfigValue -Key 'FXL_UPDATE_GITHUB_LATEST'
 $updateGitCodeLatest = Resolve-ConfigValue -Key 'FXL_UPDATE_GITCODE_LATEST'
 $updateGitCodeApiLatest = Resolve-ConfigValue -Key 'FXL_UPDATE_GITCODE_API_LATEST'
 $updateNoticesUrl = Resolve-ConfigValue -Key 'FXL_UPDATE_NOTICES_URL'
+$updateNoticesGitCodeUrl = Resolve-ConfigValue -Key 'FXL_UPDATE_NOTICES_GITCODE_URL'
 $updateNoticesFallbacks = Resolve-ConfigValue -Key 'FXL_UPDATE_NOTICES_FALLBACK_URLS'
 $updateConfigUrl = Resolve-ConfigValue -Key 'FXL_UPDATE_CONFIG_URL'
+$updateConfigGitCodeUrl = Resolve-ConfigValue -Key 'FXL_UPDATE_CONFIG_GITCODE_URL'
+$updateConfigFallbacks = Resolve-ConfigValue -Key 'FXL_UPDATE_CONFIG_FALLBACK_URLS'
 $telemetryUrl = Resolve-ConfigValue -Key 'FXL_TELEMETRY_URL'
 $updatePublicKeys = Resolve-ConfigValue -Key 'FXL_UPDATE_PUBLIC_KEYS'
 $updateAuthenticode = Resolve-ConfigValue -Key 'FXL_UPDATE_AUTHENTICODE_THUMBPRINT'
@@ -192,12 +195,18 @@ Friend Module ModBuildSecrets
     Public Const UpdateGitCodeLatest As String = $(ConvertTo-VbStringLiteral $updateGitCodeLatest)
     ' FXL_UPDATE_GITCODE_API_LATEST: GitCode release API URL; resolves the latest.json asset dynamically
     Public Const UpdateGitCodeApiLatest As String = $(ConvertTo-VbStringLiteral $updateGitCodeApiLatest)
-    ' FXL_UPDATE_NOTICES_URL: signed notices JSON URL
+    ' FXL_UPDATE_NOTICES_URL: signed notices JSON URL (GitHub)
     Public Const UpdateNoticesUrl As String = $(ConvertTo-VbStringLiteral $updateNoticesUrl)
+    ' FXL_UPDATE_NOTICES_GITCODE_URL: signed notices JSON URL (GitCode)
+    Public Const UpdateNoticesGitCodeUrl As String = $(ConvertTo-VbStringLiteral $updateNoticesGitCodeUrl)
     ' FXL_UPDATE_NOTICES_FALLBACK_URLS: additional notices URLs separated by commas
     Public Const UpdateNoticesFallbacks As String = $(ConvertTo-VbStringLiteral $updateNoticesFallbacks)
-    ' FXL_UPDATE_CONFIG_URL: signed dynamic config JSON URL
+    ' FXL_UPDATE_CONFIG_URL: signed dynamic config JSON URL (GitHub)
     Public Const UpdateConfigUrl As String = $(ConvertTo-VbStringLiteral $updateConfigUrl)
+    ' FXL_UPDATE_CONFIG_GITCODE_URL: signed dynamic config JSON URL (GitCode)
+    Public Const UpdateConfigGitCodeUrl As String = $(ConvertTo-VbStringLiteral $updateConfigGitCodeUrl)
+    ' FXL_UPDATE_CONFIG_FALLBACK_URLS: additional config URLs separated by commas
+    Public Const UpdateConfigFallbacks As String = $(ConvertTo-VbStringLiteral $updateConfigFallbacks)
     ' FXL_TELEMETRY_URL: telemetry batch endpoint; empty disables telemetry
     Public Const TelemetryUrl As String = $(ConvertTo-VbStringLiteral $telemetryUrl)
     ' FXL_UPDATE_PUBLIC_KEYS: keyId=base64(RSA public key XML), separated by semicolons

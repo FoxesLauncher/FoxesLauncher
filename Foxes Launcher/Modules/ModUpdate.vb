@@ -60,10 +60,6 @@ Friend Module ModUpdate
         Return "official"
     End Function
 
-    Private Function IsChinaRegion() As Boolean
-        Return CurrentRegion = RegionAsiaMainlandChina OrElse CurrentRegion = RegionAsiaHongKongMacaoTaiwan
-    End Function
-
     Private Function BuildUpdateSources() As List(Of UpdateSourceEntry)
         Dim Channel = GetUpdateChannel()
         Dim Platform = If(String.IsNullOrWhiteSpace(UpdatePlatform), "win-x64", UpdatePlatform)
@@ -79,7 +75,7 @@ Friend Module ModUpdate
         All.RemoveAll(Function(s) String.IsNullOrWhiteSpace(s.Url))
 
         '按区域确定默认顺序
-        Dim PreferredOrder As String() = If(IsChinaRegion(),
+        Dim PreferredOrder As String() = If(ModRegion.IsChinaRegion,
             {"gitcode", "github", "cloudflare"},
             {"github", "gitcode", "cloudflare"})
         Dim Result As New List(Of UpdateSourceEntry)
@@ -511,7 +507,7 @@ Friend Module ModUpdate
     ''' 按区域与用户偏好调整安装包镜像顺序，避免华区先尝试不可达的 GitHub。
     ''' </summary>
     Private Function OrderAssetUrls(Urls As IEnumerable(Of String)) As List(Of String)
-        Dim China = IsChinaRegion()
+        Dim China = ModRegion.IsChinaRegion
         Dim Preferred = Settings.Get(Of String)("UpdateSource")
         Return Urls.OrderBy(Function(u) GetAssetUrlRank(u, China, Preferred)).ToList()
     End Function
