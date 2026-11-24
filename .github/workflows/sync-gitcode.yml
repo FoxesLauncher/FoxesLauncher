@@ -26,8 +26,9 @@ jobs:
         run: |
           set -euo pipefail
           auth="$(printf 'oauth2:%s' "$GITCODE_TOKEN" | base64 -w0)"
+          # 强制推送，保证 GitHub 改写历史后 GitCode 能同步到相同提交
           git -c "http.extraHeader=Authorization: Basic $auth" \
-            push "https://gitcode.com/$GITCODE_REPO.git" \
+            push --force "https://gitcode.com/$GITCODE_REPO.git" \
             "HEAD:refs/heads/$GITHUB_REF_NAME"
 
       - name: Push tag to GitCode
@@ -39,5 +40,5 @@ jobs:
           set -euo pipefail
           auth="$(printf 'oauth2:%s' "$GITCODE_TOKEN" | base64 -w0)"
           git -c "http.extraHeader=Authorization: Basic $auth" \
-            push "https://gitcode.com/$GITCODE_REPO.git" \
+            push --force "https://gitcode.com/$GITCODE_REPO.git" \
             "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
