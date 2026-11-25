@@ -1676,6 +1676,9 @@ NextInstance:
             End Try
         Next
 
+        '替换存在字体漏洞的 FreeType
+        FreeTypePatchApply(Target, Loader)
+
     End Sub
     ''' <summary>
     ''' 获取 Natives 文件夹路径，以 \ 结尾。
@@ -1698,6 +1701,9 @@ NextInstance:
 #Region "启动与前后处理"
 
     Private Sub McLaunchPrerun()
+
+        '资源包字体安全检查
+        FontGuardCheckInstance(McInstanceSelected)
 
         '使用高性能显卡
         If Settings.Get(Of Boolean)("LaunchAdvanceGraphicCard") Then

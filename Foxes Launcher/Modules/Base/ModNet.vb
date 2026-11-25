@@ -1307,6 +1307,10 @@ Retry:
         ''' </summary>
         Private FileRemain As Integer
         Private ReadOnly FileRemainLock As New Object
+        ''' <summary>
+        ''' 是否已经进行过资源包字体检查，避免 OnFinish 重复执行。
+        ''' </summary>
+        Private FontGuardChecked As Boolean = False
 
         ''' <summary>
         ''' 用于显示的百分比进度。
@@ -1558,6 +1562,16 @@ FinishExCatch:
         End Sub
         Public Sub OnFinish()
             RaisePreviewFinish()
+            '资源包字体检查需要在标记完成前进行，否则后续安装阶段可能已开始
+            Dim DoFontGuard As Boolean = False
+            SyncLock LockState
+                If State > LoadState.Loading Then Return
+                If Not FontGuardChecked Then
+                    FontGuardChecked = True
+                    DoFontGuard = True
+                End If
+            End SyncLock
+            If DoFontGuard Then FontGuardAfterDownload(Files)
             SyncLock LockState
                 If State > LoadState.Loading Then Return
                 State = LoadState.Finished

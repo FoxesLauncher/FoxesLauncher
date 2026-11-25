@@ -266,6 +266,8 @@
     <Compile Include="Modules\ModMusic.vb" />
     <Compile Include="Modules\ModDevelop.vb" />
     <Compile Include="Modules\Minecraft\ModWatcher.vb" />
+    <Compile Include="Modules\Minecraft\ModFontGuard.vb" />
+    <Compile Include="Modules\Minecraft\ModFreeTypePatch.vb" />
     <Compile Include="Modules\ModSecret.vb" />
     <Compile Include="Modules\ModUpdate.vb" />
     <Compile Include="Modules\ModTelemetry.vb" />

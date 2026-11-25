@@ -10,7 +10,7 @@
 [![Build](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml/badge.svg)](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Upstream License](https://img.shields.io/badge/upstream-PCL%20Distribution%20License-blue.svg)](LICENCE)
-[![Version](https://img.shields.io/badge/version-0.1.0.0-informational.svg)](https://github.com/FoxesLauncher/FoxesLauncher/releases)
+[![Version](https://img.shields.io/badge/version-0.1.1.0-informational.svg)](https://github.com/FoxesLauncher/FoxesLauncher/releases)
 
 ---
 
@@ -99,10 +99,11 @@ Foxes Launcher\bin\Foxes Launcher.exe
 
 ### 版本与更新
 
-当前版本为 `0.1.0.0`，版本号定义在 `Foxes Launcher/Modules/Base/ModBase.vb`，程序集版本定义在 `Foxes Launcher/My Project/AssemblyInfo.vb`。发布构建由 [Build 工作流](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml) 生成。
+当前版本为 `0.1.1.0`，版本号定义在 `Foxes Launcher/Modules/Base/ModBase.vb`，程序集版本定义在 `Foxes Launcher/My Project/AssemblyInfo.vb`。发布构建由 [Build 工作流](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml) 生成。
 
 ### 变更日志
 
+- `0.1.1.0`：新增资源包字体安全检查，在启动前、下载后与游戏运行期间识别带 hinting 指令的 TrueType 字体；服务器推送的可疑资源包会自动隔离。新增 FreeType 自动修补，在版本低于 2.15.0 时替换为官方已修复的构建，用于防御 Minecraft2Shell 一类字体漏洞。
 - `2.99.0.1`：同步 PCL 2.99.0.1；整理项目地址、Issue 模板、README 与仓库排除项；清理无引用代码、预编译发布包与未使用的重复清单文件；补充 MIT 许可证与上游版权说明。
 
 ### 许可证与致谢
@@ -200,10 +201,11 @@ When unset, the corresponding features will use empty values or remain unavailab
 
 ### Version and Updates
 
-The current version is `0.1.0.0`. The version name is defined in `Foxes Launcher/Modules/Base/ModBase.vb`, and the assembly version is defined in `Foxes Launcher/My Project/AssemblyInfo.vb`. Release builds are produced by the [Build workflow](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml).
+The current version is `0.1.1.0`. The version name is defined in `Foxes Launcher/Modules/Base/ModBase.vb`, and the assembly version is defined in `Foxes Launcher/My Project/AssemblyInfo.vb`. Release builds are produced by the [Build workflow](https://github.com/FoxesLauncher/FoxesLauncher/actions/workflows/build.yml).
 
 ### Changelog
 
+- `0.1.1.0`: added resource pack font safety checks that detect TrueType fonts with hinting instructions before launch, after downloads, and while the game is running; suspicious server-pushed packs are quarantined automatically. Added automatic FreeType patching to replace versions older than 2.15.0 with the official patched build, mitigating font vulnerabilities such as Minecraft2Shell.
 - `2.99.0.1`: synced with PCL 2.99.0.1; updated project URLs, issue templates, README, and repository ignore rules; removed unreferenced code, the prebuilt release archive, and the unused duplicate manifest; added the MIT license and upstream copyright notice.
 
 ### License and Credits

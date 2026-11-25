@@ -6,12 +6,12 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "0.1.0.0" '显示用版本名
+    Public Const VersionBaseName As String = "0.1.1.0" '显示用版本名
     'CommitHash 由 build\GenerateSecrets.ps1 在构建时写入 GeneratedSecrets.vb
 #If RELEASE Then
-    Public Const VersionCode As Integer = 500 '正式版
+    Public Const VersionCode As Integer = 501 '正式版
 #Else
-    Public Const VersionCode As Integer = 501 '快照版
+    Public Const VersionCode As Integer = 502 '快照版
 #End If
 
     '版本信息

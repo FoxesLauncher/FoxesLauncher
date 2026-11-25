@@ -2067,5 +2067,17 @@
   "配置验签失败：{0}": "Config signature verification failed: {0}",
   "（来源：{0}）": "(Source: {0})",
   "（来自 {0} 的本地缓存）": "(Local cache from {0})",
-  "GitCode Release 中未找到 latest.json 资产": "The GitCode release does not contain a latest.json asset."
+  "GitCode Release 中未找到 latest.json 资产": "The GitCode release does not contain a latest.json asset.",
+  "资源包字体安全检测": "Resource pack font safety check",
+  "是否在启动前和游戏运行期间检查资源包中的 TrueType 字体。\n带 hinting 指令的字体曾被用于 Minecraft2Shell 等漏洞；服务器推送的可疑资源包会被自动隔离。": "Check TrueType fonts in resource packs before launch and while the game is running.\nFonts with hinting instructions have been abused in vulnerabilities such as Minecraft2Shell; suspicious server-pushed packs are quarantined automatically.",
+  "自动替换已修复的 FreeType": "Auto-replace with patched FreeType",
+  "是否在启动时检查游戏使用的 FreeType 版本，低于 2.15.0 时替换为官方已修复的构建。\n仅支持 Windows x64 与 arm64，需要联网下载约 1 MB 的文件。": "Check the FreeType version used by the game at launch and replace it with the official patched build when it is older than 2.15.0.\nOnly Windows x64 and arm64 are supported; about 1 MB must be downloaded.",
+  "资源包字体风险": "Resource pack font risk",
+  "移入隔离区": "Quarantine",
+  "暂不处理": "Not now",
+  "检测到 {0} 个资源包包含带 hinting 指令的字体：{1}{2}这类字体可能被用于 Minecraft2Shell 一类的漏洞攻击。要立即将它们移入隔离区吗？": "Detected {0} resource pack(s) containing fonts with hinting instructions: {1}{2}Such fonts may be used in attacks like Minecraft2Shell. Quarantine them now?",
+  "刚下载的资源包包含带 hinting 指令的字体：{0}{1}这类字体可能被用于 Minecraft2Shell 一类的漏洞攻击。要将其移入隔离区吗？": "The downloaded resource pack contains fonts with hinting instructions: {0}{1}Such fonts may be used in attacks like Minecraft2Shell. Quarantine it?",
+  "已拦截服务器推送的高风险资源包：{0}": "Blocked a high-risk server-pushed resource pack: {0}",
+  "检测到服务器推送的高风险资源包，但无法隔离，请立即退出游戏：{0}": "Detected a high-risk server-pushed resource pack but could not quarantine it. Please quit the game now: {0}",
+  "资源包 {0} 包含带 hinting 指令的字体，存在字体漏洞风险": "Resource pack {0} contains fonts with hinting instructions and is at risk of font vulnerabilities"
 }

@@ -88,6 +88,9 @@ Public Module ModWatcher
             AddHandler GameProcess.OutputDataReceived, AddressOf LogReceived
             AddHandler GameProcess.ErrorDataReceived, AddressOf LogReceived
 
+            '资源包字体监控（服务器推送的资源包不会经过启动器下载流程）
+            FontGuardStartWatcher(Me)
+
             '初始化时钟
             RunInNewThread(
             Sub()

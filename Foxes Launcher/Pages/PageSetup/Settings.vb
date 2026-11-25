@@ -103,6 +103,8 @@ Public Class Settings
         New Setting("LaunchAdvanceRunWait", True),
         New Setting("LaunchAdvanceDisableJLW", False),
         New Setting("LaunchAdvanceDisableLUA", False),
+        New Setting("LaunchAdvanceFontGuard", True),
+        New Setting("LaunchAdvanceFontGuardPatch", True),
         New Setting("LaunchAdvanceGraphicCard", True, Source:=Sources.Registry),
         New Setting("LaunchAdvanceGC", 4),
         New Setting("LaunchRamType", 0, OnChanged:=AddressOf PageSetupLaunch.UpdateRamType),
